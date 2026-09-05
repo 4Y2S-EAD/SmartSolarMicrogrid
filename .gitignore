@@ -1,0 +1,50 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.iml
+*.ipr
+*.iws
+
+# Android / Mobile
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/captures/
+android/.externalNativeBuild/
+android/.cxx/
+
+# .NET / Backend
+backend/**/bin/
+backend/**/obj/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Web / Node
+web/**/node_modules/
+web/**/dist/
+web/**/build/
+web/**/.env
+web/**/.env.local
+web/**/.env.development.local
+web/**/.env.test.local
+web/**/.env.production.local
+web/**/npm-debug.log
+web/**/yarn-error.log
+web/**/yarn-debug.log
+
+# Logs and databases
+*.log
+*.sqlite
