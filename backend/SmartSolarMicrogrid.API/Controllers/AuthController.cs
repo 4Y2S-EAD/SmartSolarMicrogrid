@@ -54,7 +54,7 @@ namespace SmartSolarMicrogrid.API.Controllers
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 Role = request.Role,
-                Status = AccountStatus.Active // Defaulting to active for ease of testing
+                AccountStatus = AccountStatus.Active // Defaulting to active for ease of testing
             };
 
             await _mongoDbService.Users.InsertOneAsync(newUser);
@@ -78,7 +78,7 @@ namespace SmartSolarMicrogrid.API.Controllers
                 return Unauthorized(new { message = "Invalid email or password." });
             }
 
-            if (user.Status != AccountStatus.Active)
+            if (user.AccountStatus != AccountStatus.Active)
             {
                 return Unauthorized(new { message = "Account is not active." });
             }
@@ -102,7 +102,7 @@ namespace SmartSolarMicrogrid.API.Controllers
         private string GenerateJwtToken(User user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"] ?? string.Empty));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -117,7 +117,7 @@ namespace SmartSolarMicrogrid.API.Controllers
                 issuer: jwtSettings["Issuer"],
                 audience: jwtSettings["Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpiryMinutes"])),
+                expires: DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpiryMinutes"] ?? "60")),
                 signingCredentials: creds
             );
 
