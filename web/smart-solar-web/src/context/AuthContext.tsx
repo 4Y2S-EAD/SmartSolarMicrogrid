@@ -28,8 +28,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const storedProfile = localStorage.getItem('profile');
     
     if (storedUser && storedProfile) {
-      setUser(JSON.parse(storedUser));
-      setProfile(JSON.parse(storedProfile));
+      try {
+        setUser(JSON.parse(storedUser));
+        setProfile(JSON.parse(storedProfile));
+      } catch (e) {
+        console.error('Failed to parse stored user data', e);
+        localStorage.removeItem('user');
+        localStorage.removeItem('profile');
+        localStorage.removeItem('token');
+      }
     }
     
     setLoading(false);
@@ -42,11 +49,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const u = result.user;
 
       const newUser = { id: u.nic, email: u.email };
+      const mappedRole = u.role === 'gridoperator' ? 'grid_operator' : u.role as UserRole;
       const newProfile: UserProfile = {
         id: u.nic,
         email: u.email,
         full_name: u.fullName,
-        role: u.role as UserRole,
+        role: mappedRole,
         status: 'active',
         badge_id: null,
         assigned_hub_id: null,
