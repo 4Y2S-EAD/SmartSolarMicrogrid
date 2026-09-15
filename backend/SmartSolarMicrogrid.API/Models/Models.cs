@@ -31,67 +31,78 @@ namespace SmartSolarMicrogrid.API.Models
         [BsonElement("email")]
         public string Email { get; set; } = null!;
 
+        [BsonElement("passwordHash")]
+        public string PasswordHash { get; set; } = null!;
+
         [BsonElement("phoneNumber")]
         public string? PhoneNumber { get; set; }
 
-        [BsonElement("passwordHash")]
-        public string PasswordHash { get; set; } = null!;
+        [BsonElement("address")]
+        public string? Address { get; set; }
 
         [BsonElement("role")]
         [BsonRepresentation(BsonType.String)]
         public UserRole Role { get; set; }
 
-        [BsonElement("status")]
+        [BsonElement("accountStatus")]
         [BsonRepresentation(BsonType.String)]
-        public AccountStatus Status { get; set; } = AccountStatus.Pending;
+        public AccountStatus AccountStatus { get; set; } = AccountStatus.Pending;
 
-        [BsonElement("deactivationReason")]
-        public string? DeactivationReason { get; set; }
+        [BsonElement("isApproved")]
+        public bool IsApproved { get; set; }
 
         [BsonElement("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [BsonElement("updatedAt")]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        [BsonElement("deactivatedAt")]
+        public DateTime? DeactivatedAt { get; set; }
     }
 
     // 2. SOLAR STATION INFO (MICROGRID HUB) MODEL
     public class GeoLocation
     {
-        [BsonElement("type")]
-        public string Type { get; set; } = "Point";
+        [BsonElement("latitude")]
+        public double Latitude { get; set; }
 
-        // GeoJSON format: [Longitude, Latitude] for Google Maps API query support
-        [BsonElement("coordinates")]
-        public double[] Coordinates { get; set; } = new double[2];
+        [BsonElement("longitude")]
+        public double Longitude { get; set; }
     }
 
     public class SolarStationInfo
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = null!;
+        public string StationId { get; set; } = null!;
 
         [BsonElement("stationName")]
         public string StationName { get; set; } = null!;
 
-        [BsonElement("locationName")]
-        public string LocationName { get; set; } = null!;
-
         [BsonElement("location")]
         public GeoLocation Location { get; set; } = null!;
 
-        [BsonElement("capacityKwH")]
-        public double CapacityKwH { get; set; }
+        [BsonElement("capacityKwh")]
+        public double CapacityKwh { get; set; }
 
-        [BsonElement("totalBatterySlots")]
-        public int TotalBatterySlots { get; set; }
+        [BsonElement("batterySlotCount")]
+        public int BatterySlotCount { get; set; }
 
-        [BsonElement("availableBatterySlots")]
-        public int AvailableBatterySlots { get; set; }
+        [BsonElement("availableSlotCount")]
+        public int AvailableSlotCount { get; set; }
 
-        [BsonElement("isActive")]
-        public bool IsActive { get; set; } = true;
+        [BsonElement("status")]
+        public string Status { get; set; } = null!;
+
+        [BsonElement("schedule")]
+        public string? Schedule { get; set; }
 
         [BsonElement("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [BsonElement("updatedAt")]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 
     // 3. ENERGY BOOKING SLOTS MODEL
@@ -99,14 +110,17 @@ namespace SmartSolarMicrogrid.API.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = null!;
+        public string SlotId { get; set; } = null!;
 
         [BsonElement("stationId")]
         [BsonRepresentation(BsonType.ObjectId)]
         public string StationId { get; set; } = null!;
 
-        [BsonElement("slotDate")]
-        public DateTime SlotDate { get; set; }
+        [BsonElement("slotNumber")]
+        public int SlotNumber { get; set; }
+
+        [BsonElement("bookingDate")]
+        public DateTime BookingDate { get; set; }
 
         [BsonElement("startTime")]
         public string StartTime { get; set; } = null!; // e.g., "09:00 AM"
@@ -114,11 +128,18 @@ namespace SmartSolarMicrogrid.API.Models
         [BsonElement("endTime")]
         public string EndTime { get; set; } = null!; // e.g., "10:00 AM"
 
-        [BsonElement("maxEnergyKwh")]
-        public double MaxEnergyKwh { get; set; }
+        [BsonElement("capacityKwh")]
+        public double CapacityKwh { get; set; }
 
-        [BsonElement("isAvailable")]
-        public bool IsAvailable { get; set; } = true;
+        [BsonElement("status")]
+        public string Status { get; set; } = null!;
+
+        [BsonElement("reservationId")]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? ReservationId { get; set; }
+
+        [BsonElement("updatedAt")]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 
     // 4. ENERGY RESERVATION MODEL
@@ -134,42 +155,55 @@ namespace SmartSolarMicrogrid.API.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = null!;
+        public string ReservationId { get; set; } = null!;
 
-        [BsonElement("prosumerNIC")]
-        public string ProsumerNIC { get; set; } = null!; // Reference to User.NIC
+        [BsonElement("prosumerNic")]
+        public string ProsumerNic { get; set; } = null!; // Reference to User.NIC
 
         [BsonElement("stationId")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string StationId { get; set; } = null!; // Reference to SolarStationInfo.Id
+        public string StationId { get; set; } = null!; // Reference to SolarStationInfo.StationId
 
         [BsonElement("slotId")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string SlotId { get; set; } = null!; // Reference to EnergyBookingSlots.Id
+        public string SlotId { get; set; } = null!; // Reference to EnergyBookingSlots.SlotId
 
-        [BsonElement("reservationDate")]
-        public DateTime ReservationDate { get; set; }
+        [BsonElement("bookingDate")]
+        public DateTime BookingDate { get; set; }
 
-        [BsonElement("energyAmountKwh")]
-        public double EnergyAmountKwh { get; set; }
+        [BsonElement("startTime")]
+        public string StartTime { get; set; } = null!;
 
-        [BsonElement("qrCodeToken")]
-        public string? QrCodeToken { get; set; } // Encrypted transaction string for Android scanner
+        [BsonElement("endTime")]
+        public string EndTime { get; set; } = null!;
 
         [BsonElement("status")]
         [BsonRepresentation(BsonType.String)]
         public ReservationStatus Status { get; set; } = ReservationStatus.Pending;
+
+        [BsonElement("qrToken")]
+        public string? QrToken { get; set; } // Encrypted transaction string for Android scanner
+
+        [BsonElement("qrGeneratedAt")]
+        public DateTime? QrGeneratedAt { get; set; }
+
+        [BsonElement("operatorId")]
+        public string? OperatorId { get; set; }
+
+        [BsonElement("verifiedAt")]
+        public DateTime? VerifiedAt { get; set; }
+
+        [BsonElement("completedAt")]
+        public DateTime? CompletedAt { get; set; }
+
+        [BsonElement("cancellationReason")]
+        public string? CancellationReason { get; set; }
 
         [BsonElement("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [BsonElement("updatedAt")]
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
-        [BsonElement("verifiedByOperatorNIC")]
-        public string? VerifiedByOperatorNIC { get; set; }
-
-        [BsonElement("completedAt")]
-        public DateTime? CompletedAt { get; set; }
     }
 }
+
