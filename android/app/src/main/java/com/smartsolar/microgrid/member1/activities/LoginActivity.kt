@@ -1,13 +1,17 @@
 package com.smartsolar.microgrid.member1.activities
 
+import android.widget.EditText
+
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.smartsolar.microgrid.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
@@ -51,25 +55,35 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        /*
-         * TODO:
-         * Call:
-         * POST /api/Auth/login
-         *
-         * Backend should:
-         * 1. Check credentials
-         * 2. Check role
-         * 3. Check account status
-         * 4. Return JWT + user information
-         */
+        val request = com.smartsolar.microgrid.network.models.LoginRequest(nic, password)
+        btnLogin.isEnabled = false
+        btnLogin.text = "Logging in..."
 
-        Toast.makeText(
-            this,
-            "Connect this button to /api/Auth/login",
-            Toast.LENGTH_SHORT
-        ).show()
-
-        // Temporary navigation for UI testing.
-        startActivity(Intent(this, HomeActivity::class.java))
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = com.smartsolar.microgrid.network.ApiClient.apiService.login(request)
+                if (response.isSuccessful) {
+                    val loginResponse = response.body()
+                    if (loginResponse != null) {
+                        com.smartsolar.microgrid.network.TokenManager.saveToken(loginResponse.token)
+                        com.smartsolar.microgrid.network.TokenManager.saveNic(loginResponse.user.nic)
+                        
+                        Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@LoginActivity, HomeActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Toast.makeText(this@LoginActivity, "Login failed: $errorBody", Toast.LENGTH_LONG).show()
+                    btnLogin.isEnabled = true
+                    btnLogin.text = "LOGIN"
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@LoginActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                btnLogin.isEnabled = true
+                btnLogin.text = "LOGIN"
+            }
+        }
     }
 }

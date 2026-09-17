@@ -1,12 +1,16 @@
 package com.smartsolar.microgrid.member1.activities
 
+import android.widget.Button
+
 import android.os.Bundle
 import android.util.Patterns
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.smartsolar.microgrid.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class EditProfileActivity : AppCompatActivity() {
 
@@ -40,28 +44,45 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun loadCurrentProfile() {
+        val nic = com.smartsolar.microgrid.network.TokenManager.getNic()
 
-        /*
-         * TODO:
-         * GET /api/users/{nic}
-         *
-         * Populate:
-         * FullName
-         * Email
-         * Phone
-         * Address
-         */
+        if (nic == null) {
+            Toast.makeText(this, "Session expired", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
 
-        etNIC.setText("")
+        etNIC.setText(nic)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = com.smartsolar.microgrid.network.ApiClient.apiService.getProfile(nic)
+                if (response.isSuccessful) {
+                    val profile = response.body()
+                    if (profile != null) {
+                        etFullName.setText(profile.fullName)
+                        etEmail.setText(profile.email)
+                        etPhone.setText(profile.phoneNumber ?: "")
+                        etAddress.setText(profile.address ?: "")
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     private fun saveProfile() {
+        val nic = com.smartsolar.microgrid.network.TokenManager.getNic()
+        if (nic == null) {
+            finish()
+            return
+        }
 
-        val fullName =
-            etFullName.text.toString().trim()
-
-        val email =
-            etEmail.text.toString().trim()
+        val fullName = etFullName.text.toString().trim()
+        val email = etEmail.text.toString().trim()
+        val phone = etPhone.text.toString().trim()
+        val address = etAddress.text.toString().trim()
 
         if (fullName.isEmpty()) {
             etFullName.error = "Full name is required"
@@ -73,22 +94,34 @@ class EditProfileActivity : AppCompatActivity() {
             return
         }
 
-        /*
-         * TODO:
-         * PUT /api/users/{nic}
-         *
-         * Do NOT allow normal users to update:
-         * NIC
-         * Role
-         * AccountStatus
-         */
+        val request = com.smartsolar.microgrid.network.models.UpdateProfileRequest(
+            fullName = fullName,
+            email = email,
+            phoneNumber = phone,
+            address = address
+        )
 
-        Toast.makeText(
-            this,
-            "Profile updated successfully",
-            Toast.LENGTH_SHORT
-        ).show()
+        val btnSave = findViewById<Button>(R.id.btnSave)
+        btnSave.isEnabled = false
+        btnSave.text = "Saving..."
 
-        finish()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = com.smartsolar.microgrid.network.ApiClient.apiService.updateProfile(nic, request)
+                if (response.isSuccessful) {
+                    Toast.makeText(this@EditProfileActivity, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Toast.makeText(this@EditProfileActivity, "Failed to update profile: $errorBody", Toast.LENGTH_LONG).show()
+                    btnSave.isEnabled = true
+                    btnSave.text = "SAVE CHANGES"
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@EditProfileActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                btnSave.isEnabled = true
+                btnSave.text = "SAVE CHANGES"
+            }
+        }
     }
 }

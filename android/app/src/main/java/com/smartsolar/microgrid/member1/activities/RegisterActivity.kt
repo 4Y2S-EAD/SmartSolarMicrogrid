@@ -1,14 +1,18 @@
 package com.smartsolar.microgrid.member1.activities
 
+import android.widget.EditText
+
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.smartsolar.microgrid.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -46,6 +50,8 @@ class RegisterActivity : AppCompatActivity() {
         val nic = etNIC.text.toString().trim()
         val name = etFullName.text.toString().trim()
         val email = etEmail.text.toString().trim()
+        val phone = etPhone.text.toString().trim()
+        val address = etAddress.text.toString().trim()
         val password = etPassword.text.toString()
         val confirmPassword = etConfirmPassword.text.toString()
 
@@ -74,34 +80,38 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
-        /*
-         * TODO:
-         * POST /api/Auth/register
-         *
-         * Send:
-         * NIC
-         * FullName
-         * Email
-         * Password
-         * Role = Prosumer
-         *
-         * Backend should create:
-         * AccountStatus = Pending
-         */
+        val request = com.smartsolar.microgrid.network.models.RegisterRequest(
+            nic = nic,
+            fullName = name,
+            email = email,
+            phone = phone,
+            address = address,
+            password = password
+        )
 
-        Toast.makeText(
-            this,
-            "Registration submitted",
-            Toast.LENGTH_SHORT
-        ).show()
+        val btnRegister = findViewById<Button>(R.id.btnRegister)
+        btnRegister.isEnabled = false
+        btnRegister.text = "Registering..."
 
-        val intent =
-            Intent(this, PendingActivationActivity::class.java)
-
-        intent.flags =
-            Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-        startActivity(intent)
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val response = com.smartsolar.microgrid.network.ApiClient.apiService.register(request)
+                if (response.isSuccessful) {
+                    Toast.makeText(this@RegisterActivity, "Registration submitted successfully", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this@RegisterActivity, PendingActivationActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Toast.makeText(this@RegisterActivity, "Registration failed: $errorBody", Toast.LENGTH_LONG).show()
+                    btnRegister.isEnabled = true
+                    btnRegister.text = "REGISTER"
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@RegisterActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                btnRegister.isEnabled = true
+                btnRegister.text = "REGISTER"
+            }
+        }
     }
 }
