@@ -21,6 +21,11 @@ class DeactivationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.m1_activity_deactivation)
 
+        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
+
         etReason = findViewById(R.id.etReason)
         cbConfirm = findViewById(R.id.cbConfirm)
 

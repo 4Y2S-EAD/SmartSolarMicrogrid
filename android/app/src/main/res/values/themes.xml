@@ -1,8 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.SmartSolarMobile" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/emerald_600</item>
+        <item name="colorPrimaryVariant">@color/emerald_500</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorError">@color/rose_500</item>
+        <item name="android:windowBackground">@color/white</item>
     </style>
 
     <style name="Theme.SmartSolarMobile" parent="Base.Theme.SmartSolarMobile" />

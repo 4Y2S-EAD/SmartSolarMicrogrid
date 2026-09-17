@@ -24,6 +24,11 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.m1_activity_edit_profile)
 
+        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
+
         etNIC = findViewById(R.id.etNIC)
         etFullName = findViewById(R.id.etFullName)
         etEmail = findViewById(R.id.etEmail)
