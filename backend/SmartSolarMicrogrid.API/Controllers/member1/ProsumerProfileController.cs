@@ -38,6 +38,8 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
                 user.Role,
                 user.AccountStatus,
                 user.IsApproved,
+                user.IsDeactivationRequested,
+                user.DeactivationReason,
                 user.CreatedAt,
                 user.UpdatedAt,
                 user.DeactivatedAt
@@ -66,8 +68,8 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
             return Ok(new { Message = "Profile updated successfully." });
         }
 
-        [HttpPost("{nic}/deactivate")]
-        public async Task<IActionResult> RequestDeactivation(string nic)
+        [HttpPost("{nic}/deactivation-request")]
+        public async Task<IActionResult> RequestDeactivation(string nic, [FromBody] DeactivationRequestDto dto)
         {
             var user = await _mongoDbService.Users.Find(u => u.NIC == nic).FirstOrDefaultAsync();
 
@@ -76,17 +78,14 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
                 return NotFound(new { Message = "User not found." });
             }
 
-            // Assuming a request deactivation marks the account as pending deactivation or deactivates it directly.
-            // Based on standard flows, we mark it Deactivated or create a deactivation request.
-            // Let's set it to deactivated here.
             var updateDefinition = Builders<User>.Update
-                .Set(u => u.AccountStatus, AccountStatus.Deactivated)
-                .Set(u => u.DeactivatedAt, DateTime.UtcNow)
+                .Set(u => u.IsDeactivationRequested, true)
+                .Set(u => u.DeactivationReason, dto.Reason)
                 .Set(u => u.UpdatedAt, DateTime.UtcNow);
 
             await _mongoDbService.Users.UpdateOneAsync(u => u.NIC == nic, updateDefinition);
 
-            return Ok(new { Message = "Account deactivated." });
+            return Ok(new { Message = "Deactivation request submitted for review." });
         }
     }
 }

@@ -10,6 +10,7 @@ export type Prosumer = {
   address: string | null;
   status: 'pending' | 'active' | 'deactivated';
   deactivation_requested: boolean;
+  deactivation_reason?: string;
   created_at: string;
   updated_at: string;
 };

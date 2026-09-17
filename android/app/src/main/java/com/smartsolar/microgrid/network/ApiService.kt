@@ -24,6 +24,9 @@ interface ApiService {
         @Body request: UpdateProfileRequest
     ): Response<MessageResponse>
 
-    @POST("member1/profile/{nic}/deactivate")
-    suspend fun deactivateProfile(@Path("nic") nic: String): Response<MessageResponse>
+    @POST("member1/profile/{nic}/deactivation-request")
+    suspend fun requestDeactivation(
+        @Path("nic") nic: String,
+        @Body request: DeactivationRequest
+    ): Response<MessageResponse>
 }

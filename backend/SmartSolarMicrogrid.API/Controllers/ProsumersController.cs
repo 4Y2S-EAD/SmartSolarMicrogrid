@@ -33,7 +33,8 @@ namespace SmartSolarMicrogrid.API.Controllers
                 phone = u.PhoneNumber,
                 address = u.Address,
                 status = u.AccountStatus.ToString().ToLower(),
-                deactivation_requested = u.AccountStatus == AccountStatus.Deactivated, // Simplified mapping, could be derived from DeactivatedAt
+                deactivation_requested = u.IsDeactivationRequested,
+                deactivation_reason = u.DeactivationReason,
                 created_at = u.CreatedAt,
                 updated_at = u.UpdatedAt
             });
@@ -72,6 +73,7 @@ namespace SmartSolarMicrogrid.API.Controllers
             var updateDefinition = Builders<User>.Update
                 .Set(u => u.AccountStatus, newStatus)
                 .Set(u => u.IsApproved, newStatus == AccountStatus.Active)
+                .Set(u => u.IsDeactivationRequested, false)
                 .Set(u => u.UpdatedAt, DateTime.UtcNow);
 
             await _mongoDbService.Users.UpdateOneAsync(u => u.NIC == nic, updateDefinition);

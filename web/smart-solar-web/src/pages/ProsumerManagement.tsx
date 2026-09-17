@@ -300,6 +300,14 @@ export default function ProsumerManagement() {
                 <div className="text-xs font-medium text-gray-400">Deactivation Requested</div>
                 <div className="mt-0.5 text-sm text-gray-900">{viewProsumer.deactivation_requested ? 'Yes' : 'No'}</div>
               </div>
+              {viewProsumer.deactivation_requested && (
+                <div className="col-span-2 mt-2 rounded-lg bg-amber-50 p-3 border border-amber-100">
+                  <div className="text-xs font-medium text-amber-800">Deactivation Reason</div>
+                  <div className="mt-1 text-sm text-amber-900">
+                    {viewProsumer.deactivation_reason || 'No reason provided'}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

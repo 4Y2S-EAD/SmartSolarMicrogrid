@@ -20,3 +20,7 @@ data class UpdateProfileRequest(
     val phoneNumber: String,
     val address: String
 )
+
+data class DeactivationRequest(
+    val reason: String
+)

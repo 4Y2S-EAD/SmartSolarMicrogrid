@@ -58,5 +58,11 @@ namespace SmartSolarMicrogrid.API.Models
 
         [BsonElement("deactivatedAt")]
         public DateTime? DeactivatedAt { get; set; }
+
+        [BsonElement("isDeactivationRequested")]
+        public bool IsDeactivationRequested { get; set; } = false;
+
+        [BsonElement("deactivationReason")]
+        public string? DeactivationReason { get; set; }
     }
 }
