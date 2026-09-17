@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA"
+    android:background="@color/white"
     android:fillViewport="true">
 
     <LinearLayout
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="Smart Solar Microgrid"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="26sp"
             android:textStyle="bold"/>
 
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:text="Prosumer Management Portal"
-            android:textColor="#627D98"
+            android:textColor="@color/gray_500"
             android:textSize="15sp"/>
 
         <TextView
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="45dp"
             android:text="Welcome back"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="22sp"
             android:textStyle="bold"/>
 
@@ -56,43 +56,44 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Sign in to continue to your account."
-            android:textColor="#829AB1"
+            android:textColor="@color/gray_500"
             android:textSize="14sp"/>
 
         <EditText
-            android:id="@+id/etEmail"
+            android:id="@+id/etNIC"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="28dp"
-            android:background="@android:drawable/edit_text"
-            android:hint="Email address"
-            android:inputType="textEmailAddress"
+            android:background="@drawable/bg_rounded_input"
+            android:hint="NIC Number"
+            android:inputType="text"
             android:paddingHorizontal="16dp"
-            android:textColor="#102A43"
-            android:textColorHint="#9FB3C8"/>
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"/>
 
         <EditText
             android:id="@+id/etPassword"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="14dp"
-            android:background="@android:drawable/edit_text"
+            android:background="@drawable/bg_rounded_input"
             android:hint="Password"
             android:inputType="textPassword"
             android:paddingHorizontal="16dp"
-            android:textColor="#102A43"
-            android:textColorHint="#9FB3C8"/>
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="26dp"
-            android:backgroundTint="#0B6E4F"
+            android:background="@drawable/bg_rounded_button"
             android:text="SIGN IN"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:textSize="15sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:elevation="2dp"/>
 
         <TextView
             android:id="@+id/tvRegister"
@@ -101,7 +102,7 @@
             android:layout_marginTop="18dp"
             android:gravity="center"
             android:text="New Solar Prosumer?  Create Account"
-            android:textColor="#0B6E4F"
+            android:textColor="@color/emerald_600"
             android:textSize="14sp"
             android:textStyle="bold"/>
 

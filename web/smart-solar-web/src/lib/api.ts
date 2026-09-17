@@ -130,8 +130,8 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 export const ApiService = {
   // Prosumers
   getProsumers: () => fetchApi<Prosumer[]>('/prosumers'),
-  updateProsumerStatus: (id: string, status: string) => 
-    fetchApi<Prosumer>(`/prosumers/${id}/status`, {
+  updateProsumerStatus: (nic: string, status: string) => 
+    fetchApi<Prosumer>(`/prosumers/${nic}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status })
     }),

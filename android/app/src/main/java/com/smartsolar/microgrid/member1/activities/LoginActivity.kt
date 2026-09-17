@@ -11,7 +11,7 @@ import com.smartsolar.microgrid.R
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var etEmail: EditText
+    private lateinit var etNIC: EditText
     private lateinit var etPassword: EditText
     private lateinit var btnLogin: Button
     private lateinit var tvRegister: TextView
@@ -20,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.m1_activity_login)
 
-        etEmail = findViewById(R.id.etEmail)
+        etNIC = findViewById(R.id.etNIC)
         etPassword = findViewById(R.id.etPassword)
         btnLogin = findViewById(R.id.btnLogin)
         tvRegister = findViewById(R.id.tvRegister)
@@ -38,16 +38,11 @@ class LoginActivity : AppCompatActivity() {
 
     private fun loginUser() {
 
-        val email = etEmail.text.toString().trim()
+        val nic = etNIC.text.toString().trim()
         val password = etPassword.text.toString()
 
-        if (email.isEmpty()) {
-            etEmail.error = "Email is required"
-            return
-        }
-
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.error = "Enter a valid email address"
+        if (nic.isEmpty()) {
+            etNIC.error = "NIC is required"
             return
         }
 

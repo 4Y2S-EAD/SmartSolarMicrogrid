@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:text="My Profile"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="27sp"
             android:textStyle="bold"/>
 
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="Manage your personal and account information."
-            android:textColor="#627D98"
+            android:textColor="@color/gray_500"
             android:textSize="14sp"/>
 
         <TextView
@@ -34,10 +34,10 @@
             android:layout_height="80dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="28dp"
-            android:background="#0B6E4F"
+            android:background="@color/emerald_600"
             android:gravity="center"
             android:text="SP"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold"/>
 
@@ -48,7 +48,7 @@
             android:layout_marginTop="15dp"
             android:gravity="center"
             android:text="Solar Prosumer"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="21sp"
             android:textStyle="bold"/>
 
@@ -57,11 +57,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
-            android:background="#D4EDDA"
+            android:background="@color/emerald_500"
             android:paddingHorizontal="14dp"
             android:paddingVertical="7dp"
             android:text="ACTIVE"
-            android:textColor="#155724"
+            android:textColor="@color/white"
             android:textStyle="bold"/>
 
         <TextView
@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="35dp"
             android:text="ACCOUNT INFORMATION"
-            android:textColor="#0B6E4F"
+            android:textColor="@color/emerald_600"
             android:textSize="12sp"
             android:textStyle="bold"/>
 
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="NIC\n—"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="16sp"/>
 
         <TextView
@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="Email\n—"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="16sp"/>
 
         <TextView
@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="Phone Number\n—"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="16sp"/>
 
         <TextView
@@ -106,7 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="Address\n—"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="16sp"/>
 
         <TextView
@@ -115,18 +115,19 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="Role\nSolar Prosumer"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="16sp"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnEditProfile"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="35dp"
-            android:backgroundTint="#0B6E4F"
+            android:background="@drawable/bg_rounded_button"
             android:text="EDIT PROFILE"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"/>
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:elevation="2dp"/>
 
         <Button
             android:id="@+id/btnDeactivate"
@@ -134,9 +135,9 @@
             android:layout_height="56dp"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="25dp"
-            android:backgroundTint="#FDECEC"
+            android:backgroundTint="@color/rose_500"
             android:text="REQUEST ACCOUNT DEACTIVATION"
-            android:textColor="#C62828"
+            android:textColor="@color/white"
             android:textStyle="bold"/>
 
     </LinearLayout>

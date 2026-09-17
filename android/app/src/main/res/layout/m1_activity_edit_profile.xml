@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:text="Edit Profile"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="27sp"
             android:textStyle="bold"/>
 
@@ -25,14 +25,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="Update your personal information."
-            android:textColor="#627D98"/>
+            android:textColor="@color/gray_500"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:text="NIC NUMBER"
-            android:textColor="#627D98"
+            android:textColor="@color/emerald_600"
             android:textSize="12sp"
             android:textStyle="bold"/>
 
@@ -41,7 +41,11 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:enabled="false"
+            android:background="@drawable/bg_rounded_input"
             android:hint="NIC Number"
+            android:textColor="@color/gray_500"
+            android:textColorHint="@color/gray_300"
+            android:layout_marginTop="12dp"
             android:paddingHorizontal="16dp"/>
 
         <TextView
@@ -49,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="FULL NAME"
-            android:textColor="#627D98"
+            android:textColor="@color/emerald_600"
             android:textSize="12sp"
             android:textStyle="bold"/>
 
@@ -57,7 +61,11 @@
             android:id="@+id/etFullName"
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:background="@drawable/bg_rounded_input"
             android:hint="Full Name"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:paddingHorizontal="16dp"/>
 
         <TextView
@@ -65,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="EMAIL ADDRESS"
-            android:textColor="#627D98"
+            android:textColor="@color/emerald_600"
             android:textSize="12sp"
             android:textStyle="bold"/>
 
@@ -73,8 +81,12 @@
             android:id="@+id/etEmail"
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:background="@drawable/bg_rounded_input"
             android:hint="Email Address"
+            android:layout_marginTop="12dp"
             android:inputType="textEmailAddress"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:paddingHorizontal="16dp"/>
 
         <TextView
@@ -82,7 +94,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="PHONE NUMBER"
-            android:textColor="#627D98"
+            android:textColor="@color/emerald_600"
             android:textSize="12sp"
             android:textStyle="bold"/>
 
@@ -90,8 +102,12 @@
             android:id="@+id/etPhone"
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:background="@drawable/bg_rounded_input"
             android:hint="Phone Number"
             android:inputType="phone"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:paddingHorizontal="16dp"/>
 
         <TextView
@@ -99,7 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="ADDRESS"
-            android:textColor="#627D98"
+            android:textColor="@color/emerald_600"
             android:textSize="12sp"
             android:textStyle="bold"/>
 
@@ -107,20 +123,25 @@
             android:id="@+id/etAddress"
             android:layout_width="match_parent"
             android:layout_height="90dp"
+            android:background="@drawable/bg_rounded_input"
             android:gravity="top"
             android:hint="Address"
+            android:layout_marginTop="12dp"
             android:inputType="textMultiLine"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:padding="16dp"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="30dp"
-            android:backgroundTint="#0B6E4F"
+            android:background="@drawable/bg_rounded_button"
             android:text="SAVE CHANGES"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"/>
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:elevation="2dp"/>
 
         <Button
             android:id="@+id/btnCancel"
@@ -128,9 +149,9 @@
             android:layout_height="52dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="25dp"
-            android:backgroundTint="#E8EEF3"
+            android:backgroundTint="@color/gray_100"
             android:text="CANCEL"
-            android:textColor="#102A43"/>
+            android:textColor="@color/gray_900"/>
 
     </LinearLayout>
 </ScrollView>

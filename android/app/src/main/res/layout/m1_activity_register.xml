@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:text="Create Prosumer Account"
-            android:textColor="#102A43"
+            android:textColor="@color/gray_900"
             android:textSize="26sp"
             android:textStyle="bold"/>
 
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:text="Join the Smart Solar Microgrid network."
-            android:textColor="#627D98"
+            android:textColor="@color/gray_500"
             android:textSize="14sp"/>
 
         <TextView
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:text="PERSONAL INFORMATION"
-            android:textColor="#0B6E4F"
+            android:textColor="@color/emerald_600"
             android:textSize="12sp"
             android:textStyle="bold"/>
 
@@ -42,7 +42,10 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="12dp"
+            android:background="@drawable/bg_rounded_input"
             android:hint="NIC Number"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:paddingHorizontal="16dp"/>
 
         <EditText
@@ -50,8 +53,11 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="12dp"
+            android:background="@drawable/bg_rounded_input"
             android:hint="Full Name"
             android:inputType="textPersonName"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:paddingHorizontal="16dp"/>
 
         <EditText
@@ -59,8 +65,11 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="12dp"
+            android:background="@drawable/bg_rounded_input"
             android:hint="Email Address"
             android:inputType="textEmailAddress"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:paddingHorizontal="16dp"/>
 
         <EditText
@@ -68,8 +77,11 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="12dp"
+            android:background="@drawable/bg_rounded_input"
             android:hint="Phone Number"
             android:inputType="phone"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:paddingHorizontal="16dp"/>
 
         <EditText
@@ -77,9 +89,12 @@
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_marginTop="12dp"
+            android:background="@drawable/bg_rounded_input"
             android:gravity="top"
             android:hint="Address"
             android:inputType="textPostalAddress|textMultiLine"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:padding="16dp"/>
 
         <TextView
@@ -87,7 +102,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:text="ACCOUNT SECURITY"
-            android:textColor="#0B6E4F"
+            android:textColor="@color/emerald_600"
             android:textSize="12sp"
             android:textStyle="bold"/>
 
@@ -96,8 +111,11 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="12dp"
+            android:background="@drawable/bg_rounded_input"
             android:hint="Password"
             android:inputType="textPassword"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:paddingHorizontal="16dp"/>
 
         <EditText
@@ -105,19 +123,23 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="12dp"
+            android:background="@drawable/bg_rounded_input"
             android:hint="Confirm Password"
             android:inputType="textPassword"
+            android:textColor="@color/gray_900"
+            android:textColorHint="@color/gray_500"
             android:paddingHorizontal="16dp"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="28dp"
-            android:backgroundTint="#0B6E4F"
+            android:background="@drawable/bg_rounded_button"
             android:text="CREATE ACCOUNT"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"/>
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:elevation="2dp"/>
 
         <TextView
             android:id="@+id/tvLogin"
@@ -125,7 +147,7 @@
             android:layout_height="52dp"
             android:gravity="center"
             android:text="Already have an account? Sign In"
-            android:textColor="#0B6E4F"
+            android:textColor="@color/emerald_600"
             android:textStyle="bold"/>
 
     </LinearLayout>

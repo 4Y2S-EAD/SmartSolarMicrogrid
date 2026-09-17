@@ -29,11 +29,28 @@ export default function ProsumerManagement() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    let query = ApiService.getProsumers().order('created_at', { ascending: false });
-    if (statusFilter !== 'all') query = query.eq('status', statusFilter);
-    if (search) query = query.or(`full_name.ilike.%${search}%,nic.ilike.%${search}%,email.ilike.%${search}%`);
-    const { data } = await query;
-    setProsumers((data as Prosumer[]) ?? []);
+    try {
+      const data = await ApiService.getProsumers();
+      let filtered = data || [];
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(p => p.status.toLowerCase() === statusFilter.toLowerCase());
+      }
+      if (search) {
+        const s = search.toLowerCase();
+        filtered = filtered.filter(p => 
+          p.full_name?.toLowerCase().includes(s) || 
+          p.nic?.toLowerCase().includes(s) || 
+          p.email?.toLowerCase().includes(s)
+        );
+      }
+      // Sort descending by created_at
+      filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      
+      setProsumers(filtered);
+    } catch (error) {
+      console.error('Failed to load prosumers:', error);
+      setProsumers([]);
+    }
     setLoading(false);
   }, [search, statusFilter]);
 
@@ -46,23 +63,26 @@ export default function ProsumerManagement() {
       return;
     }
     setSaving(true);
-    const { error } = await Promise.resolve({data: null, error: null});
-    setSaving(false);
-    if (error) {
-      setFormError(error.message);
-      return;
+    try {
+      // In a real app we'd call an add prosumer API. Reusing signup for now.
+      await ApiService.signUp(form.nic, form.email, "tempPass123!", form.full_name, "prosumer");
+      setAddOpen(false);
+      setForm({ nic: '', full_name: '', email: '', phone: '', address: '' });
+      load();
+    } catch (e: any) {
+      setFormError(e.message || 'Error adding prosumer');
     }
-    setAddOpen(false);
-    setForm({ nic: '', full_name: '', email: '', phone: '', address: '' });
-    load();
+    setSaving(false);
   };
 
   const updateStatus = async (p: Prosumer, status: Prosumer['status'], deactivationRequested = false) => {
-    const updates: Record<string, unknown> = { status };
-    if (deactivationRequested !== undefined) updates.deactivation_requested = deactivationRequested;
-    await Promise.resolve({data: null, error: null});
-    load();
-    setViewProsumer(null);
+    try {
+      await ApiService.updateProsumerStatus(p.nic, status);
+      load();
+      setViewProsumer(null);
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
   };
 
   const filtered = prosumers;
