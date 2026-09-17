@@ -13,15 +13,53 @@
         android:theme="@style/Theme.SmartSolarMobile"
         tools:targetApi="31"
         tools:ignore="ObsoleteSdkInt">
+<!--        <activity-->
+<!--            android:name=".MainActivity"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+
         <activity
-            android:name=".MainActivity"
+            android:name=".member1.activities.DeactivationActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".member1.activities.EditProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".member1.activities.ProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".member1.activities.HomeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".member1.activities.PendingActivationActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".member1.activities.RegisterActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".member1.activities.LoginActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category
+                    android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
     </application>
 
 </manifest>

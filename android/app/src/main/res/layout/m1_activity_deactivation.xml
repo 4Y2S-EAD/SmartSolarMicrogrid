@@ -1,6 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F7FA">
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="26dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            android:text="Account Deactivation"
+            android:textColor="#102A43"
+            android:textSize="27sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:text="Request temporary deactivation of your Solar Prosumer account."
+            android:textColor="#627D98"
+            android:textSize="14sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:background="#FFF3CD"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Important"
+                android:textColor="#856404"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="3dp"
+                android:text="Submitting this request will not immediately delete your account. Your request will be reviewed by Backoffice."
+                android:textColor="#856404"
+                android:textSize="14sp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="REASON FOR DEACTIVATION"
+            android:textColor="#627D98"
+            android:textSize="12sp"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/etReason"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:layout_marginTop="10dp"
+            android:gravity="top"
+            android:hint="Please briefly explain why you want to deactivate your account..."
+            android:inputType="textMultiLine"
+            android:padding="16dp"/>
+
+        <CheckBox
+            android:id="@+id/cbConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="I understand that my account access may be disabled after Backoffice approval."
+            android:textColor="#334E68"/>
+
+        <Button
+            android:id="@+id/btnSubmitDeactivation"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="25dp"
+            android:backgroundTint="#C62828"
+            android:text="SUBMIT DEACTIVATION REQUEST"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="25dp"
+            android:backgroundTint="#E8EEF3"
+            android:text="KEEP MY ACCOUNT"
+            android:textColor="#102A43"/>
+
+    </LinearLayout>
+
+</ScrollView>

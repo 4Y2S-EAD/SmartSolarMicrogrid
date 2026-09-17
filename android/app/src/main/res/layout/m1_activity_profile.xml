@@ -1,6 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F7FA">
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="My Profile"
+            android:textColor="#102A43"
+            android:textSize="27sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Manage your personal and account information."
+            android:textColor="#627D98"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/tvProfileInitial"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="28dp"
+            android:background="#0B6E4F"
+            android:gravity="center"
+            android:text="SP"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvFullName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:gravity="center"
+            android:text="Solar Prosumer"
+            android:textColor="#102A43"
+            android:textSize="21sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:background="#D4EDDA"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="7dp"
+            android:text="ACTIVE"
+            android:textColor="#155724"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            android:text="ACCOUNT INFORMATION"
+            android:textColor="#0B6E4F"
+            android:textSize="12sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvNIC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="NIC\n—"
+            android:textColor="#102A43"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Email\n—"
+            android:textColor="#102A43"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Phone Number\n—"
+            android:textColor="#102A43"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Address\n—"
+            android:textColor="#102A43"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvRole"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Role\nSolar Prosumer"
+            android:textColor="#102A43"
+            android:textSize="16sp"/>
+
+        <Button
+            android:id="@+id/btnEditProfile"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="35dp"
+            android:backgroundTint="#0B6E4F"
+            android:text="EDIT PROFILE"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/btnDeactivate"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="25dp"
+            android:backgroundTint="#FDECEC"
+            android:text="REQUEST ACCOUNT DEACTIVATION"
+            android:textColor="#C62828"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+</ScrollView>
