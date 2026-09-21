@@ -9,13 +9,14 @@ import EmptyState from '@/components/ui/EmptyState';
 import { CalendarDays, Plus, Clock, Zap, Pencil, Trash2 } from 'lucide-react';
 
 type SlotForm = {
-  hub_id: string;
-  start_time: string;
-  end_time: string;
-  energy_available_kwh: string;
+  stationId: string;
+  slotNumber: string;
+  startTime: string;
+  endTime: string;
+  capacityKwh: string;
 };
 
-const emptyForm: SlotForm = { hub_id: '', start_time: '', end_time: '', energy_available_kwh: '' };
+const emptyForm: SlotForm = { stationId: '', slotNumber: '1', startTime: '', endTime: '', capacityKwh: '' };
 
 export default function ScheduleManagement() {
   const [slots, setSlots] = useState<BookingSlot[]>([]);
@@ -28,46 +29,69 @@ export default function ScheduleManagement() {
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  // 1. Load Data from Backend APIs (Changed to match Member 2 endpoints)
   const load = useCallback(async () => {
     setLoading(true);
-    const [slotRes, hubRes] = await Promise.all([
-      Promise.resolve({data: [], error: null}),
-      ApiService.getHubs().eq('status', 'active').order('name'),
-    ]);
-    setSlots((slotRes.data as BookingSlot[]) ?? []);
-    setHubs((hubRes.data as Hub[]) ?? []);
+    try {
+      // get hubs from our API
+      const hubsData = await ApiService.getHubs();
+      const activeHubs = hubsData.filter(h => h.status === 'Active');
+
+      // Load slots for each active hub
+      let allSlots: BookingSlot[] = [];
+      for (const h of activeHubs) {
+        try {
+          const slotsData = await ApiService.getBookingSlots(h.stationId);
+          // Attach hub reference to slot so UI can show hub name
+          const slotsWithHub = slotsData.map((s: any) => ({ ...s, hub: h }));
+          allSlots = [...allSlots, ...slotsWithHub];
+        } catch (e) {
+          console.error("Failed to load slots for hub " + h.stationId);
+        }
+      }
+
+      setHubs(activeHubs);
+      setSlots(allSlots);
+    } catch (err) {
+      console.error(err);
+    }
     setLoading(false);
   }, []);
 
   useEffect(() => { load(); }, [load]);
 
-  const filtered = hubFilter === 'all' ? slots : slots.filter((s) => s.hub_id === hubFilter);
+  const filtered = hubFilter === 'all' ? slots : slots.filter((s) => s.stationId === hubFilter);
 
-  const openAdd = () => { setForm({ ...emptyForm, hub_id: hubs[0]?.id ?? '' }); setFormError(null); setAddOpen(true); };
+  const openAdd = () => { setForm({ ...emptyForm, stationId: hubs[0]?.stationId ?? '' }); setFormError(null); setAddOpen(true); };
+
   const openEdit = (s: BookingSlot) => {
     setForm({
-      hub_id: s.hub_id,
-      start_time: toLocalInput(s.start_time),
-      end_time: toLocalInput(s.end_time),
-      energy_available_kwh: String(s.energy_available_kwh),
+      stationId: s.stationId,
+      slotNumber: String(s.slotNumber || 1),
+      startTime: toLocalInput(s.startTime),
+      endTime: toLocalInput(s.endTime),
+      capacityKwh: String(s.capacityKwh),
     });
     setFormError(null);
     setEditSlot(s);
   };
 
+  // 2. Save Slot to Backend Database
   const handleSave = async () => {
     setFormError(null);
-    if (!form.hub_id) {
+    if (!form.stationId) {
       setFormError('Please select a hub.');
       return;
     }
-    if (!form.start_time || !form.end_time) {
+    if (!form.startTime || !form.endTime) {
       setFormError('Start time and end time are required.');
       return;
     }
+
     try {
-      const start = new Date(form.start_time);
-      const end = new Date(form.end_time);
+      const start = new Date(form.startTime);
+      const end = new Date(form.endTime);
+
       if (isNaN(start.getTime()) || isNaN(end.getTime())) {
         setFormError('Invalid date format. Please pick valid start and end times.');
         return;
@@ -76,42 +100,51 @@ export default function ScheduleManagement() {
         setFormError('End time must be after start time.');
         return;
       }
+
+      // Create payload matching CreateSlotDto in C# Backend
       const payload = {
-        hub_id: form.hub_id,
-        start_time: start.toISOString(),
-        end_time: end.toISOString(),
-        energy_available_kwh: parseFloat(form.energy_available_kwh) || 0,
+        slotNumber: parseInt(form.slotNumber) || 1,
+        bookingDate: start.toISOString(),
+        startTime: start.toISOString(),
+        endTime: end.toISOString(),
+        capacityKwh: parseFloat(form.capacityKwh) || 0,
+        status: "Available"
       };
+
       setSaving(true);
-      let result;
+
       if (editSlot) {
-        result = await Promise.resolve({data: null, error: null});
+        // Update slot using API
+        await ApiService.updateBookingSlot(editSlot.slotId, payload);
       } else {
-        result = await Promise.resolve({data: null, error: null});
+        // Create slot using API
+        await ApiService.createBookingSlot(form.stationId, payload);
       }
+
       setSaving(false);
-      if (result.error) {
-        console.error('Slot save error:', result.error);
-        setFormError(result.error.message);
-        return;
-      }
       setAddOpen(false);
       setEditSlot(null);
       setForm(emptyForm);
       load();
-    } catch (err) {
+    } catch (err: any) {
       setSaving(false);
       console.error('Slot save exception:', err);
-      setFormError(err instanceof Error ? err.message : 'An unexpected error occurred while saving.');
+      setFormError(err.message || 'An unexpected error occurred while saving.');
     }
   };
 
+  // 3. Delete Slot using Backend API
   const handleDelete = async (s: BookingSlot) => {
-    await supabase.from('booking_slots').delete().eq('id', s.id);
-    load();
+    try {
+      await ApiService.deleteBookingSlot(s.slotId);
+      load();
+    } catch (err: any) {
+      alert("Cannot delete slot: " + err.message);
+    }
   };
 
   const toLocalInput = (iso: string) => {
+    if (!iso) return '';
     const d = new Date(iso);
     const offset = d.getTimezoneOffset() * 60000;
     return new Date(d.getTime() - offset).toISOString().slice(0, 16);
@@ -126,7 +159,7 @@ export default function ScheduleManagement() {
           className="rounded-lg border-0 py-2.5 pl-3.5 pr-8 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-amber-500"
         >
           <option value="all">All Hubs</option>
-          {hubs.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+          {hubs.map((h) => <option key={h.stationId} value={h.stationId}>{h.stationName}</option>)}
         </select>
         <Button onClick={openAdd} disabled={hubs.length === 0}>
           <Plus className="h-4 w-4" />
@@ -143,38 +176,32 @@ export default function ScheduleManagement() {
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((s) => {
-            const pct = s.energy_available_kwh > 0 ? (s.energy_booked_kwh / s.energy_available_kwh) * 100 : 0;
             return (
-              <div key={s.id} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md">
+              <div key={s.slotId} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-50 text-sky-600">
                       <CalendarDays className="h-5 w-5" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-gray-900">{s.hub?.name ?? 'Unknown hub'}</div>
+                      <div className="text-sm font-semibold text-gray-900">{s.hub?.stationName ?? 'Unknown hub'}</div>
                       <StatusBadge status={s.status} />
                     </div>
                   </div>
+                  <div className="text-sm font-bold text-gray-500">Slot #{s.slotNumber}</div>
                 </div>
                 <div className="mt-4 space-y-3">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Clock className="h-4 w-4 text-gray-400" />
-                    {new Date(s.start_time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                    {new Date(s.startTime).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                   </div>
                   <div className="text-xs text-gray-400">
-                    until {new Date(s.end_time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                    until {new Date(s.endTime).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                   </div>
                   <div className="border-t border-gray-50 pt-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-500">Energy booked</span>
-                      <span className="font-semibold text-gray-900">{s.energy_booked_kwh}/{s.energy_available_kwh} kWh</span>
-                    </div>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100">
-                      <div
-                        className={`h-full rounded-full ${pct >= 100 ? 'bg-rose-500' : pct > 50 ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                        style={{ width: `${Math.min(pct, 100)}%` }}
-                      />
+                      <span className="text-gray-500">Slot Capacity</span>
+                      <span className="font-semibold text-gray-900">{s.capacityKwh} kWh</span>
                     </div>
                   </div>
                 </div>
@@ -208,19 +235,22 @@ export default function ScheduleManagement() {
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-700">Hub *</label>
             <select
-              value={form.hub_id}
-              onChange={(e) => setForm({ ...form, hub_id: e.target.value })}
+              value={form.stationId}
+              onChange={(e) => setForm({ ...form, stationId: e.target.value })}
               className="w-full rounded-lg border-0 py-2.5 px-3.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-amber-500"
             >
               <option value="">Select a hub...</option>
-              {hubs.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+              {hubs.map((h) => <option key={h.stationId} value={h.stationId}>{h.stationName}</option>)}
             </select>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Start Time *" type="datetime-local" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} />
-            <Input label="End Time *" type="datetime-local" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} />
+            <Input label="Slot Number *" type="number" value={form.slotNumber} onChange={(e) => setForm({ ...form, slotNumber: e.target.value })} />
+            <Input label="Capacity (kWh) *" type="number" step="any" value={form.capacityKwh} onChange={(e) => setForm({ ...form, capacityKwh: e.target.value })} placeholder="20.00" />
           </div>
-          <Input label="Energy Available (kWh)" type="number" step="any" value={form.energy_available_kwh} onChange={(e) => setForm({ ...form, energy_available_kwh: e.target.value })} placeholder="20.00" />
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="Start Time *" type="datetime-local" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} />
+            <Input label="End Time *" type="datetime-local" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
+          </div>
           {formError && <div className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{formError}</div>}
         </div>
       </Modal>
