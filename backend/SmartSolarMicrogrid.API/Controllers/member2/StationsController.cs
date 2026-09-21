@@ -120,9 +120,8 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
             // BUSINESS RULE: cannot deactivate if active reservations exist
             // check in EnergyReservations collection
             var activeReservations = await _mongoDbService.EnergyReservations
-                .Find(r => r.StationId == id && r.BookingStatus == "Active")
-                .ToListAsync();
-
+               .Find(r => r.StationId == id && (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Approved))
+            .ToListAsync();
             if (activeReservations.Count > 0)
             {
                 // block deactivation
