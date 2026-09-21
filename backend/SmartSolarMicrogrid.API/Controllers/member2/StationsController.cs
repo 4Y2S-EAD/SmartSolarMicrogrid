@@ -138,5 +138,97 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
             return Ok(new { Message = "Station deactivated successfully" });
         }
 
+
+        //battery slot management part 
+
+                // 6. CREATE A NEW BATTERY SLOT FOR A STATION
+        [HttpPost("{id}/slots")]
+        public async Task<IActionResult> CreateSlot(string id, [FromBody] CreateSlotDto dto)
+        {
+            // check if the station exists first
+            var station = await _mongoDbService.SolarStations.Find(s => s.StationId == id).FirstOrDefaultAsync();
+            if (station == null)
+            {
+                return NotFound(new { Message = "Station not found" });
+            }
+
+            var slot = new EnergyBookingSlots
+            {
+                StationId = id,
+                SlotNumber = dto.SlotNumber,
+                BookingDate = dto.BookingDate,
+                StartTime = dto.StartTime,
+                EndTime = dto.EndTime,
+                CapacityKwh = dto.CapacityKwh,
+                Status = dto.Status, // default is Available
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _mongoDbService.EnergyBookingSlots.InsertOneAsync(slot);
+
+            return Ok(new { Message = "Battery slot created successfully", SlotId = slot.SlotId });
+        }
+
+
+        // 7. GET ALL SLOTS FOR A SPECIFIC STATION
+        [HttpGet("{id}/slots")]
+        public async Task<IActionResult> GetSlotsForStation(string id)
+        {
+            // find all slots where StationId matches the given id
+            var slots = await _mongoDbService.EnergyBookingSlots.Find(s => s.StationId == id).ToListAsync();
+            
+            return Ok(slots);
+        }
+
+        // 8. UPDATE SLOT AVAILABILITY OR DETAILS
+        [HttpPut("slots/{slotId}")]
+        public async Task<IActionResult> UpdateSlot(string slotId, [FromBody] UpdateSlotDto dto)
+        {
+            var slot = await _mongoDbService.EnergyBookingSlots.Find(s => s.SlotId == slotId).FirstOrDefaultAsync();
+            
+            if (slot == null)
+            {
+                return NotFound(new { Message = "Slot not found" });
+            }
+
+            // update fields if they are sent in request
+            if (dto.SlotNumber != null) slot.SlotNumber = dto.SlotNumber.Value;
+            if (dto.BookingDate != null) slot.BookingDate = dto.BookingDate.Value;
+            if (dto.StartTime != null) slot.StartTime = dto.StartTime;
+            if (dto.EndTime != null) slot.EndTime = dto.EndTime;
+            if (dto.CapacityKwh != null) slot.CapacityKwh = dto.CapacityKwh.Value;
+            if (dto.Status != null) slot.Status = dto.Status; // eg: changing "Available" to "Unavailable"
+
+            slot.UpdatedAt = DateTime.UtcNow;
+
+            await _mongoDbService.EnergyBookingSlots.ReplaceOneAsync(s => s.SlotId == slotId, slot);
+
+            return Ok(new { Message = "Slot updated successfully" });
+        }
+
+        // 9. DELETE A BATTERY SLOT
+        [HttpDelete("slots/{slotId}")]
+        public async Task<IActionResult> DeleteSlot(string slotId)
+        {
+            var slot = await _mongoDbService.EnergyBookingSlots.Find(s => s.SlotId == slotId).FirstOrDefaultAsync();
+            
+            if (slot == null)
+            {
+                return NotFound(new { Message = "Slot not found" });
+            }
+
+            // BUSINESS RULE: Cannot delete a slot if it is already booked
+            if (slot.Status == "Booked")
+            {
+                return BadRequest(new { Message = "Cannot delete this slot because it is already booked by a prosumer." });
+            }
+
+            // if it is not booked, we can delete it
+            await _mongoDbService.EnergyBookingSlots.DeleteOneAsync(s => s.SlotId == slotId);
+
+            return Ok(new { Message = "Battery slot deleted successfully" });
+        }
+
+
     }
 }
