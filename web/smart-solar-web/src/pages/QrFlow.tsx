@@ -39,12 +39,8 @@ export default function QrFlow() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from('qr_transactions')
-      .select('*, reservation:reservations!reservation_id(*, prosumer:prosumers!prosumer_id(*), hub:hubs!hub_id(*), slot:booking_slots!slot_id(*)), operator:operators!operator_id(*)')
-      .order('scanned_at', { ascending: false })
-      .limit(50);
-    setTransactions((data as QrTransaction[]) ?? []);
+    const data = await ApiService.getQrTransactions();
+    setTransactions(data ?? []);
     setLoading(false);
   }, []);
 
@@ -65,7 +61,7 @@ export default function QrFlow() {
     setBusy(true);
     setScanState({ step: 'scanning', token: tokenInput.trim() });
 
-    const { data, error } = await verifyQrToken(tokenInput.trim());
+    const { data, error } = await ApiService.verifyQrToken(tokenInput.trim());
 
     if (error) {
       setScanState({ step: 'error', token: tokenInput.trim(), errorMessage: error });
@@ -95,7 +91,7 @@ export default function QrFlow() {
   const handleFinalize = async () => {
     if (!scanState.token) return;
     setBusy(true);
-    const { data, error } = await finalizeQrTransaction(scanState.token);
+    const { data, error } = await ApiService.finalizeQrTransaction(scanState.token);
     if (error) {
       setScanState({ ...scanState, step: 'error', errorMessage: error });
       setBusy(false);
@@ -381,7 +377,7 @@ export default function QrFlow() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400">Hub</span>
-                    <span className="text-sm text-gray-900">{viewTx.reservation?.hub?.name ?? '—'}</span>
+                    <span className="text-sm text-gray-900">{viewTx.reservation?.hub?.stationName ?? '—'}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400">Energy</span>
