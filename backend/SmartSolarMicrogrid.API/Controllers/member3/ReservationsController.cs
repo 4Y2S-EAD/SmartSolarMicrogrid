@@ -170,6 +170,9 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
         EndTime = reservation.EndTime,
         Status = reservation.Status.ToString(),
         QrToken = reservation.QrToken,
+        VerifiedAt = reservation.VerifiedAt,
+        CompletedAt = reservation.CompletedAt,
+        CancellationReason = reservation.CancellationReason,
         CreatedAt = reservation.CreatedAt,
         UpdatedAt = reservation.UpdatedAt
       };
@@ -218,7 +221,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       {
         return BadRequest(new { Message = "Reservation reschedule must within the 7 day period." });
       }
-      
+
       // Verify the new station exists
       var newStation = await _mongoDbService.SolarStations.Find(s => s.StationId == dto.StationId).FirstOrDefaultAsync();
       if (newStation == null)
@@ -423,6 +426,9 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
         EndTime = r.EndTime,
         Status = r.Status.ToString(),
         QrToken = r.QrToken,
+        VerifiedAt = r.VerifiedAt,
+        CompletedAt = r.CompletedAt,
+        CancellationReason = r.CancellationReason,
         CreatedAt = r.CreatedAt,
         UpdatedAt = r.UpdatedAt
       }).ToList();
@@ -506,7 +512,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
 
       if (string.IsNullOrEmpty(secretKey))
       {
-          throw new InvalidOperationException("QR JWT Secret is not configured in .env.");
+        throw new InvalidOperationException("QR JWT Secret is not configured in .env.");
       }
 
       string serializedPayload = JsonSerializer.Serialize(qrPayloadObject);

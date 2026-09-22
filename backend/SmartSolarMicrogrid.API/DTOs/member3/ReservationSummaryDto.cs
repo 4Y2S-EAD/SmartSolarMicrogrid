@@ -5,7 +5,7 @@ Description : Data Transfer Object for returning reservation summary with statio
 Creator     : Rathnayake R. M. S. D. (IT22140616)
 */
 
-using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace SmartSolarMicrogrid.API.DTOs.member3
 {
@@ -22,6 +22,9 @@ namespace SmartSolarMicrogrid.API.DTOs.member3
     public string EndTime { get; set; } = null!;
     public string Status { get; set; } = null!;
     public string? QrToken { get; set; }
+    public DateTime? VerifiedAt { get; set; }
+    public DateTime? CompletedAt { get; set; }
+    public string? CancellationReason { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
   }
