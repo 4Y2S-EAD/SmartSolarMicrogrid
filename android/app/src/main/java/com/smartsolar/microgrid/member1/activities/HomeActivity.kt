@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.member2.activities.M2StationsActivity
+import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
 
@@ -33,7 +34,13 @@ class HomeActivity : AppCompatActivity() {
         val tvWelcomeName = findViewById<TextView>(R.id.tvWelcomeName)
 
         // Set welcome name (Later get this from TokenManager/Session)
-        tvWelcomeName.text = "Nimal Perera"
+        val nic = com.smartsolar.microgrid.network.TokenManager.getNic()
+        if (nic != null) {
+            tvWelcomeName.text = "Loading..."
+            fetchUserProfile(nic, tvWelcomeName)
+        } else {
+            tvWelcomeName.text = "Welcome User"
+        }
 
         // 1. Open Sidebar when Menu icon is clicked
         btnMenu.setOnClickListener {
@@ -91,12 +98,32 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun fetchUserProfile(nic: String, tvName: TextView) {
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            try {
+                val response = com.smartsolar.microgrid.network.ApiClient.apiService.getProfile(nic)
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    if (response.isSuccessful && response.body() != null) {
+                        tvName.text = response.body()!!.fullName
+                    } else {
+                        tvName.text = "Welcome!"
+                    }
+                }
+            } catch (e: Exception) {
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    tvName.text = "Welcome!"
+                }
+            }
+        }
+    }
+
     // Function to show the logout dialog
     private fun showLogoutConfirmation() {
         AlertDialog.Builder(this)
             .setTitle("Sign Out")
             .setMessage("Are you sure you want to sign out?")
             .setPositiveButton("Sign Out") { _, _ ->
+                com.smartsolar.microgrid.network.TokenManager.clear()
                 val intent = Intent(this, LoginActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
