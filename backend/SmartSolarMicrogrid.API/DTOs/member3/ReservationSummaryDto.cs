@@ -1,3 +1,10 @@
+/*
+File Name   : ReservationSummaryDto.cs
+Description : Data Transfer Object for returning reservation summary with station and slot details
+
+Creator     : Rathnayake R. M. S. D. (IT22140616)
+*/
+
 using System.ComponentModel.DataAnnotations;
 
 namespace SmartSolarMicrogrid.API.DTOs.member3

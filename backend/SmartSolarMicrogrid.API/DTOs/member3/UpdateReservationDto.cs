@@ -1,3 +1,10 @@
+/*
+File Name   : UpdateReservationDto.cs
+Description : Data Transfer Object for updating reservation station, slot, date or time
+
+Creator     : Rathnayake R. M. S. D. (IT22140616)
+*/
+
 using System.ComponentModel.DataAnnotations;
 
 namespace SmartSolarMicrogrid.API.DTOs.member3
