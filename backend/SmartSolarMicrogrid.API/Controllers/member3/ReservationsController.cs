@@ -16,6 +16,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using Microsoft.Extensions.Configuration;
+
 namespace SmartSolarMicrogrid.API.Controllers.member3
 {
   [ApiController]
@@ -23,10 +28,12 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
   public class ReservationsController : ControllerBase
   {
     private readonly MongoDbService _mongoDbService;
+    private readonly IConfiguration _configuration;
 
-    public ReservationsController(MongoDbService mongoDbService)
+    public ReservationsController(MongoDbService mongoDbService, IConfiguration configuration)
     {
       _mongoDbService = mongoDbService;
+      _configuration = configuration;
     }
 
 
@@ -84,7 +91,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       {
         return BadRequest(new { Message = "Reservations can only be scheduled within 7 days from today." });
       }
-    
+
 
       // Create reservation
       var reservation = new EnergyReservation
@@ -177,7 +184,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
     {
       // get existing reservation
       var reservation = await _mongoDbService.EnergyReservations.Find(r => r.ReservationId == id).FirstOrDefaultAsync();
-      
+
       // Check reservation exists
       if (reservation == null)
       {
@@ -191,7 +198,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       }
 
       DateTime now = DateTime.UtcNow;
-      DateTime currentScheduledTime = ParseSlotDateTime(reservation.BookingDate, reservation.StartTime);    
+      DateTime currentScheduledTime = ParseSlotDateTime(reservation.BookingDate, reservation.StartTime);
       DateTime newScheduledTime = ParseSlotDateTime(dto.BookingDate, dto.StartTime);
 
       // Cannot reschedule to a past date
@@ -286,7 +293,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
     {
       // Fetch the reservation
       var reservation = await _mongoDbService.EnergyReservations.Find(r => r.ReservationId == id).FirstOrDefaultAsync();
-      
+
       // Check if reservation exists
       if (reservation == null)
       {
@@ -430,7 +437,6 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       });
     }
 
-
     // Combine date and time strings
     private DateTime ParseSlotDateTime(DateTime bookingDate, string timeString)
     {
@@ -440,6 +446,98 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
         return bookingDate.Date.Add(parsedTime.TimeOfDay);
       }
       return bookingDate.Date;
+    }
+
+
+    // Generate QR code for a reservation (POST: api/reservations/{id}/generate-qr)
+    [HttpPost("{id}/generate-qr")]
+    public async Task<IActionResult> GenerateReservationQr(string id)
+    {
+      // Fetch the reservation
+      var reservation = await _mongoDbService.EnergyReservations
+          .Find(r => r.ReservationId == id)
+          .FirstOrDefaultAsync();
+
+      // Check if reservation exists
+      if (reservation == null)
+      {
+        return NotFound(new { Message = "Reservation not found." });
+      }
+
+      // Check if reservation is in pending status
+      if (reservation.Status == ReservationStatus.Cancelled || reservation.Status == ReservationStatus.Completed)
+      {
+        return BadRequest(new { Message = "Cannot generate QR code for a cancelled or completed reservation." });
+      }
+
+      // Fetch the station and slot details
+      var station = await _mongoDbService.SolarStations
+          .Find(s => s.StationId == reservation.StationId)
+          .FirstOrDefaultAsync();
+
+      var slot = await _mongoDbService.EnergyBookingSlots
+          .Find(s => s.SlotId == reservation.SlotId)
+          .FirstOrDefaultAsync();
+
+      DateTime generatedAt = DateTime.UtcNow;
+
+      // Generate a payload for the QR code
+      var qrPayloadObject = new
+      {
+        reservationId = reservation.ReservationId,
+        prosumerNic = reservation.ProsumerNic,
+        stationId = reservation.StationId,
+        stationName = station?.StationName ?? "Solar Microgrid Hub",
+        slotId = reservation.SlotId,
+        slotNumber = slot?.SlotNumber ?? 0,
+        bookingDate = reservation.BookingDate.ToString("yyyy-MM-dd"),
+        startTime = reservation.StartTime,
+        endTime = reservation.EndTime,
+        status = reservation.Status.ToString(),
+        generatedAt = generatedAt.ToString("o")
+      };
+
+      DotNetEnv.Env.Load();
+
+      var secretKey = Environment.GetEnvironmentVariable("QR_JWT_SECRET");
+
+      if (string.IsNullOrEmpty(secretKey))
+      {
+          throw new InvalidOperationException("QR JWT Secret is not configured in .env.");
+      }
+
+      string serializedPayload = JsonSerializer.Serialize(qrPayloadObject);
+      string signature = ComputeHmacSha256(serializedPayload, secretKey);
+
+      var fullQrData = new
+      {
+        data = qrPayloadObject,
+        signature = signature
+      };
+
+      string qrTokenString = JsonSerializer.Serialize(fullQrData);
+
+      var updateDef = Builders<EnergyReservation>.Update
+          .Set(r => r.QrToken, qrTokenString)
+          .Set(r => r.QrGeneratedAt, generatedAt)
+          .Set(r => r.UpdatedAt, generatedAt);
+
+      await _mongoDbService.EnergyReservations.UpdateOneAsync(r => r.ReservationId == id, updateDef);
+
+      return Ok(new
+      {
+        Message = "QR code generated successfully.",
+        ReservationId = id,
+        QrToken = qrTokenString,
+        GeneratedAt = generatedAt
+      });
+    }
+
+    private string ComputeHmacSha256(string rawData, string key)
+    {
+      using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key));
+      byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+      return Convert.ToBase64String(hash);
     }
   }
 }
