@@ -16,26 +16,32 @@ export type Prosumer = {
 };
 
 export type Hub = {
-  id: string;
-  name: string;
-  location_name: string;
-  latitude: number;
-  longitude: number;
-  capacity_kw: number;
-  status: 'active' | 'deactivated';
-  created_at: string;
-  updated_at: string;
+  stationId: string;
+  stationName: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  capacityKwh: number;
+  batterySlotCount: number;
+  availableSlotCount: number;
+  status: string;
+  schedule?: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type BookingSlot = {
-  id: string;
-  hub_id: string;
-  start_time: string;
-  end_time: string;
-  energy_available_kwh: number;
-  energy_booked_kwh: number;
-  status: 'open' | 'full' | 'closed';
-  created_at: string;
+  slotId: string;
+  stationId: string;
+  slotNumber: number;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+  capacityKwh: number;
+  status: string;
+  reservationId?: string;
+  updatedAt: string;
   hub?: Hub;
 };
 
@@ -131,27 +137,53 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 export const ApiService = {
   // Prosumers
   getProsumers: () => fetchApi<Prosumer[]>('/prosumers'),
-  updateProsumerStatus: (nic: string, status: string) => 
+  updateProsumerStatus: (nic: string, status: string) =>
     fetchApi<Prosumer>(`/prosumers/${nic}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status })
     }),
 
-  // Hubs
-  getHubs: () => fetchApi<Hub[]>('/hubs'),
-  updateHubStatus: (id: string, status: string) =>
-    fetchApi<Hub>(`/hubs/${id}/status`, {
+  // Hubs (Microgrid Nodes)
+  getHubs: () => fetchApi<Hub[]>('/stations'),
+
+  createHub: (payload: any) =>
+    fetchApi<Hub>('/stations', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  updateHub: (id: string, payload: any) =>
+    fetchApi<Hub>(`/stations/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ status })
+      body: JSON.stringify(payload)
+    }),
+
+  // Deactivate hub (Our C# API uses DELETE for deactivation)
+  deactivateHub: (id: string) =>
+    fetchApi<any>(`/stations/${id}`, {
+      method: 'DELETE'
     }),
 
   // Booking Slots
-  getBookingSlots: () => fetchApi<BookingSlot[]>('/slots'),
-  createBookingSlot: (slot: Partial<BookingSlot>) =>
-    fetchApi<BookingSlot>('/slots', {
+  getBookingSlots: (stationId: string) => fetchApi<BookingSlot[]>(`/stations/${stationId}/slots`),
+
+  createBookingSlot: (stationId: string, slot: any) =>
+    fetchApi<BookingSlot>(`/stations/${stationId}/slots`, {
       method: 'POST',
       body: JSON.stringify(slot)
     }),
+
+  updateBookingSlot: (slotId: string, payload: any) =>
+    fetchApi<BookingSlot>(`/stations/slots/${slotId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    }),
+
+  deleteBookingSlot: (slotId: string) =>
+    fetchApi<any>(`/stations/slots/${slotId}`, {
+      method: 'DELETE'
+    }),
+
 
   // Reservations
   getReservations: () => fetchApi<Reservation[]>('/reservations'),
@@ -160,7 +192,7 @@ export const ApiService = {
       method: 'PUT',
       body: JSON.stringify({ status })
     }),
-    
+
   // Operators
   getOperators: () => fetchApi<Operator[]>('/operators'),
   updateOperatorStatus: (id: string, status: string) =>
@@ -176,7 +208,7 @@ export const ApiService = {
       method: 'PUT',
       body: JSON.stringify({ role })
     }),
-    
+
   // Auth Dummy logic
   signUp: async (nic: string, email: string, password: string, fullName: string, role: string) => {
     const res = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -203,9 +235,37 @@ export const ApiService = {
     }
     return res.json();
   },
-  
+
   // Dashboard specific (for the dashboard component graphs etc)
   getDashboardStats: async () => {
     return fetchApi<any>('/dashboard/stats');
+  },
+
+  // QR Transactions (Mocked since endpoints may not exist in C# API yet)
+  getQrTransactions: () => fetchApi<QrTransaction[]>('/qr-transactions').catch(() => []),
+  
+  verifyQrToken: async (token: string) => {
+    try {
+      const res = await fetchApi<any>(`/qr-transactions/verify`, {
+        method: 'POST',
+        body: JSON.stringify({ token })
+      });
+      return { data: res, error: null };
+    } catch (err: any) {
+      // Return a mock error or handle properly when backend is ready
+      return { data: null, error: err.message || 'Verification failed' };
+    }
+  },
+
+  finalizeQrTransaction: async (token: string) => {
+    try {
+      const res = await fetchApi<any>(`/qr-transactions/finalize`, {
+        method: 'POST',
+        body: JSON.stringify({ token })
+      });
+      return { data: res, error: null };
+    } catch (err: any) {
+      return { data: null, error: err.message || 'Finalization failed' };
+    }
   }
 };
