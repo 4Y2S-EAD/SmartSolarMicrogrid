@@ -9,12 +9,16 @@ import QrFlow from '@/pages/QrFlow';
 import OperatorManagement from '@/pages/OperatorManagement';
 import UserManagement from '@/pages/UserManagement';
 import Login from '@/pages/Login';
+import ProsumerDashboard from '@/pages/ProsumerDashboard';
+import CreateReservation from '@/pages/CreateReservation';
+import ViewReservation from '@/pages/ViewReservation';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 function App() {
   const { user, profile, role, loading } = useAuth();
   const [view, setView] = useState('dashboard');
+  const [activeReservationId, setActiveReservationId] = useState<string | null>(null);
 
   if (loading) {
     return (
@@ -33,6 +37,39 @@ function App() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+      </div>
+    );
+  }
+
+  const navigateProsumer = (nextView: string, reservationId?: string) => {
+    if (reservationId) setActiveReservationId(reservationId);
+    setView(nextView);
+  };
+
+  // Prosumer views
+  if (role === 'prosumer') {
+    return (
+      <div className="min-h-screen bg-gray-50/70 p-4 sm:p-8">
+        <div className="mx-auto max-w-6xl">
+          {view === 'create-reservation' && (
+            <CreateReservation
+              onBack={() => setView('dashboard')}
+              onSuccess={(newId) => {
+                setActiveReservationId(newId);
+                setView('view-reservation');
+              }}
+            />
+          )}
+          {view === 'view-reservation' && activeReservationId && (
+            <ViewReservation
+              reservationId={activeReservationId}
+              onBack={() => setView('dashboard')}
+            />
+          )}
+          {view === 'dashboard' && (
+            <ProsumerDashboard onNavigate={navigateProsumer} />
+          )}
+        </div>
       </div>
     );
   }
