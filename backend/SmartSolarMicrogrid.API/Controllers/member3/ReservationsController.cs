@@ -201,6 +201,12 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       DateTime currentScheduledTime = ParseSlotDateTime(reservation.BookingDate, reservation.StartTime);
       DateTime newScheduledTime = ParseSlotDateTime(dto.BookingDate, dto.StartTime);
 
+      // Cannot update reservation less than 12 hours remain
+      if (currentScheduledTime - now < TimeSpan.FromHours(12))
+      {
+        return BadRequest(new { Message = "Reservation can only modified least 12 hours remain." });
+      }
+
       // Cannot reschedule to a past date
       if (newScheduledTime < now)
       {
@@ -212,13 +218,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       {
         return BadRequest(new { Message = "Reservation reschedule must within the 7 day period." });
       }
-
-      // Cannot update reservation less than 12 hours remain
-      if (currentScheduledTime - now < TimeSpan.FromHours(12))
-      {
-        return BadRequest(new { Message = "Reservation can only modified least 12 hours remain." });
-      }
-
+      
       // Verify the new station exists
       var newStation = await _mongoDbService.SolarStations.Find(s => s.StationId == dto.StationId).FirstOrDefaultAsync();
       if (newStation == null)
@@ -441,11 +441,14 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
     private DateTime ParseSlotDateTime(DateTime bookingDate, string timeString)
     {
       string[] formats = { "hh:mm tt", "h:mm tt", "HH:mm" };
+      TimeSpan timeOfDay = TimeSpan.Zero;
+
       if (DateTime.TryParseExact(timeString.Trim(), formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedTime))
       {
-        return bookingDate.Date.Add(parsedTime.TimeOfDay);
+        timeOfDay = parsedTime.TimeOfDay;
       }
-      return bookingDate.Date;
+
+      return new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, 0, 0, 0, DateTimeKind.Utc).Add(timeOfDay);
     }
 
 
