@@ -63,7 +63,7 @@
                                 android:id="@+id/ivAppIcon"
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
-                                android:background="@mipmap/ic_launcher" />
+                                android:background="@drawable/bg_remove_app_logo" />
 
                             <!-- Title & Subtitle -->
                             <LinearLayout
