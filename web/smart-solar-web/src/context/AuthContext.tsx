@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { ApiService } from '@/lib/api';
 import type { UserProfile } from '@/lib/api';
 
-export type UserRole = 'backoffice' | 'grid_operator';
+export type UserRole = 'backoffice' | 'grid_operator' | 'prosumer';
 
 type AuthContextType = {
   user: { id: string, email: string } | null;
@@ -49,12 +49,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const u = result.user;
 
       const newUser = { id: u.nic, email: u.email };
-      const mappedRole = u.role === 'gridoperator' ? 'grid_operator' : u.role as UserRole;
+      const rawRole = (u.role || '').toLowerCase();
+      const mappedRole: UserRole = 
+        rawRole === 'gridoperator' || rawRole === 'grid_operator' 
+          ? 'grid_operator' 
+          : rawRole === 'prosumer' 
+            ? 'prosumer' 
+            : 'backoffice';
       const newProfile: UserProfile = {
         id: u.nic,
         email: u.email,
         full_name: u.fullName,
-        role: mappedRole,
+        role: mappedRole as any,
         status: 'active',
         badge_id: null,
         assigned_hub_id: null,
