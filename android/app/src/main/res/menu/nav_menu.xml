@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/nav_home" android:title="Home" android:icon="@android:drawable/ic_menu_myplaces" />
+        <item android:id="@+id/nav_stations" android:title="Nearby Stations" android:icon="@android:drawable/ic_menu_mapmode" />
+        <item android:id="@+id/nav_bookings" android:title="My Bookings" android:icon="@android:drawable/ic_menu_today" />
+        <item android:id="@+id/nav_history" android:title="Booking History" android:icon="@android:drawable/ic_menu_recent_history" />
+        <item android:id="@+id/nav_profile" android:title="My Profile" android:icon="@android:drawable/ic_menu_info_details" />
+        <item android:id="@+id/nav_settings" android:title="Settings" android:icon="@android:drawable/ic_menu_preferences" />
+    </group>
+
+    <!-- Switch Role Section -->
+    <item android:title="Switch Role">
+        <menu>
+            <item android:id="@+id/nav_prosumer" android:title="Prosumer Mode" android:checkable="true" android:checked="true" />
+            <item android:id="@+id/nav_operator" android:title="Operator Mode" android:checkable="true" />
+        </menu>
+    </item>
+
+    <item android:id="@+id/nav_logout" android:title="Logout" android:icon="@android:drawable/ic_lock_power_off" />
+</menu>

@@ -67,9 +67,16 @@ class LoginActivity : AppCompatActivity() {
                     if (loginResponse != null) {
                         com.smartsolar.microgrid.network.TokenManager.saveToken(loginResponse.token)
                         com.smartsolar.microgrid.network.TokenManager.saveNic(loginResponse.user.nic)
+                        com.smartsolar.microgrid.network.TokenManager.saveRole(loginResponse.user.role)
                         
                         Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this@LoginActivity, HomeActivity::class.java)
+                        
+                        val intent = if (loginResponse.user.role == "GridOperator") {
+                            Intent(this@LoginActivity, GridOperatorDashboardActivity::class.java)
+                        } else {
+                            Intent(this@LoginActivity, HomeActivity::class.java)
+                        }
+                        
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                     }

@@ -32,13 +32,11 @@
                 android:layout_width="1dp"
                 android:layout_height="30dp"/>
 
-            <TextView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:gravity="center"
-                android:text="☀"
-                android:textSize="42sp"
-                android:backgroundTint="#FFC107"/>
+            <ImageView
+                android:id="@+id/ivAppIcon"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@drawable/bg_remove_app_logo" />
 
             <TextView
                 android:layout_width="wrap_content"
