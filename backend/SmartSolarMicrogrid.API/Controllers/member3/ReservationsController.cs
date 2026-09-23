@@ -72,13 +72,6 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
         return NotFound(new { Message = "The specified battery slot was not found on this station." });
       }
 
-      //  Prevent double booking
-      if (!string.Equals(slot.Status, "Available", StringComparison.OrdinalIgnoreCase))
-      {
-        return Conflict(new { Message = "The requested battery slot is already reserved or unavailable." });
-      }
-
-
       //  Reserve date and time
       //  Cannot scheduled in past
       if (scheduledDateTime < now)
@@ -92,6 +85,18 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
         return BadRequest(new { Message = "Reservations can only be scheduled within 7 days from today." });
       }
 
+      // Check calendar conflict (same slot, date, and start time)
+      var isSlotAlreadyReserved = await _mongoDbService.EnergyReservations
+          .Find(r => r.SlotId == dto.SlotId
+                  && r.BookingDate == dto.BookingDate.Date
+                  && r.StartTime == dto.StartTime
+                  && (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Approved))
+          .AnyAsync();
+
+      if (isSlotAlreadyReserved)
+      {
+        return Conflict(new { Message = "This battery slot is already reserved for the selected date and time." });
+      }
 
       // Create reservation
       var reservation = new EnergyReservation
@@ -108,14 +113,6 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       };
 
       await _mongoDbService.EnergyReservations.InsertOneAsync(reservation);
-
-      // Reserve the slot
-      var updateSlotDef = Builders<EnergyBookingSlots>.Update
-          .Set(s => s.Status, "Booked")
-          .Set(s => s.ReservationId, reservation.ReservationId)
-          .Set(s => s.UpdatedAt, DateTime.UtcNow);
-
-      await _mongoDbService.EnergyBookingSlots.UpdateOneAsync(s => s.SlotId == dto.SlotId, updateSlotDef);
 
       var summary = new ReservationSummaryDto
       {
@@ -236,27 +233,17 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
         return NotFound(new { Message = "Selected slot was not found on the specified station." });
       }
 
-      // Is target slot available and free the previous slot
-      if (reservation.SlotId != dto.SlotId)
+      var hasConflict = await _mongoDbService.EnergyReservations
+          .Find(r => r.ReservationId != id
+                  && r.SlotId == dto.SlotId
+                  && r.BookingDate == dto.BookingDate.Date
+                  && r.StartTime == dto.StartTime
+                  && (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Approved))
+          .AnyAsync();
+
+      if (hasConflict)
       {
-        if (!string.Equals(newSlot.Status, "Available", StringComparison.OrdinalIgnoreCase))
-        {
-          return Conflict(new { Message = "The target slot is already reserved or unavailable." });
-        }
-
-        // Release previous slot
-        var releaseOldSlotDef = Builders<EnergyBookingSlots>.Update
-            .Set(s => s.Status, "Available")
-            .Set(s => s.ReservationId, null)
-            .Set(s => s.UpdatedAt, DateTime.UtcNow);
-        await _mongoDbService.EnergyBookingSlots.UpdateOneAsync(s => s.SlotId == reservation.SlotId, releaseOldSlotDef);
-
-        // Reserve new slot
-        var reserveNewSlotDef = Builders<EnergyBookingSlots>.Update
-            .Set(s => s.Status, "Booked")
-            .Set(s => s.ReservationId, reservation.ReservationId)
-            .Set(s => s.UpdatedAt, DateTime.UtcNow);
-        await _mongoDbService.EnergyBookingSlots.UpdateOneAsync(s => s.SlotId == dto.SlotId, reserveNewSlotDef);
+        return Conflict(new { Message = "The selected battery slot is already reserved by another booking for this date and time." });
       }
 
       // Update the reservation
@@ -283,6 +270,9 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
         EndTime = dto.EndTime,
         Status = reservation.Status.ToString(),
         QrToken = reservation.QrToken,
+        VerifiedAt = reservation.VerifiedAt,
+        CompletedAt = reservation.CompletedAt,
+        CancellationReason = reservation.CancellationReason,
         CreatedAt = reservation.CreatedAt,
         UpdatedAt = DateTime.UtcNow
       };
@@ -290,14 +280,76 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       return Ok(summary);
     }
 
-    // Cancel Reservation (DELETE: api/reservations/{id})
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> CancelReservation(string id, [FromBody] CancelReservationDto dto)
+    //  Approve Reservation (PUT: api/reservations/{id}/approve)
+    [HttpPut("{id}/approve")]
+    public async Task<IActionResult> ApproveReservation(string id)
     {
       // Fetch the reservation
       var reservation = await _mongoDbService.EnergyReservations.Find(r => r.ReservationId == id).FirstOrDefaultAsync();
-
+     
       // Check if reservation exists
+      if (reservation == null)
+      {
+        return NotFound(new { Message = "Reservation not found." });
+      }
+
+      // Check if reservation is in pending status
+      if (reservation.Status != ReservationStatus.Pending)
+      {
+        return BadRequest(new { Message = $"Only pending reservations can be approved. Current status: {reservation.Status}" });
+      }
+
+      var updateDef = Builders<EnergyReservation>.Update
+          .Set(r => r.Status, ReservationStatus.Approved)
+          .Set(r => r.UpdatedAt, DateTime.UtcNow);
+
+      await _mongoDbService.EnergyReservations.UpdateOneAsync(r => r.ReservationId == id, updateDef);
+
+      return Ok(new
+      {
+        Message = "Reservation approved successfully.",
+        ReservationId = id,
+        Status = ReservationStatus.Approved.ToString()
+      });
+    }
+
+    //  Complete Reservation (PUT: api/reservations/{id}/complete)
+    [HttpPut("{id}/complete")]
+    public async Task<IActionResult> CompleteReservation(string id, [FromQuery] string? operatorId = null)
+    {
+      var reservation = await _mongoDbService.EnergyReservations.Find(r => r.ReservationId == id).FirstOrDefaultAsync();
+      if (reservation == null)
+      {
+        return NotFound(new { Message = "Reservation not found." });
+      }
+
+      if (reservation.Status != ReservationStatus.Approved)
+      {
+        return BadRequest(new { Message = $"Only approved reservations can be marked as completed. Current status: {reservation.Status}" });
+      }
+
+      DateTime now = DateTime.UtcNow;
+      var updateDef = Builders<EnergyReservation>.Update
+          .Set(r => r.Status, ReservationStatus.Completed)
+          .Set(r => r.CompletedAt, now)
+          .Set(r => r.OperatorId, operatorId ?? "OP-DEFAULT")
+          .Set(r => r.UpdatedAt, now);
+
+      await _mongoDbService.EnergyReservations.UpdateOneAsync(r => r.ReservationId == id, updateDef);
+
+      return Ok(new
+      {
+        Message = "Energy transfer finalized. Reservation completed.",
+        ReservationId = id,
+        Status = ReservationStatus.Completed.ToString()
+      });
+    }
+
+    // Cancel Reservation (PUT: api/reservations/{id}/cancel)
+    [HttpPut("{id}/cancel")]
+    public async Task<IActionResult> CancelReservation(string id, [FromBody] CancelReservationDto dto)
+    {
+      var reservation = await _mongoDbService.EnergyReservations.Find(r => r.ReservationId == id).FirstOrDefaultAsync();
       if (reservation == null)
       {
         return NotFound(new { Message = "Reservation not found." });
@@ -331,14 +383,6 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
 
       await _mongoDbService.EnergyReservations.UpdateOneAsync(r => r.ReservationId == id, updateReservationDef);
 
-      // Release the slot
-      var releaseSlotDef = Builders<EnergyBookingSlots>.Update
-          .Set(s => s.Status, "Available")
-          .Set(s => s.ReservationId, null)
-          .Set(s => s.UpdatedAt, DateTime.UtcNow);
-
-      await _mongoDbService.EnergyBookingSlots.UpdateOneAsync(s => s.SlotId == reservation.SlotId, releaseSlotDef);
-
       return Ok(new
       {
         Message = "Reservation cancelled successfully.",
@@ -347,8 +391,98 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       });
     }
 
+    // Delete Reservation permanently (DELETE: api/reservations/{id})
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteReservation(string id)
+    {
+      var reservation = await _mongoDbService.EnergyReservations.Find(r => r.ReservationId == id).FirstOrDefaultAsync();
+      if (reservation == null)
+      {
+        return NotFound(new { Message = "Reservation not found." });
+      }
 
-    // Get all Pending reservations for user GET: api/reservations/user/{nic}/pending?page=1&pageSize=10
+      await _mongoDbService.EnergyReservations.DeleteOneAsync(r => r.ReservationId == id);
+
+      return Ok(new
+      {
+        Message = "Reservation permanently deleted from the database.",
+        ReservationId = id
+      });
+    }
+
+    // Get All Reservations for a User (Paginated) (GET: api/reservations/user/{nic})
+    [HttpGet("user/{nic}")]
+    public async Task<IActionResult> GetAllReservationsForUser(string nic, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+      if (page < 1) page = 1;
+      if (pageSize < 1) pageSize = 10;
+
+      var filter = Builders<EnergyReservation>.Filter.Eq(r => r.ProsumerNic, nic);
+      return await FetchAndFormatPaginatedReservations(filter, page, pageSize);
+    }
+
+    // Get User Dashboard Counts (GET: api/reservations/user/{nic}/dashboard)
+    [HttpGet("user/{nic}/dashboard")]
+    public async Task<IActionResult> GetUserReservationDashboard(string nic)
+    {
+      var filterBuilder = Builders<EnergyReservation>.Filter;
+
+      long total = await _mongoDbService.EnergyReservations.CountDocumentsAsync(filterBuilder.Eq(r => r.ProsumerNic, nic));
+      long pending = await _mongoDbService.EnergyReservations.CountDocumentsAsync(
+          filterBuilder.Eq(r => r.ProsumerNic, nic) & filterBuilder.Eq(r => r.Status, ReservationStatus.Pending));
+      long approved = await _mongoDbService.EnergyReservations.CountDocumentsAsync(
+          filterBuilder.Eq(r => r.ProsumerNic, nic) & filterBuilder.Eq(r => r.Status, ReservationStatus.Approved));
+      long completed = await _mongoDbService.EnergyReservations.CountDocumentsAsync(
+          filterBuilder.Eq(r => r.ProsumerNic, nic) & filterBuilder.Eq(r => r.Status, ReservationStatus.Completed));
+      long cancelled = await _mongoDbService.EnergyReservations.CountDocumentsAsync(
+          filterBuilder.Eq(r => r.ProsumerNic, nic) & filterBuilder.Eq(r => r.Status, ReservationStatus.Cancelled));
+
+      return Ok(new
+      {
+        ProsumerNic = nic,
+        TotalReservations = total,
+        PendingCount = pending,
+        ApprovedCount = approved,
+        CompletedCount = completed,
+        CancelledCount = cancelled
+      });
+    }
+
+    // Get Station Dashboard Counts for Grid Operator (GET: api/reservations/station/{stationId}/dashboard)
+    [HttpGet("station/{stationId}/dashboard")]
+    public async Task<IActionResult> GetStationReservationDashboard(string stationId)
+    {
+      var station = await _mongoDbService.SolarStations.Find(s => s.StationId == stationId).FirstOrDefaultAsync();
+      if (station == null)
+      {
+        return NotFound(new { Message = "Solar station not found." });
+      }
+
+      var filterBuilder = Builders<EnergyReservation>.Filter;
+
+      long total = await _mongoDbService.EnergyReservations.CountDocumentsAsync(filterBuilder.Eq(r => r.StationId, stationId));
+      long pending = await _mongoDbService.EnergyReservations.CountDocumentsAsync(
+          filterBuilder.Eq(r => r.StationId, stationId) & filterBuilder.Eq(r => r.Status, ReservationStatus.Pending));
+      long approved = await _mongoDbService.EnergyReservations.CountDocumentsAsync(
+          filterBuilder.Eq(r => r.StationId, stationId) & filterBuilder.Eq(r => r.Status, ReservationStatus.Approved));
+      long completed = await _mongoDbService.EnergyReservations.CountDocumentsAsync(
+          filterBuilder.Eq(r => r.StationId, stationId) & filterBuilder.Eq(r => r.Status, ReservationStatus.Completed));
+      long cancelled = await _mongoDbService.EnergyReservations.CountDocumentsAsync(
+          filterBuilder.Eq(r => r.StationId, stationId) & filterBuilder.Eq(r => r.Status, ReservationStatus.Cancelled));
+
+      return Ok(new
+      {
+        StationId = station.StationId,
+        StationName = station.StationName,
+        TotalReservations = total,
+        PendingCount = pending,
+        ApprovedCount = approved,
+        CompletedCount = completed,
+        CancelledCount = cancelled
+      });
+    }
+
+    // Status-specific queries
     [HttpGet("user/{nic}/pending")]
     public async Task<IActionResult> GetPendingReservations(string nic, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
@@ -389,6 +523,12 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       var filterBuilder = Builders<EnergyReservation>.Filter;
       var filter = filterBuilder.Eq(r => r.ProsumerNic, nic) & filterBuilder.Eq(r => r.Status, status);
 
+      return await FetchAndFormatPaginatedReservations(filter, page, pageSize);
+    }
+
+    // Helper: Execute search & join metadata
+    private async Task<IActionResult> FetchAndFormatPaginatedReservations(FilterDefinition<EnergyReservation> filter, int page, int pageSize)
+    {
       long totalCount = await _mongoDbService.EnergyReservations.CountDocumentsAsync(filter);
 
       var reservations = await _mongoDbService.EnergyReservations
@@ -410,6 +550,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
           .Find(s => slotIds.Contains(s.SlotId))
           .ToListAsync();
 
+      // Fetch referenced station and slot details
       var stationDict = stations.ToDictionary(s => s.StationId, s => s.StationName);
       var slotDict = slots.ToDictionary(s => s.SlotId, s => s.SlotNumber);
 
@@ -462,12 +603,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
     [HttpPost("{id}/generate-qr")]
     public async Task<IActionResult> GenerateReservationQr(string id)
     {
-      // Fetch the reservation
-      var reservation = await _mongoDbService.EnergyReservations
-          .Find(r => r.ReservationId == id)
-          .FirstOrDefaultAsync();
-
-      // Check if reservation exists
+      var reservation = await _mongoDbService.EnergyReservations.Find(r => r.ReservationId == id).FirstOrDefaultAsync();
       if (reservation == null)
       {
         return NotFound(new { Message = "Reservation not found." });
@@ -479,14 +615,8 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
         return BadRequest(new { Message = "Cannot generate QR code for a cancelled or completed reservation." });
       }
 
-      // Fetch the station and slot details
-      var station = await _mongoDbService.SolarStations
-          .Find(s => s.StationId == reservation.StationId)
-          .FirstOrDefaultAsync();
-
-      var slot = await _mongoDbService.EnergyBookingSlots
-          .Find(s => s.SlotId == reservation.SlotId)
-          .FirstOrDefaultAsync();
+      var station = await _mongoDbService.SolarStations.Find(s => s.StationId == reservation.StationId).FirstOrDefaultAsync();
+      var slot = await _mongoDbService.EnergyBookingSlots.Find(s => s.SlotId == reservation.SlotId).FirstOrDefaultAsync();
 
       DateTime generatedAt = DateTime.UtcNow;
 
