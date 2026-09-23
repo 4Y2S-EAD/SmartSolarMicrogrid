@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navOperatorHome"
+        android:icon="@drawable/ic_home_24"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/navOperatorApprovals"
+        android:icon="@drawable/ic_qr_code_24"
+        android:title="Approvals" />
+
+    <item
+        android:id="@+id/navOperatorStations"
+        android:icon="@drawable/ic_share_location_24"
+        android:title="Stations" />
+
+    <item
+        android:id="@+id/navOperatorProfile"
+        android:icon="@drawable/ic_account_circle_24"
+        android:title="Profile" />
+
+</menu>
