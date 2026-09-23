@@ -239,5 +239,33 @@ export const ApiService = {
   // Dashboard specific (for the dashboard component graphs etc)
   getDashboardStats: async () => {
     return fetchApi<any>('/dashboard/stats');
+  },
+
+  // QR Transactions (Mocked since endpoints may not exist in C# API yet)
+  getQrTransactions: () => fetchApi<QrTransaction[]>('/qr-transactions').catch(() => []),
+  
+  verifyQrToken: async (token: string) => {
+    try {
+      const res = await fetchApi<any>(`/qr-transactions/verify`, {
+        method: 'POST',
+        body: JSON.stringify({ token })
+      });
+      return { data: res, error: null };
+    } catch (err: any) {
+      // Return a mock error or handle properly when backend is ready
+      return { data: null, error: err.message || 'Verification failed' };
+    }
+  },
+
+  finalizeQrTransaction: async (token: string) => {
+    try {
+      const res = await fetchApi<any>(`/qr-transactions/finalize`, {
+        method: 'POST',
+        body: JSON.stringify({ token })
+      });
+      return { data: res, error: null };
+    } catch (err: any) {
+      return { data: null, error: err.message || 'Finalization failed' };
+    }
   }
 };

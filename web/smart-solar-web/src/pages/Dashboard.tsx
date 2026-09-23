@@ -41,9 +41,9 @@ export default function Dashboard() {
         Promise.resolve({data: [], error: null}),
       ]);
 
-      const h = (hubs.data as Hub[]) ?? [];
-      const p = (prosumers.data as Prosumer[]) ?? [];
-      const r = (reservations.data as Reservation[]) ?? [];
+      const h = hubs ?? [];
+      const p = prosumers ?? [];
+      const r = (reservations as any).data ?? [];
 
       setStats({
         hubs: h.length,
@@ -52,8 +52,8 @@ export default function Dashboard() {
         activeProsumers: p.filter((x) => x.status === 'active').length,
         pendingProsumers: p.filter((x) => x.status === 'pending').length,
         reservations: r.length,
-        confirmedReservations: r.filter((x) => x.status === 'confirmed').length,
-        completedReservations: r.filter((x) => x.status === 'completed').length,
+        confirmedReservations: r.filter((x: any) => x.status === 'confirmed').length,
+        completedReservations: r.filter((x: any) => x.status === 'completed').length,
       });
       setRecentReservations(r);
       setLoading(false);
@@ -93,7 +93,7 @@ export default function Dashboard() {
             </div>
             <div>
               <h2 className="text-lg font-bold text-gray-900">Welcome, {profile?.full_name || 'Operator'}</h2>
-              <p className="text-sm text-gray-500">Your assigned hub: {profile?.assigned_hub?.name ?? 'Unassigned'}</p>
+              <p className="text-sm text-gray-500">Your assigned hub: {profile?.assigned_hub?.stationName ?? 'Unassigned'}</p>
             </div>
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <div className="text-sm font-medium text-gray-900">{r.prosumer?.full_name ?? 'Unknown'}</div>
-                    <div className="text-xs text-gray-400">{r.hub?.name ?? 'Unknown hub'} - {r.energy_kwh} kWh</div>
+                    <div className="text-xs text-gray-400">{r.hub?.stationName ?? 'Unknown hub'} - {r.energy_kwh} kWh</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -243,7 +243,7 @@ export default function Dashboard() {
               {recentReservations[0]?.hub && (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <MapPin className="h-4 w-4 text-gray-400" />
-                  {recentReservations[0].hub.location_name}
+                  {recentReservations[0].hub.stationName}
                 </div>
               )}
               <p className="text-xs text-gray-400">

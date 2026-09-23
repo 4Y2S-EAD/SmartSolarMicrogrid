@@ -28,13 +28,21 @@ export default function OperatorManagement() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [opRes, hubRes] = await Promise.all([
-      Promise.resolve({data: [], error: null}),
-      ApiService.getHubs().eq('status', 'active').order('name'),
-    ]);
-    setOperators((opRes.data as Operator[]) ?? []);
-    setHubs((hubRes.data as Hub[]) ?? []);
-    setLoading(false);
+    try {
+      const [operators, hubs] = await Promise.all([
+        ApiService.getOperators(),
+        ApiService.getHubs(),
+      ]);
+      setOperators(operators || []);
+      const activeHubs = (hubs || [])
+        .filter(h => h.status === 'active')
+        .sort((a, b) => (a.stationName || '').localeCompare(b.stationName || ''));
+      setHubs(activeHubs);
+    } catch (err) {
+      console.error('Failed to load operators/hubs:', err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -120,7 +128,7 @@ export default function OperatorManagement() {
               </div>
               <div className="mt-4 border-t border-gray-50 pt-3">
                 <div className="text-xs text-gray-400">Assigned Hub</div>
-                <div className="mt-0.5 text-sm text-gray-900">{op.assigned_hub?.name ?? 'Unassigned'}</div>
+                <div className="mt-0.5 text-sm text-gray-900">{op.assigned_hub?.stationName ?? 'Unassigned'}</div>
               </div>
               <div className="mt-4 flex items-center gap-2 border-t border-gray-50 pt-4">
                 <Button variant="ghost" size="sm" onClick={() => openEdit(op)}>
@@ -158,7 +166,7 @@ export default function OperatorManagement() {
               className="w-full rounded-lg border-0 py-2.5 px-3.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-amber-500"
             >
               <option value="">Unassigned</option>
-              {hubs.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+              {hubs.map((h) => <option key={h.stationId} value={h.stationId}>{h.stationName}</option>)}
             </select>
           </div>
           {formError && <div className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{formError}</div>}
