@@ -1,6 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { ApiService, type ReservationSummary, type PaginatedReservations } from '@/lib/api';
+import { 
+  ApiService, 
+  type ReservationSummary, 
+  type PaginatedReservations, 
+  type UserDashboardStats 
+} from '@/lib/api';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
@@ -16,6 +21,10 @@ import {
   ChevronRight,
   User,
   LogOut,
+  Layers,
+  Hourglass,
+  CheckCircle2,
+  CalendarCheck
 } from 'lucide-react';
 
 type TabStatus = 'approved' | 'pending' | 'completed' | 'cancelled';
@@ -27,6 +36,7 @@ type ProsumerDashboardProps = {
 export default function ProsumerDashboard({ onNavigate }: ProsumerDashboardProps) {
   const { user, profile, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<TabStatus>('approved');
+  const [stats, setStats] = useState<UserDashboardStats | null>(null);
   const [data, setData] = useState<PaginatedReservations>({
     currentPage: 1,
     pageSize: 10,
@@ -38,6 +48,18 @@ export default function ProsumerDashboard({ onNavigate }: ProsumerDashboardProps
   const [qrModalItem, setQrModalItem] = useState<ReservationSummary | null>(null);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
+  // Fetch count statistics using the new backend endpoint
+  const loadDashboardStats = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const res = await ApiService.getUserReservationDashboard(user.id);
+      setStats(res);
+    } catch (err) {
+      console.error('Failed to load dashboard metrics:', err);
+    }
+  }, [user?.id]);
+
+  // Fetch reservation table records
   const loadReservations = useCallback(async (tab: TabStatus, page: number) => {
     if (!user?.id) return;
     setLoading(true);
@@ -58,8 +80,9 @@ export default function ProsumerDashboard({ onNavigate }: ProsumerDashboardProps
   }, [user?.id]);
 
   useEffect(() => {
+    loadDashboardStats();
     loadReservations(activeTab, 1);
-  }, [activeTab, loadReservations]);
+  }, [activeTab, loadReservations, loadDashboardStats]);
 
   const handleTabChange = (tab: TabStatus) => {
     setActiveTab(tab);
@@ -89,7 +112,7 @@ export default function ProsumerDashboard({ onNavigate }: ProsumerDashboardProps
             </h1>
           </div>
           <p className="mt-1 text-sm text-gray-500">
-            Manage your solar battery charging slot reservations.
+            Manage your solar battery charging slot reservations and energy transfers.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
@@ -97,10 +120,102 @@ export default function ProsumerDashboard({ onNavigate }: ProsumerDashboardProps
             <User className="h-4 w-4" />
             My Profile
           </Button>
-          <Button variant="ghost" onClick={() => setLogoutConfirmOpen(true)} className="text-gray-500 hover:text-rose-600">
+          <Button
+            variant="ghost"
+            onClick={() => setLogoutConfirmOpen(true)}
+            className="text-gray-500 hover:text-rose-600"
+          >
             <LogOut className="h-4 w-4" />
             Sign Out
           </Button>
+        </div>
+      </div>
+
+      {/* Metrics / Status Count Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Bookings Card */}
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+              Total Bookings
+            </span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <Layers className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold text-gray-900">
+            {stats ? stats.totalReservations : '—'}
+          </div>
+          <span className="mt-1 block text-xs text-gray-400">All-time reservations</span>
+        </div>
+
+        {/* Pending Card (Clickable to switch tab) */}
+        <div
+          onClick={() => handleTabChange('pending')}
+          className={`cursor-pointer rounded-2xl border p-5 shadow-sm transition-all hover:shadow-md ${
+            activeTab === 'pending'
+              ? 'border-amber-400 bg-amber-50/30'
+              : 'border-gray-100 bg-white hover:border-amber-200'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-amber-700">
+              Pending
+            </span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+              <Hourglass className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold text-gray-900">
+            {stats ? stats.pendingCount : '—'}
+          </div>
+          <span className="mt-1 block text-xs text-gray-400">Awaiting approval</span>
+        </div>
+
+        {/* Approved Card (Clickable to switch tab) */}
+        <div
+          onClick={() => handleTabChange('approved')}
+          className={`cursor-pointer rounded-2xl border p-5 shadow-sm transition-all hover:shadow-md ${
+            activeTab === 'approved'
+              ? 'border-emerald-400 bg-emerald-50/30'
+              : 'border-gray-100 bg-white hover:border-emerald-200'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
+              Approved
+            </span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+              <CalendarCheck className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold text-gray-900">
+            {stats ? stats.approvedCount : '—'}
+          </div>
+          <span className="mt-1 block text-xs text-gray-400">Ready for drop-off</span>
+        </div>
+
+        {/* Completed Card (Clickable to switch tab) */}
+        <div
+          onClick={() => handleTabChange('completed')}
+          className={`cursor-pointer rounded-2xl border p-5 shadow-sm transition-all hover:shadow-md ${
+            activeTab === 'completed'
+              ? 'border-indigo-400 bg-indigo-50/30'
+              : 'border-gray-100 bg-white hover:border-indigo-200'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-700">
+              Completed
+            </span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
+              <CheckCircle2 className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold text-gray-900">
+            {stats ? stats.completedCount : '—'}
+          </div>
+          <span className="mt-1 block text-xs text-gray-400">Transfers finalized</span>
         </div>
       </div>
 
@@ -113,10 +228,11 @@ export default function ProsumerDashboard({ onNavigate }: ProsumerDashboardProps
               <button
                 key={t.id}
                 onClick={() => handleTabChange(t.id)}
-                className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-all ${active
+                className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-all ${
+                  active
                     ? 'border-amber-500 text-amber-700 bg-amber-50/40 rounded-t-lg'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                }`}
               >
                 {t.label}
               </button>
@@ -124,7 +240,6 @@ export default function ProsumerDashboard({ onNavigate }: ProsumerDashboardProps
           })}
         </div>
 
-        {/* Location matched to screenshot */}
         <div className="pb-2">
           <Button onClick={() => onNavigate('create-reservation')}>
             <Plus className="h-4 w-4" />

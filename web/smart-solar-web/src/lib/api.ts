@@ -135,6 +135,15 @@ export type ReservationSummary = {
   cancellationReason?: string | null;
 };
 
+export type UserDashboardStats = {
+  prosumerNic: string;
+  totalReservations: number;
+  pendingCount: number;
+  approvedCount: number;
+  completedCount: number;
+  cancelledCount: number;
+};
+
 export type PaginatedReservations = {
   currentPage: number;
   pageSize: number;
@@ -256,6 +265,9 @@ export const ApiService = {
       body: JSON.stringify({ role })
     }),
 
+  getUserReservationDashboard: (nic: string) =>
+    fetchApi<UserDashboardStats>(`/reservations/user/${nic}/dashboard`),
+
   // Auth Dummy logic
   signUp: async (nic: string, email: string, password: string, fullName: string, role: string) => {
     const res = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -336,9 +348,14 @@ export const ApiService = {
     }),
 
   cancelReservation: (id: string, reason: string) =>
-    fetchApi<{ message: string; reservationId: string; status: string }>(`/reservations/${id}`, {
-      method: 'DELETE',
+    fetchApi<{ message: string; reservationId: string; status: string }>(`/reservations/${id}/cancel`, {
+      method: 'PUT',
       body: JSON.stringify({ cancellationReason: reason }),
+    }),
+
+  deleteReservationPermanent: (id: string) =>
+    fetchApi<{ message: string; reservationId: string }>(`/reservations/${id}`, {
+      method: 'DELETE',
     }),
 
   generateQrCode: (id: string) =>
