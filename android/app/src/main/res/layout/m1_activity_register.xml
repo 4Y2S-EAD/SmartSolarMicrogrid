@@ -33,6 +33,13 @@
             android:orientation="vertical"
             android:padding="28dp">
 
+            <ImageView
+                android:id="@+id/ivAppIcon"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/bg_remove_app_logo" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -40,7 +47,8 @@
                 android:text="Create Account"
                 android:textColor="@color/gray_900"
                 android:textSize="28sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:gravity="center"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -48,7 +56,8 @@
                 android:layout_marginTop="4dp"
                 android:text="Sign up to manage your solar energy."
                 android:textColor="@color/gray_500"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:gravity="center"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"

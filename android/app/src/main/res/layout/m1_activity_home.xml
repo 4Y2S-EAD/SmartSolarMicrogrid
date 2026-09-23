@@ -1,139 +1,453 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
+    android:background="#F3F4F6">
 
-    <LinearLayout
+    <!-- Main Content Area -->
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_height="match_parent">
 
-        <TextView
+        <!-- Scrollable Dashboard Content -->
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="100dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- TOP HEADER -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp"
+                    app:cardElevation="0dp"
+                    app:cardCornerRadius="0dp"
+                    android:layout_marginBottom="-30dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <!-- Background Image -->
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/home_back" />
+
+                        <!-- Dark Overlay for text readability (Blur effect) -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#77004d40" />
+
+                        <!-- Top Title Section (Fixed Alignment & Margin) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="20dp"
+                            android:layout_marginTop="60dp"
+                            android:gravity="center_vertical">
+
+                            <!-- App Icon -->
+                            <ImageView
+                                android:id="@+id/ivAppIcon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:background="@drawable/bg_remove_app_logo" />
+
+                            <!-- Title & Subtitle -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginStart="12dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Smart Solar Microgrid"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Clean Energy • Better Tomorrow"
+                                    android:textColor="#D1FAE5"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <!-- Notification Bell -->
+                            <ImageView
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:src="@android:drawable/ic_popup_reminder"
+                                app:tint="#FFFFFF" />
+                        </LinearLayout>
+
+                        <!-- Bottom Profile Section -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="20dp"
+                            android:paddingBottom="60dp"
+                            android:layout_gravity="bottom"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:background="@android:drawable/ic_menu_camera"
+                                android:backgroundTint="#FFF" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginStart="16dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Hello,"
+                                    android:textColor="#E5E7EB"
+                                    android:textSize="14sp"/>
+
+                                <TextView
+                                    android:id="@+id/tvWelcomeName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Nimal Perera"
+                                    android:textColor="#FFF"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="● Solar Prosumer"
+                                    android:textColor="#A7F3D0"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"/>
+                            </LinearLayout>
+
+                            <ImageView
+                                android:id="@+id/btnMenu"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:src="@android:drawable/ic_menu_sort_by_size"
+                                app:tint="#FFF"/>
+                        </LinearLayout>
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- YOUR ENERGY CONTRIBUTION CARD -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="-30dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="#065F46">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="20dp"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Your Energy Contribution"
+                                android:textColor="#D1FAE5"
+                                android:textSize="14sp"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="12.5 kWh"
+                                android:textColor="#FFF"
+                                android:textSize="26sp"
+                                android:textStyle="bold"/>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_media_play"
+                            app:tint="#FFF"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- STATS ROW (4 boxes) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:layout_marginTop="20dp"
+                    android:weightSum="4">
+
+                    <!-- Stats Box 1: Active Bookings -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#E0F2FE">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="8dp">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/ic_menu_today"
+                                app:tint="#0284C7"/>
+                            <TextView android:text="3" android:textSize="20sp" android:textStyle="bold" android:textColor="#000" android:layout_marginTop="4dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                            <TextView android:text="Active\nBookings" android:textSize="10sp" android:gravity="center" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Stats Box 2: Pending Bookings -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#FFEDD5">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="8dp">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/ic_menu_recent_history"
+                                app:tint="#EA580C"/>
+                            <TextView android:text="1" android:textSize="20sp" android:textStyle="bold" android:textColor="#000" android:layout_marginTop="4dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                            <TextView android:text="Pending\nBookings" android:textSize="10sp" android:gravity="center" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Stats Box 3: Completed -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#DCFCE7">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="8dp">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/checkbox_on_background"
+                                app:tint="#16A34A"/>
+                            <TextView android:text="2" android:textSize="20sp" android:textStyle="bold" android:textColor="#000" android:layout_marginTop="4dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                            <TextView android:text="Completed" android:textSize="10sp" android:gravity="center" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Stats Box 4: Nearby Stations -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#F3E8FF">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="8dp">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/ic_menu_mapmode"
+                                app:tint="#9333EA"/>
+                            <TextView android:text="5" android:textSize="20sp" android:textStyle="bold" android:textColor="#000" android:layout_marginTop="4dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                            <TextView android:text="Nearby\nStations" android:textSize="10sp" android:gravity="center" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quick Actions"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#000"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- QUICK ACTIONS GRID (With Custom Icons) -->
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:paddingHorizontal="12dp"
+                    android:useDefaultMargins="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFindStations"
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_columnWeight="1"
+                        android:backgroundTint="#059669"
+                        android:text="Find Nearby Stations"
+                        android:textColor="#FFF"
+                        app:icon="@drawable/ic_share_location_24"
+                        app:iconTint="#FFF"
+                        app:iconGravity="top"
+                        app:cornerRadius="16dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_columnWeight="1"
+                        android:backgroundTint="#3B82F6"
+                        android:text="Make a Booking"
+                        android:textColor="#FFF"
+                        app:icon="@drawable/ic_add_notes_24"
+                        app:iconTint="#FFF"
+                        app:iconGravity="top"
+                        app:cornerRadius="16dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_columnWeight="1"
+                        android:backgroundTint="#8B5CF6"
+                        android:text="My Bookings"
+                        android:textColor="#FFF"
+                        app:icon="@drawable/ic_ad_24"
+                        app:iconTint="#FFF"
+                        app:iconGravity="top"
+                        app:cornerRadius="16dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_columnWeight="1"
+                        android:backgroundTint="#F59E0B"
+                        android:text="My Profile"
+                        android:textColor="#FFF"
+                        app:icon="@drawable/ic_account_circle_24"
+                        app:iconTint="#FFF"
+                        app:iconGravity="top"
+                        app:cornerRadius="16dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_columnWeight="1"
+                        android:backgroundTint="#0EA5E9"
+                        android:text="QR Code"
+                        android:textColor="#FFF"
+                        app:icon="@drawable/ic_qr_code_24"
+                        app:iconTint="#FFF"
+                        app:iconGravity="top"
+                        app:cornerRadius="16dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRequestDeactivation"
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_columnWeight="1"
+                        android:backgroundTint="#EF4444"
+                        android:text="Request Deactivation"
+                        android:textColor="#FFF"
+                        app:icon="@drawable/ic_app_badging_24"
+                        app:iconTint="#FFF"
+                        app:iconGravity="top"
+                        app:cornerRadius="16dp"/>
+
+                </GridLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- BOTTOM APP BAR -->
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/bottomAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:fabCradleMargin="10dp"
+            app:fabCradleRoundedCornerRadius="20dp"
+            app:fabAlignmentMode="center">
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNavigationView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:elevation="0dp"
+                app:menu="@menu/bottom_nav_menu" />
+        </com.google.android.material.bottomappbar.BottomAppBar>
+
+        <!-- FLOATING ACTION BUTTON (Center QR) -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:text="Smart Solar Microgrid"
-            android:textColor="#0B6E4F"
-            android:textSize="15sp"
-            android:textStyle="bold"/>
+            android:src="@android:drawable/ic_menu_camera"
+            app:tint="#FFF"
+            app:backgroundTint="#059669"
+            app:layout_anchor="@id/bottomAppBar" />
 
-        <TextView
-            android:id="@+id/tvWelcome"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Welcome, Solar Prosumer"
-            android:textColor="#102A43"
-            android:textSize="27sp"
-            android:textStyle="bold"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="#D4EDDA"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="8dp"
-            android:text="● ACCOUNT ACTIVE"
-            android:textColor="#155724"
-            android:textStyle="bold"/>
+    <!-- SIDEBAR NAVIGATION DRAWER -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/nav_menu" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:background="#102A43"
-            android:orientation="vertical"
-            android:padding="22dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PROSUMER ACCOUNT"
-                android:textColor="#9FB3C8"
-                android:textSize="12sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/tvNIC"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="NIC: —"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/tvRole"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Role: Solar Prosumer"
-                android:textColor="#D9E2EC"
-                android:textSize="14sp"/>
-
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:text="Quick Access"
-            android:textColor="#102A43"
-            android:textSize="19sp"
-            android:textStyle="bold"/>
-
-        <Button
-            android:id="@+id/btnProfile"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="#0B6E4F"
-            android:text="MY PROFILE"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"/>
-
-        <Button
-            android:id="@+id/btnEnergyStations"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="#FFFFFF"
-            android:text="SOLAR STATIONS &amp; BOOKINGS"
-            android:textColor="#102A43"/>
-
-        <Button
-            android:id="@+id/btnTrading"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="#FFFFFF"
-            android:text="ENERGY TRADING"
-            android:textColor="#102A43"/>
-
-        <Button
-            android:id="@+id/btnAnalytics"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="#FFFFFF"
-            android:text="ANALYTICS &amp; HISTORY"
-            android:textColor="#102A43"/>
-
-        <Button
-            android:id="@+id/btnLogout"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:layout_marginTop="35dp"
-            android:layout_marginBottom="25dp"
-            android:backgroundTint="#E8EEF3"
-            android:text="SIGN OUT"
-            android:textColor="#C62828"
-            android:textStyle="bold"/>
-
-    </LinearLayout>
-</ScrollView>
+</androidx.drawerlayout.widget.DrawerLayout>

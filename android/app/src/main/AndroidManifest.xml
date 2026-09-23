@@ -18,15 +18,15 @@
         android:theme="@style/Theme.SmartSolarMobile"
         tools:targetApi="31"
         tools:ignore="ObsoleteSdkInt">
-<!--        <activity-->
-<!--            android:name=".MainActivity"-->
-<!--            android:exported="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
+        <!--        <activity-->
+        <!--            android:name=".MainActivity"-->
+        <!--            android:exported="true">-->
+        <!--            <intent-filter>-->
+        <!--                <action android:name="android.intent.action.MAIN" />-->
 
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
+        <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+        <!--            </intent-filter>-->
+        <!--        </activity>-->
 
         <activity
             android:name=".member1.activities.DeactivationActivity"
@@ -53,17 +53,31 @@
             android:exported="false" />
 
         <activity
-            android:name=".member1.activities.LoginActivity"
+            android:name=".Onboarding1Activity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <category
-                    android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
+
+        <activity
+            android:name=".Onboarding2Activity"
+            android:exported="false" />
+
+        <activity
+            android:name=".member1.activities.LoginActivity"
+            android:exported="false">
+        </activity>
+
+        <!-- Member 2: Stations Screen -->
+        <activity
+            android:name=".member2.activities.M2StationsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".member2.activities.M2StationDetailsActivity"
+            android:exported="false" />
 
     </application>
 
