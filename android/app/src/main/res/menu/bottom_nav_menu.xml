@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/bottom_home" android:title="Home" android:icon="@android:drawable/ic_menu_myplaces" />
+    <item android:id="@+id/bottom_stations" android:title="Stations" android:icon="@android:drawable/ic_menu_mapmode" />
+
+    <!-- QR button -->
+    <item android:id="@+id/bottom_empty" android:title="" android:enabled="false" />
+
+    <item android:id="@+id/bottom_bookings" android:title="Bookings" android:icon="@android:drawable/ic_menu_today" />
+    <item android:id="@+id/bottom_profile" android:title="Profile" android:icon="@android:drawable/ic_menu_info_details" />
+</menu>

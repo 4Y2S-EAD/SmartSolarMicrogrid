@@ -29,4 +29,17 @@ interface ApiService {
         @Path("nic") nic: String,
         @Body request: DeactivationRequest
     ): Response<MessageResponse>
+
+    // ==========================================
+    // MEMBER 2: MICROGRID NODE & SLOT MANAGEMENT
+    // ==========================================
+
+    // Fetches all active microgrid stations from the backend
+    @GET("stations")
+    suspend fun getStations(): Response<List<Station>>
+
+    // Fetches all available booking slots for a specific station
+    @GET("stations/{id}/slots")
+    suspend fun getStationSlots(@Path("id") stationId: String): Response<List<BookingSlot>>
+
 }
