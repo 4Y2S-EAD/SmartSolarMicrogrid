@@ -67,7 +67,6 @@ class HomeActivity : AppCompatActivity() {
             }
             true
         }
-
         // 3. Handle Bottom Navigation Bar Clicks
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
