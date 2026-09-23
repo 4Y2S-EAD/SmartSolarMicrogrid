@@ -64,5 +64,11 @@ namespace SmartSolarMicrogrid.API.Models
 
         [BsonElement("deactivationReason")]
         public string? DeactivationReason { get; set; }
+
+        [BsonElement("badgeId")]
+        public string? BadgeId { get; set; }
+
+        [BsonElement("assignedHubId")]
+        public string? AssignedHubId { get; set; }
     }
 }

@@ -258,11 +258,29 @@ export const ApiService = {
     }),
 
   // Users
-  getUsers: () => fetchApi<UserProfile[]>('/users'),
-  updateUserRole: (id: string, role: string) =>
-    fetchApi<UserProfile>(`/users/${id}/role`, {
+  getUsers: () => fetchApi<UserProfile[]>('/member1/users'),
+  
+  createUser: (payload: any) => 
+    fetchApi<any>('/member1/users', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  updateUser: (nic: string, payload: any) =>
+    fetchApi<any>(`/member1/users/${nic}`, {
       method: 'PUT',
-      body: JSON.stringify({ role })
+      body: JSON.stringify(payload)
+    }),
+
+  updateUserStatus: (nic: string, status: string) =>
+    fetchApi<any>(`/member1/users/${nic}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    }),
+
+  deleteUser: (nic: string) =>
+    fetchApi<any>(`/member1/users/${nic}`, {
+      method: 'DELETE'
     }),
 
   getUserReservationDashboard: (nic: string) =>
