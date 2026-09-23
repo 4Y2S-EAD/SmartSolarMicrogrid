@@ -27,6 +27,14 @@ object TokenManager {
         return prefs?.getString("user_nic", null)
     }
 
+    fun saveRole(role: String) {
+        prefs?.edit()?.putString("user_role", role)?.apply()
+    }
+
+    fun getRole(): String? {
+        return prefs?.getString("user_role", null)
+    }
+
     fun clear() {
         prefs?.edit()?.clear()?.apply()
     }

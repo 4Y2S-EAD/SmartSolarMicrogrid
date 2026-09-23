@@ -45,6 +45,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".member1.activities.GridOperatorDashboardActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".member1.activities.PendingActivationActivity"
             android:exported="false" />
 
