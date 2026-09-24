@@ -53,4 +53,7 @@ interface ApiService {
     @GET("stations/{id}/slots")
     suspend fun getStationSlots(@Path("id") stationId: String): Response<List<BookingSlot>>
 
+    // Fetches prosumer reservation dashboard stats (Active, Pending, Completed)
+    @GET("reservations/user/{nic}/dashboard")
+    suspend fun getUserReservationDashboard(@Path("nic") nic: String): Response<UserReservationDashboardResponse>
 }

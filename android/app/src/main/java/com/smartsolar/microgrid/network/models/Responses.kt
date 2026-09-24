@@ -27,3 +27,13 @@ data class UserProfileResponse(
     val accountStatus: String,
     val isApproved: Boolean
 )
+
+// Energy Reservation Dashboard Stats
+data class UserReservationDashboardResponse(
+    val prosumerNic: String? = null,
+    val totalReservations: Long = 0,
+    val pendingCount: Long = 0,
+    val approvedCount: Long = 0,
+    val completedCount: Long = 0,
+    val cancelledCount: Long = 0
+)

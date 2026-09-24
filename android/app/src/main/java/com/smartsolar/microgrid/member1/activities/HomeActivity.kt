@@ -38,6 +38,7 @@ class HomeActivity : AppCompatActivity() {
         if (nic != null) {
             tvWelcomeName.text = "Loading..."
             fetchUserProfile(nic, tvWelcomeName)
+            fetchReservationDashboardStats(nic)
         } else {
             tvWelcomeName.text = "Welcome User"
         }
@@ -94,6 +95,32 @@ class HomeActivity : AppCompatActivity() {
 
         btnRequestDeactivation.setOnClickListener {
             startActivity(Intent(this, DeactivationActivity::class.java))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val nic = com.smartsolar.microgrid.network.TokenManager.getNic()
+        if (nic != null) {
+            fetchReservationDashboardStats(nic)
+        }
+    }
+
+    private fun fetchReservationDashboardStats(nic: String) {
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            try {
+                val response = com.smartsolar.microgrid.network.ApiClient.apiService.getUserReservationDashboard(nic)
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val stats = response.body()!!
+                        findViewById<TextView>(R.id.tvActiveCount)?.text = stats.approvedCount.toString()
+                        findViewById<TextView>(R.id.tvPendingCount)?.text = stats.pendingCount.toString()
+                        findViewById<TextView>(R.id.tvCompletedCount)?.text = stats.completedCount.toString()
+                    }
+                }
+            } catch (e: Exception) {
+                // Keep default 0 in case of error
+            }
         }
     }
 
