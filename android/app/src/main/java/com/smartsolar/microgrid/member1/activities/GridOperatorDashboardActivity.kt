@@ -63,12 +63,12 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
         }
         // Monitor Stations
         btnMonitorStations.setOnClickListener {
-            Toast.makeText(this, "Monitor Stations", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, M2StationsActivity::class.java))
         }
 
         // Reservations
         btnReservations.setOnClickListener {
-            Toast.makeText(this, "Reservations", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, com.smartsolar.microgrid.member4.operator.OperatorReservationsActivity::class.java))
         }
 
         // Manage Users
@@ -120,7 +120,7 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
 
                 // STATIONS
                 R.id.navOperatorStations -> {
-                    Toast.makeText(this, "Station Monitoring", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, M2StationsActivity::class.java))
                     true
                 }
                 // PROFILE

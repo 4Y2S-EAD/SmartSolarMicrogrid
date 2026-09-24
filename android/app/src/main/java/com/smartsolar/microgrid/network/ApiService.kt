@@ -11,6 +11,18 @@ import retrofit2.http.Query
 import com.smartsolar.microgrid.member4.maps.StationMapResponse
 
 interface ApiService {
+    // Member 4: reservation reads and the existing Member 3 approval write.
+    @GET("operator/reservations")
+    suspend fun getOperatorReservations(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("operator/reservations/pending")
+    suspend fun getOperatorPending(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("operator/reservations/history")
+    suspend fun getOperatorHistory(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("operator/reservations/search")
+    suspend fun searchOperatorReservations(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @PUT("reservations/{id}/approve")
+    suspend fun approveOperatorReservation(@Path("id") id: String): Response<MessageResponse>
+
     @POST("member1/auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<MessageResponse>
 
