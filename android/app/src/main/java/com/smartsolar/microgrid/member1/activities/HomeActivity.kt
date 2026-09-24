@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.member2.activities.M2StationsActivity
+import com.smartsolar.microgrid.member3.activities.M3ReservationsActivity
 import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
@@ -30,6 +31,7 @@ class HomeActivity : AppCompatActivity() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
         val btnFindStations = findViewById<Button>(R.id.btnFindStations)
+        val btnMyReservations = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnMyReservations)
         val btnRequestDeactivation = findViewById<Button>(R.id.btnRequestDeactivation)
         val tvWelcomeName = findViewById<TextView>(R.id.tvWelcomeName)
 
@@ -59,6 +61,12 @@ class HomeActivity : AppCompatActivity() {
                     drawerLayout.closeDrawer(GravityCompat.START)
                 }
 
+                // M3 Integration: Open My Reservations from Sidebar
+                R.id.nav_bookings -> {
+                    startActivity(Intent(this, M3ReservationsActivity::class.java))
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+
                 R.id.nav_profile -> {
                     startActivity(Intent(this, ProfileActivity::class.java))
                     drawerLayout.closeDrawer(GravityCompat.START)
@@ -79,6 +87,12 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
 
+                // M3 Integration: Open My Reservations from Bottom Bar
+                R.id.bottom_bookings -> {
+                    startActivity(Intent(this, M3ReservationsActivity::class.java))
+                    true
+                }
+
                 R.id.bottom_profile -> {
                     startActivity(Intent(this, ProfileActivity::class.java))
                     true
@@ -91,6 +105,11 @@ class HomeActivity : AppCompatActivity() {
         btnFindStations.setOnClickListener {
             // M2 Integration: Open Stations screen from Grid Button
             startActivity(Intent(this, M2StationsActivity::class.java))
+        }
+
+        // M3 Integration: Open My Reservations from Quick Action
+        btnMyReservations?.setOnClickListener {
+            startActivity(Intent(this, M3ReservationsActivity::class.java))
         }
 
         btnRequestDeactivation.setOnClickListener {

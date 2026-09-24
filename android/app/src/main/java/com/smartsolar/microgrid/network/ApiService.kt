@@ -56,4 +56,33 @@ interface ApiService {
     // Fetches prosumer reservation dashboard stats (Active, Pending, Completed)
     @GET("reservations/user/{nic}/dashboard")
     suspend fun getUserReservationDashboard(@Path("nic") nic: String): Response<UserReservationDashboardResponse>
+
+    // Fetches paginated reservations by status for a user
+    @GET("reservations/user/{nic}/approved")
+    suspend fun getApprovedReservations(
+        @Path("nic") nic: String,
+        @Query("page") page: Int = 1,
+        @Query("pageSize") pageSize: Int = 10
+    ): Response<PaginatedReservationsResponse>
+
+    @GET("reservations/user/{nic}/pending")
+    suspend fun getPendingReservations(
+        @Path("nic") nic: String,
+        @Query("page") page: Int = 1,
+        @Query("pageSize") pageSize: Int = 10
+    ): Response<PaginatedReservationsResponse>
+
+    @GET("reservations/user/{nic}/completed")
+    suspend fun getCompletedReservations(
+        @Path("nic") nic: String,
+        @Query("page") page: Int = 1,
+        @Query("pageSize") pageSize: Int = 10
+    ): Response<PaginatedReservationsResponse>
+
+    @GET("reservations/user/{nic}/cancelled")
+    suspend fun getCancelledReservations(
+        @Path("nic") nic: String,
+        @Query("page") page: Int = 1,
+        @Query("pageSize") pageSize: Int = 10
+    ): Response<PaginatedReservationsResponse>
 }

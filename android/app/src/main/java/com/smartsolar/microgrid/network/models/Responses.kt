@@ -37,3 +37,32 @@ data class UserReservationDashboardResponse(
     val completedCount: Long = 0,
     val cancelledCount: Long = 0
 )
+
+// Paginated Reservations Response
+data class PaginatedReservationsResponse(
+    val currentPage: Int = 1,
+    val pageSize: Int = 10,
+    val totalRecords: Long = 0,
+    val totalPages: Int = 1,
+    val items: List<ReservationSummaryItem> = emptyList()
+)
+
+// Reservation Summary Item
+data class ReservationSummaryItem(
+    val reservationId: String = "",
+    val prosumerNic: String = "",
+    val stationId: String = "",
+    val stationName: String = "",
+    val slotId: String = "",
+    val slotNumber: Int = 0,
+    val bookingDate: String = "",
+    val startTime: String = "",
+    val endTime: String = "",
+    val status: String = "",
+    val qrToken: String? = null,
+    val verifiedAt: String? = null,
+    val completedAt: String? = null,
+    val cancellationReason: String? = null,
+    val createdAt: String? = null,
+    val updatedAt: String? = null
+)
