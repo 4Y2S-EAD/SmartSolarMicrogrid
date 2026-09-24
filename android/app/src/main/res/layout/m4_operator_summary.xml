@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<!-- Member 4: live reservation metrics and navigation. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical">
+        <TextView android:id="@+id/m4SummaryTitle" android:layout_width="0dp"
+            android:layout_weight="1" android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp" android:text="Reservation overview"
+            android:textSize="20sp" android:textColor="#193C2D" android:textStyle="bold"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4SummaryRefresh" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Refresh" android:textAllCaps="false" app:cornerRadius="12dp"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_margin="4dp" app:cardCornerRadius="16dp" app:cardElevation="0dp" app:strokeWidth="1dp" app:strokeColor="#D7E8DE" app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:id="@+id/m4ActiveCount" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="--" android:textSize="30sp" android:textColor="#193C2D" android:textStyle="bold"/>
+                <TextView android:id="@+id/m4ActiveCountLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Active bookings" android:textSize="12sp" android:textColor="#193C2D"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_margin="4dp" app:cardCornerRadius="16dp" app:cardElevation="0dp" app:strokeWidth="1dp" app:strokeColor="#D7E8DE" app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:id="@+id/m4PendingCount" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="--" android:textSize="30sp" android:textColor="#193C2D" android:textStyle="bold"/>
+                <TextView android:id="@+id/m4PendingCountLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Pending reservations" android:textSize="12sp" android:textColor="#193C2D"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+        <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_margin="4dp" app:cardCornerRadius="16dp" app:cardElevation="0dp" app:strokeWidth="1dp" app:strokeColor="#D7E8DE" app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:id="@+id/m4ApprovedCount" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="--" android:textSize="30sp" android:textColor="#193C2D" android:textStyle="bold"/>
+                <TextView android:id="@+id/m4ApprovedCountLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Approved reservations" android:textSize="12sp" android:textColor="#193C2D"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_margin="4dp" app:cardCornerRadius="16dp" app:cardElevation="0dp" app:strokeWidth="1dp" app:strokeColor="#D7E8DE" app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:id="@+id/m4CompletedCount" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="--" android:textSize="30sp" android:textColor="#193C2D" android:textStyle="bold"/>
+                <TextView android:id="@+id/m4CompletedCountLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Completed reservations" android:textSize="12sp" android:textColor="#193C2D"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+    <ProgressBar android:id="@+id/m4SummaryLoading" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true"/>
+    <TextView android:id="@+id/m4SummaryMessage" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="" android:textSize="12sp" android:textColor="#193C2D" android:accessibilityLiveRegion="polite"/>
+    <com.google.android.material.chip.ChipGroup android:layout_width="match_parent" android:layout_height="wrap_content">
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4OpenAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="All reservations" android:textAllCaps="false" app:cornerRadius="12dp"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4OpenPending" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Pending" android:textAllCaps="false" app:cornerRadius="12dp"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4OpenCompleted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Completed" android:textAllCaps="false" app:cornerRadius="12dp"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4OpenHistory" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Booking history" android:textAllCaps="false" app:cornerRadius="12dp"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4OpenSearch" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Search bookings" android:textAllCaps="false" app:cornerRadius="12dp"/>
+    </com.google.android.material.chip.ChipGroup>
+</LinearLayout>

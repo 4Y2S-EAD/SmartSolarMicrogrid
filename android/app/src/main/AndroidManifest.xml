@@ -80,6 +80,8 @@
             android:exported="false">
         </activity>
 
+        <activity android:name=".member4.operator.OperatorReservationsActivity" android:exported="false" />
+
         <!-- Member 2: Stations Screen -->
         <activity
             android:name=".member2.activities.M2StationsActivity"
