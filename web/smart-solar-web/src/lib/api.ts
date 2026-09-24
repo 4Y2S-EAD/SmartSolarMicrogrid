@@ -114,6 +114,62 @@ export type UserProfile = {
   assigned_hub?: Hub;
 };
 
+
+// member 03
+export type ReservationSummary = {
+  reservationId: string;
+  prosumerNic: string;
+  stationId: string;
+  stationName: string;
+  slotId: string;
+  slotNumber: number;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  qrToken: string | null;
+  createdAt: string;
+  updatedAt: string;
+  verifiedAt?: string | null;
+  completedAt?: string | null;
+  cancellationReason?: string | null;
+};
+
+export type UserDashboardStats = {
+  prosumerNic: string;
+  totalReservations: number;
+  pendingCount: number;
+  approvedCount: number;
+  completedCount: number;
+  cancelledCount: number;
+};
+
+export type PaginatedReservations = {
+  currentPage: number;
+  pageSize: number;
+  totalRecords: number;
+  totalPages: number;
+  items: ReservationSummary[];
+};
+
+export type CreateReservationPayload = {
+  prosumerNic: string;
+  stationId: string;
+  slotId: string;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+};
+
+export type UpdateReservationPayload = {
+  stationId: string;
+  slotId: string;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+};
+
+
 // --- Helper Functions ---
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -202,12 +258,33 @@ export const ApiService = {
     }),
 
   // Users
-  getUsers: () => fetchApi<UserProfile[]>('/users'),
-  updateUserRole: (id: string, role: string) =>
-    fetchApi<UserProfile>(`/users/${id}/role`, {
-      method: 'PUT',
-      body: JSON.stringify({ role })
+  getUsers: () => fetchApi<UserProfile[]>('/member1/users'),
+  
+  createUser: (payload: any) => 
+    fetchApi<any>('/member1/users', {
+      method: 'POST',
+      body: JSON.stringify(payload)
     }),
+
+  updateUser: (nic: string, payload: any) =>
+    fetchApi<any>(`/member1/users/${nic}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    }),
+
+  updateUserStatus: (nic: string, status: string) =>
+    fetchApi<any>(`/member1/users/${nic}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    }),
+
+  deleteUser: (nic: string) =>
+    fetchApi<any>(`/member1/users/${nic}`, {
+      method: 'DELETE'
+    }),
+
+  getUserReservationDashboard: (nic: string) =>
+    fetchApi<UserDashboardStats>(`/reservations/user/${nic}/dashboard`),
 
   // Auth Dummy logic
   signUp: async (nic: string, email: string, password: string, fullName: string, role: string) => {
@@ -243,7 +320,7 @@ export const ApiService = {
 
   // QR Transactions (Mocked since endpoints may not exist in C# API yet)
   getQrTransactions: () => fetchApi<QrTransaction[]>('/qr-transactions').catch(() => []),
-  
+
   verifyQrToken: async (token: string) => {
     try {
       const res = await fetchApi<any>(`/qr-transactions/verify`, {
@@ -267,5 +344,40 @@ export const ApiService = {
     } catch (err: any) {
       return { data: null, error: err.message || 'Finalization failed' };
     }
-  }
+  },
+
+  // Member 03 - Prosumer Reservations
+  getReservationsByStatus: (nic: string, status: 'pending' | 'approved' | 'completed' | 'cancelled', page = 1, pageSize = 10) =>
+    fetchApi<PaginatedReservations>(`/reservations/user/${nic}/${status}?page=${page}&pageSize=${pageSize}`),
+
+  getReservationById: (id: string) =>
+    fetchApi<ReservationSummary>(`/reservations/${id}`),
+
+  createReservation: (payload: CreateReservationPayload) =>
+    fetchApi<ReservationSummary>('/reservations', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateReservation: (id: string, payload: UpdateReservationPayload) =>
+    fetchApi<ReservationSummary>(`/reservations/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  cancelReservation: (id: string, reason: string) =>
+    fetchApi<{ message: string; reservationId: string; status: string }>(`/reservations/${id}/cancel`, {
+      method: 'PUT',
+      body: JSON.stringify({ cancellationReason: reason }),
+    }),
+
+  deleteReservationPermanent: (id: string) =>
+    fetchApi<{ message: string; reservationId: string }>(`/reservations/${id}`, {
+      method: 'DELETE',
+    }),
+
+  generateQrCode: (id: string) =>
+    fetchApi<{ message: string; reservationId: string; qrToken: string; generatedAt: string }>(`/reservations/${id}/generate-qr`, {
+      method: 'POST',
+    }),
 };

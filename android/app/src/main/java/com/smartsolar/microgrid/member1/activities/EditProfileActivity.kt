@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 
 class EditProfileActivity : AppCompatActivity() {
 
-    private lateinit var etNIC: EditText
     private lateinit var etFullName: EditText
     private lateinit var etEmail: EditText
     private lateinit var etPhone: EditText
@@ -29,7 +28,6 @@ class EditProfileActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
 
-        etNIC = findViewById(R.id.etNIC)
         etFullName = findViewById(R.id.etFullName)
         etEmail = findViewById(R.id.etEmail)
         etPhone = findViewById(R.id.etPhone)
@@ -56,8 +54,6 @@ class EditProfileActivity : AppCompatActivity() {
             finish()
             return
         }
-
-        etNIC.setText(nic)
 
         CoroutineScope(Dispatchers.Main).launch {
             try {

@@ -7,17 +7,20 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import EmptyState from '@/components/ui/EmptyState';
-import { Users, Shield, Radio, Search, Power, Pencil, UserCog, Plus } from 'lucide-react';
+import { Users, Shield, Radio, Search, Power, Pencil, UserCog, Plus, Trash2 } from 'lucide-react';
 
 type Tab = 'backoffice' | 'grid_operator';
 
 type UserForm = {
+  nic: string;
+  email: string;
+  password?: string;
   full_name: string;
   badge_id: string;
   assigned_hub_id: string;
 };
 
-const emptyForm: UserForm = { full_name: '', badge_id: '', assigned_hub_id: '' };
+const emptyForm: UserForm = { nic: '', email: '', password: '', full_name: '', badge_id: '', assigned_hub_id: '' };
 
 export default function UserManagement() {
   const { user, refreshProfile } = useAuth();
@@ -27,18 +30,23 @@ export default function UserManagement() {
   const [tab, setTab] = useState<Tab>('backoffice');
   const [search, setSearch] = useState('');
   const [editProfile, setEditProfile] = useState<UserProfile | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
   const [form, setForm] = useState<UserForm>(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [profRes, hubRes] = await Promise.all([
-      Promise.resolve({data: [], error: null}),
-      Promise.resolve({data: [], error: null}),
-    ]);
-    setProfiles((profRes.data as UserProfile[]) ?? []);
-    setHubs((hubRes.data as Hub[]) ?? []);
+    try {
+      const [profRes, hubRes] = await Promise.all([
+        ApiService.getUsers(),
+        ApiService.getHubs().catch(() => []) // hubs might fail if endpoint not ready
+      ]);
+      setProfiles(profRes || []);
+      setHubs(hubRes || []);
+    } catch (e) {
+      console.error(e);
+    }
     setLoading(false);
   }, []);
 
@@ -53,19 +61,41 @@ export default function UserManagement() {
         (p.badge_id ?? '').toLowerCase().includes(search.toLowerCase()))
   );
 
+  const openCreate = () => {
+    setForm(emptyForm);
+    setFormError(null);
+    setEditProfile(null);
+    setIsCreating(true);
+  };
+
   const openEdit = (p: UserProfile) => {
     setForm({
+      nic: p.id,
+      email: p.email,
+      password: '',
       full_name: p.full_name,
       badge_id: p.badge_id ?? '',
       assigned_hub_id: p.assigned_hub_id ?? '',
     });
     setFormError(null);
     setEditProfile(p);
+    setIsCreating(false);
   };
 
   const handleSave = async () => {
-    if (!editProfile) return;
     setFormError(null);
+    if (isCreating && !form.nic.trim()) {
+      setFormError('NIC is required.');
+      return;
+    }
+    if (isCreating && !form.email.trim()) {
+      setFormError('Email is required.');
+      return;
+    }
+    if (isCreating && !form.password?.trim()) {
+      setFormError('Password is required.');
+      return;
+    }
     if (!form.full_name.trim()) {
       setFormError('Full name is required.');
       return;
@@ -74,28 +104,66 @@ export default function UserManagement() {
       setFormError('Badge ID is required for grid operators.');
       return;
     }
+    
     setSaving(true);
-    const payload: Record<string, unknown> = {
-      full_name: form.full_name,
-      assigned_hub_id: form.assigned_hub_id || null,
-    };
-    if (tab === 'grid_operator') {
-      payload.badge_id = form.badge_id;
+    try {
+      if (isCreating) {
+        const payload: any = {
+          nic: form.nic,
+          email: form.email,
+          password: form.password,
+          full_name: form.full_name,
+          role: tab,
+        };
+        if (tab === 'grid_operator') {
+          payload.badge_id = form.badge_id;
+          payload.assigned_hub_id = form.assigned_hub_id || null;
+        }
+        await ApiService.createUser(payload);
+      } else if (editProfile) {
+        const payload: any = {
+          full_name: form.full_name,
+          assigned_hub_id: form.assigned_hub_id || null,
+        };
+        if (tab === 'grid_operator') {
+          payload.badge_id = form.badge_id;
+        }
+        await ApiService.updateUser(editProfile.id, payload);
+        if (editProfile.id === user?.id) await refreshProfile();
+      }
+      
+      setEditProfile(null);
+      setIsCreating(false);
+      setForm(emptyForm);
+      load();
+    } catch (err: any) {
+      setFormError(err.message || 'An error occurred while saving.');
+    } finally {
+      setSaving(false);
     }
-    const { error } = await Promise.resolve({data: null, error: null});
-    setSaving(false);
-    if (error) { setFormError(error.message); return; }
-    if (editProfile.id === user?.id) await refreshProfile();
-    setEditProfile(null);
-    setForm(emptyForm);
-    load();
+  };
+
+  const handleDelete = async (p: UserProfile) => {
+    if (window.confirm(`Are you sure you want to delete ${p.full_name || p.email}? This action cannot be undone.`)) {
+      try {
+        await ApiService.deleteUser(p.id);
+        if (p.id === user?.id) await refreshProfile();
+        load();
+      } catch (err) {
+        console.error(err);
+      }
+    }
   };
 
   const toggleStatus = async (p: UserProfile) => {
     const newStatus = p.status === 'active' ? 'deactivated' : 'active';
-    await Promise.resolve({data: null, error: null});
-    if (p.id === user?.id) await refreshProfile();
-    load();
+    try {
+      await ApiService.updateUserStatus(p.id, newStatus);
+      if (p.id === user?.id) await refreshProfile();
+      load();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const tabs: { id: Tab; label: string; icon: typeof Shield; count: number }[] = [
@@ -106,28 +174,35 @@ export default function UserManagement() {
   return (
     <div className="space-y-5">
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-200">
-        {tabs.map((t) => {
-          const Icon = t.icon;
-          const active = tab === t.id;
-          return (
-            <button
-              key={t.id}
-              onClick={() => { setTab(t.id); setSearch(''); }}
-              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
-                active
-                  ? 'border-amber-500 text-amber-700'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              {t.label}
-              <span className={`ml-1 rounded-full px-2 py-0.5 text-xs ${active ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
-                {t.count}
-              </span>
-            </button>
-          );
-        })}
+      <div className="flex items-center justify-between border-b border-gray-200">
+        <div className="flex items-center gap-2">
+          {tabs.map((t) => {
+            const Icon = t.icon;
+            const active = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => { setTab(t.id); setSearch(''); }}
+                className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
+                  active
+                    ? 'border-amber-500 text-amber-700'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {t.label}
+                <span className={`ml-1 rounded-full px-2 py-0.5 text-xs ${active ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
+                  {t.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        
+        <Button onClick={openCreate} className="mb-2">
+          <Plus className="mr-2 h-4 w-4" />
+          Add User
+        </Button>
       </div>
 
       {/* Toolbar */}
@@ -194,7 +269,7 @@ export default function UserManagement() {
                       <td className="px-6 py-4 font-mono text-xs text-gray-600">{p.badge_id ?? '—'}</td>
                     )}
                     {tab === 'grid_operator' && (
-                      <td className="px-6 py-4 text-gray-600">{p.assigned_hub?.name ?? 'Unassigned'}</td>
+                      <td className="px-6 py-4 text-gray-600">{hubs.find(h => h.stationId === p.assigned_hub_id)?.stationName ?? 'Unassigned'}</td>
                     )}
                     <td className="px-6 py-4"><StatusBadge status={p.status} /></td>
                     <td className="px-6 py-4">
@@ -213,6 +288,13 @@ export default function UserManagement() {
                         >
                           <Power className="h-4 w-4" />
                         </button>
+                        <button
+                          onClick={() => handleDelete(p)}
+                          className="rounded-md p-1.5 text-gray-400 hover:bg-red-100 hover:text-red-600"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -223,21 +305,29 @@ export default function UserManagement() {
         )}
       </div>
 
-      {/* Edit modal */}
+      {/* Edit/Create modal */}
       <Modal
-        open={!!editProfile}
-        onClose={() => { setEditProfile(null); setForm(emptyForm); setFormError(null); }}
-        title={`Edit ${tab === 'backoffice' ? 'Backoffice User' : 'Grid Operator'}`}
-        description={editProfile?.email}
+        open={!!editProfile || isCreating}
+        onClose={() => { setEditProfile(null); setIsCreating(false); setForm(emptyForm); setFormError(null); }}
+        title={`${isCreating ? 'Add' : 'Edit'} ${tab === 'backoffice' ? 'Backoffice User' : 'Grid Operator'}`}
+        description={isCreating ? 'Create a new user account' : editProfile?.email}
         footer={
           <>
-            <Button variant="secondary" onClick={() => { setEditProfile(null); setForm(emptyForm); setFormError(null); }}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</Button>
+            <Button variant="secondary" onClick={() => { setEditProfile(null); setIsCreating(false); setForm(emptyForm); setFormError(null); }}>Cancel</Button>
+            <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : (isCreating ? 'Create' : 'Save Changes')}</Button>
           </>
         }
       >
         <div className="space-y-4">
+          {isCreating && (
+            <>
+              <Input label="NIC *" value={form.nic} onChange={(e) => setForm({ ...form, nic: e.target.value })} placeholder="NIC number" />
+              <Input label="Email *" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email address" type="email" />
+              <Input label="Password *" value={form.password || ''} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Secure password" type="password" />
+            </>
+          )}
           <Input label="Full Name *" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} placeholder="John Doe" />
+          
           {tab === 'grid_operator' && (
             <Input label="Badge ID *" value={form.badge_id} onChange={(e) => setForm({ ...form, badge_id: e.target.value })} placeholder="OP-001" />
           )}
@@ -250,7 +340,7 @@ export default function UserManagement() {
                 className="w-full rounded-lg border-0 py-2.5 px-3.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-amber-500"
               >
                 <option value="">Unassigned</option>
-                {hubs.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+                {hubs.map((h) => <option key={h.stationId} value={h.stationId}>{h.stationName}</option>)}
               </select>
             </div>
           )}
