@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="m4_nearby_stations">Nearby Stations</string>
+    <string name="m4_station_map">Station Map</string>
+    <string name="m4_back">Back</string>
+    <string name="m4_refresh">Refresh</string>
+    <string name="m4_search_hint">Search station name</string>
+    <string name="m4_search">Search</string>
+    <string name="m4_clear">Clear search</string>
+    <string name="m4_all">All stations</string>
+    <string name="m4_near_me">Near me · 25 km</string>
+    <string name="m4_stations">Stations</string>
+    <string name="m4_loading_stations">Loading stations…</string>
+    <string name="m4_loading_map">Loading map…</string>
+    <string name="m4_map_unavailable">Map unavailable. You can still browse stations below. Tap to retry.</string>
+    <string name="m4_data_error">Could not refresh stations. Check your connection and tap Refresh. Previously loaded results may be out of date.</string>
+    <string name="m4_empty">No stations available.</string>
+    <string name="m4_no_matches">No matching stations. Clear search or choose All stations.</string>
+    <plurals name="m4_unplottable">
+        <item quantity="one">%1$d station has missing or invalid coordinates.</item>
+        <item quantity="other">%1$d stations have missing or invalid coordinates.</item>
+    </plurals>
+    <string name="m4_location_denied">Location access is off. You can still browse all stations.</string>
+    <string name="m4_location_missing">Current location is unavailable. Enable device location and try again.</string>
+    <string name="m4_locating">Finding your location…</string>
+    <string name="m4_location_approximate">Using approximate location; distances are estimates.</string>
+    <string name="m4_capacity">Capacity: %1$s kWh</string>
+    <string name="m4_slots">Battery slots: %1$s available / %2$s total</string>
+    <string name="m4_status">Status: %1$s</string>
+    <string name="m4_distance">%1$.1f km away · straight-line distance</string>
+    <string name="m4_schedule_missing">Schedule not provided</string>
+    <string name="m4_coordinates_missing">Map location unavailable</string>
+    <string name="m4_view_details">View station details</string>
+    <string name="m4_close">Close</string>
+    <string name="m4_unknown">Not provided</string>
+    <string name="m4_nearest_station">Nearest station</string>
+    <string name="m4_nearest_title">Nearest: %1$s</string>
+</resources>

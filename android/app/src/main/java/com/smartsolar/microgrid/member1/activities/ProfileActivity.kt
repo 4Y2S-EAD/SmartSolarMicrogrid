@@ -31,12 +31,18 @@ class ProfileActivity : AppCompatActivity() {
                 )
             }
 
-        findViewById<Button>(R.id.btnDeactivate)
-            .setOnClickListener {
+        val role = com.smartsolar.microgrid.network.TokenManager.getRole()
+        val btnDeactivate = findViewById<Button>(R.id.btnDeactivate)
+        
+        if (role == "GridOperator") {
+            btnDeactivate.visibility = android.view.View.GONE
+        } else {
+            btnDeactivate.setOnClickListener {
                 startActivity(
                     Intent(this, DeactivationActivity::class.java)
                 )
             }
+        }
     }
 
     override fun onResume() {

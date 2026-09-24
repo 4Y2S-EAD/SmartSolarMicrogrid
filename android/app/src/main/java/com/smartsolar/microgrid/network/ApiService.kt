@@ -7,6 +7,8 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
+import com.smartsolar.microgrid.member4.maps.StationMapResponse
 
 interface ApiService {
     @POST("member1/auth/register")
@@ -34,9 +36,18 @@ interface ApiService {
     // MEMBER 2: MICROGRID NODE & SLOT MANAGEMENT
     // ==========================================
 
-    // Fetches all active microgrid stations from the backend
+    // Fetches all microgrid stations from the backend (including inactive stations).
     @GET("stations")
     suspend fun getStations(): Response<List<Station>>
+
+    // Member 4: all search, coordinate validation and nearby calculations run in the API.
+    @GET("member4/maps/stations")
+    suspend fun getMapStations(
+        @Query("query") query: String? = null,
+        @Query("latitude") latitude: Double? = null,
+        @Query("longitude") longitude: Double? = null,
+        @Query("radiusKm") radiusKm: Double? = null
+    ): Response<StationMapResponse>
 
     // Fetches all available booking slots for a specific station
     @GET("stations/{id}/slots")

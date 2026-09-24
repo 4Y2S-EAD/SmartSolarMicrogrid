@@ -7,6 +7,17 @@ import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import EmptyState from '@/components/ui/EmptyState';
 import { Zap, Plus, Search, MapPin, Pencil, Trash2, AlertTriangle, Eye, Power } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+
+function MapEvents({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
+  useMapEvents({
+    click(e) {
+      onLocationSelect(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+}
 
 type HubForm = {
   stationName: string;
@@ -227,12 +238,12 @@ export default function HubManagement() {
         </div>
       )}
 
-      {/* Add/Edit modal */}
       <Modal
         open={addOpen || !!editHub}
         onClose={() => { setAddOpen(false); setEditHub(null); setForm(emptyForm); setFormError(null); }}
         title={editHub ? 'Edit Hub' : 'Create New Hub'}
         description="Configure the solar station location and capacity."
+        size="xl"
         footer={
           <>
             <Button variant="secondary" onClick={() => { setAddOpen(false); setEditHub(null); setForm(emptyForm); setFormError(null); }}>Cancel</Button>
@@ -240,17 +251,38 @@ export default function HubManagement() {
           </>
         }
       >
-        <div className="space-y-4">
-          <Input label="Hub Name *" value={form.stationName} onChange={(e) => setForm({ ...form, stationName: e.target.value })} placeholder="Central Solar Hub" />
-          <div className="grid grid-cols-2 gap-4">
-            <Input label="Latitude *" type="number" step="any" value={form.latitude} onChange={(e) => setForm({ ...form, latitude: e.target.value })} placeholder="6.9271" />
-            <Input label="Longitude *" type="number" step="any" value={form.longitude} onChange={(e) => setForm({ ...form, longitude: e.target.value })} placeholder="79.8612" />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
+          <div className="space-y-3 md:col-span-3">
+             <h3 className="text-sm font-medium text-gray-900">Hub Location</h3>
+             <div className="h-[300px] w-full overflow-hidden rounded-xl border border-gray-200">
+               <MapContainer center={form.latitude && form.longitude ? [parseFloat(form.latitude), parseFloat(form.longitude)] : [6.9271, 79.8612]} zoom={10} style={{ height: '100%', width: '100%' }}>
+                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                 <MapEvents onLocationSelect={(lat, lng) => setForm({ ...form, latitude: lat.toFixed(4), longitude: lng.toFixed(4) })} />
+                 {form.latitude && form.longitude && (
+                   <Marker position={[parseFloat(form.latitude), parseFloat(form.longitude)]} />
+                 )}
+               </MapContainer>
+             </div>
+             <div className="flex items-center justify-between rounded-lg bg-gray-50 p-4">
+               <div className="flex items-center gap-3">
+                 <div className="rounded-full bg-white p-2 shadow-sm"><MapPin className="h-5 w-5 text-gray-400" /></div>
+                 <div>
+                   <div className="text-sm font-medium text-gray-900">Selected location</div>
+                   <div className="text-xs text-gray-500">Click on the map to select.</div>
+                 </div>
+               </div>
+               <div className="flex gap-4 text-right">
+                 <div><div className="text-xs text-gray-500">Latitude</div><div className="text-sm font-semibold">{form.latitude || '-'}</div></div>
+                 <div><div className="text-xs text-gray-500">Longitude</div><div className="text-sm font-semibold">{form.longitude || '-'}</div></div>
+               </div>
+             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Input label="Capacity (kW)" type="number" step="any" value={form.capacityKwh} onChange={(e) => setForm({ ...form, capacityKwh: e.target.value })} placeholder="50.00" />
+          <div className="space-y-4 md:col-span-2">
+            <Input label="Hub Name *" value={form.stationName} onChange={(e) => setForm({ ...form, stationName: e.target.value })} placeholder="Central Solar Hub" />
+            <Input label="Capacity (kW) *" type="number" step="any" value={form.capacityKwh} onChange={(e) => setForm({ ...form, capacityKwh: e.target.value })} placeholder="50.00" />
             <Input label="Battery Slots" type="number" value={form.batterySlotCount} onChange={(e) => setForm({ ...form, batterySlotCount: e.target.value })} placeholder="10" />
+            {formError && <div className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{formError}</div>}
           </div>
-          {formError && <div className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{formError}</div>}
         </div>
       </Modal>
 

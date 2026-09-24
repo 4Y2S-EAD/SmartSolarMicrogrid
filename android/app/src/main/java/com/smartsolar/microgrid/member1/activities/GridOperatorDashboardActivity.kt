@@ -2,11 +2,17 @@ package com.smartsolar.microgrid.member1.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.navigation.NavigationView
 import com.smartsolar.microgrid.R
+import com.smartsolar.microgrid.member2.activities.M2StationsActivity
 
 class GridOperatorDashboardActivity : AppCompatActivity() {
 
@@ -18,225 +24,127 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
     private lateinit var btnLogout: MaterialButton
 
     private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var btnMenu: ImageView
+    private lateinit var navView: NavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.m1_activity_grid_operator)
-
         initializeViews()
-
         setupQuickActions()
-
         setupBottomNavigation()
+        setupSidebar()
     }
 
-
-    // ============================================================
     // INITIALIZE VIEWS
-    // ============================================================
-
     private fun initializeViews() {
-
         btnQrApproval = findViewById(R.id.btnQrApproval)
-
         btnManagement = findViewById(R.id.btnManagement)
-
         btnMonitorStations = findViewById(R.id.btnMonitorStations)
-
         btnReservations = findViewById(R.id.btnReservations)
-
         btnUsers = findViewById(R.id.btnUsers)
-
         btnLogout = findViewById(R.id.btnLogout)
-
-        bottomNavigationView =
-            findViewById(R.id.bottomNavigationView)
+        bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        drawerLayout = findViewById(R.id.drawerLayout)
+        btnMenu = findViewById(R.id.btnMenu)
+        navView = findViewById(R.id.navigationView)
     }
 
-
-    // ============================================================
     // QUICK ACTION BUTTONS
-    // ============================================================
-
     private fun setupQuickActions() {
-
         // QR Approvals
         btnQrApproval.setOnClickListener {
-
-
-
-            Toast.makeText(
-                this,
-                "QR Approvals",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "QR Approvals", Toast.LENGTH_SHORT).show()
         }
-
-
         // System Management
         btnManagement.setOnClickListener {
-
-
-
-            Toast.makeText(
-                this,
-                "System Management",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "System Management", Toast.LENGTH_SHORT).show()
         }
-
-
         // Monitor Stations
         btnMonitorStations.setOnClickListener {
-
-
-
-            Toast.makeText(
-                this,
-                "Monitor Stations",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Monitor Stations", Toast.LENGTH_SHORT).show()
         }
-
 
         // Reservations
         btnReservations.setOnClickListener {
-
-
-
-            Toast.makeText(
-                this,
-                "Reservations",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Reservations", Toast.LENGTH_SHORT).show()
         }
-
 
         // Manage Users
         btnUsers.setOnClickListener {
-
-
-
-            Toast.makeText(
-                this,
-                "Manage Users",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Manage Users", Toast.LENGTH_SHORT).show()
         }
-
-
         // Logout
         btnLogout.setOnClickListener {
-
-            performLogout()
+            showLogoutConfirmation()
         }
     }
 
+    private fun setupSidebar() {
+        btnMenu.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
 
-    // ============================================================
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_home -> drawerLayout.closeDrawer(GravityCompat.START)
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+                R.id.nav_logout -> showLogoutConfirmation()
+                // other items can be added here if needed
+            }
+            true
+        }
+    }
+
     // BOTTOM NAVIGATION
-    // ============================================================
-
     private fun setupBottomNavigation() {
-
         // Home is current page
-        bottomNavigationView.selectedItemId =
-            R.id.navOperatorHome
-
-
+        bottomNavigationView.selectedItemId = R.id.navOperatorHome
         bottomNavigationView.setOnItemSelectedListener { item ->
-
             when (item.itemId) {
-
-                // ------------------------------------------------
                 // HOME
-                // ------------------------------------------------
-
                 R.id.navOperatorHome -> {
-
                     // Already on Grid Operator Dashboard
-
                     true
                 }
 
-
-                // ------------------------------------------------
                 // APPROVALS
-                // ------------------------------------------------
-
                 R.id.navOperatorApprovals -> {
-
-
-
-                    Toast.makeText(
-                        this,
-                        "QR Approvals",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
+                    Toast.makeText(this, "QR Approvals", Toast.LENGTH_SHORT).show()
                     true
                 }
 
-
-                // ------------------------------------------------
                 // STATIONS
-                // ------------------------------------------------
-
                 R.id.navOperatorStations -> {
-
-
-
-                    Toast.makeText(
-                        this,
-                        "Station Monitoring",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
+                    Toast.makeText(this, "Station Monitoring", Toast.LENGTH_SHORT).show()
                     true
                 }
-
-
-                // ------------------------------------------------
                 // PROFILE
-                // ------------------------------------------------
-
                 R.id.navOperatorProfile -> {
-
-
-
-                    Toast.makeText(
-                        this,
-                        "Operator Profile",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
+                    startActivity(Intent(this, ProfileActivity::class.java))
                     true
                 }
-
-
                 else -> false
             }
         }
     }
-
-
-    // ============================================================
+    
     // LOGOUT
-    // ============================================================
-
-    private fun performLogout() {
-
-
-
-
-        Toast.makeText(
-            this,
-            "Logged out successfully",
-            Toast.LENGTH_SHORT
-        ).show()
-
-
-
+    private fun showLogoutConfirmation() {
+        AlertDialog.Builder(this)
+            .setTitle("Sign Out")
+            .setMessage("Are you sure you want to sign out?")
+            .setPositiveButton("Sign Out") { _, _ ->
+                com.smartsolar.microgrid.network.TokenManager.clear()
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 }
