@@ -34,7 +34,8 @@ class M2StationsAdapter(
         val station = stations[position]
 
         holder.tvStationName.text = station.stationName
-        holder.tvCapacity.text = "Distance: 2.4 km • ${station.capacityKwh} kW/h"
+        // Member 4: distances are only displayed when calculated by the map API.
+        holder.tvCapacity.text = "${station.capacityKwh} kWh"
 
         // අර ඔයා දාන පින්තූර 4 මාරුවෙන් මාරුවට සෙට් කරන කෑල්ල
         val imageResId = when (position % 4) {
