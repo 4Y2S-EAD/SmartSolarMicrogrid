@@ -120,10 +120,32 @@ class M3ReservationsAdapter(
     }
 
     private fun showQrTokenDialog(context: android.content.Context, item: ReservationSummaryItem) {
-        AlertDialog.Builder(context)
-            .setTitle("Transaction Token")
-            .setMessage("Station: ${item.stationName}\nSlot: ${item.slotNumber}\nTime: ${item.startTime} - ${item.endTime}\n\nSecure QR Token:\n${item.qrToken}")
-            .setPositiveButton("Close", null)
-            .show()
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.m3_dialog_qr_code, null)
+        
+        val tvStationName = dialogView.findViewById<TextView>(R.id.tvDialogStationName)
+        val tvSlotAndTime = dialogView.findViewById<TextView>(R.id.tvDialogSlotAndTime)
+        val ivQrCode = dialogView.findViewById<android.widget.ImageView>(R.id.ivDialogQrCode)
+        val btnClose = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDialogClose)
+
+        tvStationName.text = item.stationName
+        tvSlotAndTime.text = "Slot ${item.slotNumber} • ${item.startTime} - ${item.endTime}"
+
+        val qrContent = item.qrToken ?: ""
+        val qrBitmap = com.smartsolar.microgrid.member3.utils.QrCodeHelper.generateQrCodeBitmap(qrContent, 600, 600)
+        if (qrBitmap != null) {
+            ivQrCode.setImageBitmap(qrBitmap)
+        }
+
+        val dialog = AlertDialog.Builder(context)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }
