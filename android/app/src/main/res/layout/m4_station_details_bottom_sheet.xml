@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Member 4: selected station details, with the existing Member 2 details route preserved. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="24dp">
+        <TextView android:id="@+id/m4DetailName" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="22sp" android:textStyle="bold" android:textColor="@color/gray_900" />
+        <TextView android:id="@+id/m4DetailBody" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" android:textSize="16sp" android:lineSpacingExtra="6dp" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4DetailOpen"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:text="@string/m4_view_details" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4DetailClose"
+            style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="@string/m4_close" />
+    </LinearLayout>
+</ScrollView>
