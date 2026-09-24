@@ -17,7 +17,7 @@ const navItems: NavItem[] = [
   { id: 'prosumers', label: 'Prosumer Management', icon: Users, roles: ['backoffice'] },
   { id: 'hubs', label: 'Hub Management', icon: Zap, roles: ['backoffice'] },
   { id: 'schedule', label: 'Schedule & Slots', icon: CalendarDays, roles: ['backoffice'] },
-  { id: 'reservations', label: 'Reservations', icon: Gauge, roles: ['backoffice'] },
+  { id: 'reservations', label: 'Reservations', icon: Gauge, roles: ['backoffice', 'grid_operator'] },
   { id: 'qr-flow', label: 'QR Transaction Flow', icon: QrCode, roles: ['backoffice', 'grid_operator'] },
   { id: 'operators', label: 'Operators', icon: Radio, roles: ['backoffice'] },
   { id: 'user-management', label: 'User Management', icon: UserCog, roles: ['backoffice'] },
