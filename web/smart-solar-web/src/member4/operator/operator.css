@@ -1,2 +1,67 @@
 /* Member 4: styles scoped to the operator reservation screen. */
-.m4-operator{color:#172b26;max-width:1440px;margin:auto}.m4-heading{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}.m4-eyebrow{font-size:11px;letter-spacing:.13em;font-weight:700;color:#047857}.m4-heading h2{font-size:28px;font-weight:750;margin:7px 0}.m4-heading p,.m4-caption{color:#65746e;font-size:13px}.m4-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#047857;color:white;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:650;white-space:nowrap;transition:background .15s}.m4-button:hover{background:#065f46}.m4-button:disabled,.m4-pagination button:disabled{opacity:.5;cursor:not-allowed}.m4-button:focus-visible,.m4-tabs button:focus-visible,.m4-pagination button:focus-visible{outline:3px solid #34d399;outline-offset:3px}.m4-secondary{background:#eef6f2;color:#065f46}.m4-secondary:hover{background:#d1fae5}.m4-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.m4-metric{background:white;border:1px solid #dce8e1;border-radius:18px;padding:22px;box-shadow:0 3px 12px #16352a05;animation:m4-enter .2s ease-out}.m4-metric svg{color:#059669}.m4-metric p{font-size:13px;color:#65746e;margin:14px 0 5px}.m4-metric strong{font-size:32px}.m4-caption{margin:12px 0 22px}.m4-panel{background:white;border:1px solid #dce8e1;border-radius:18px;overflow:hidden}.m4-tabs{display:flex;gap:5px;padding:16px;border-bottom:1px solid #edf0ee;overflow-x:auto}.m4-tabs button{padding:10px 14px;white-space:nowrap;color:#596961;border-radius:9px;font-size:13px;font-weight:600}.m4-tabs button[aria-pressed=true]{background:#ecfdf5;color:#047857}.m4-filters{padding:22px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;background:#f8fbf9;animation:m4-enter .18s ease-out}.m4-filters label{font-size:12px;font-weight:650;color:#40564b}.m4-filters input,.m4-filters select{display:block;width:100%;border:1px solid #cad8d0;background:white;border-radius:8px;padding:10px;margin-top:6px;font-size:14px}.m4-filter-actions{display:flex;gap:8px;align-items:end}.m4-table-wrap{overflow-x:auto;animation:m4-enter .18s ease-out}.m4-operator table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}.m4-operator th{padding:15px 18px;background:#f8faf9;color:#65746e;font-size:11px;text-transform:uppercase;letter-spacing:.04em}.m4-operator td{padding:18px;border-top:1px solid #edf0ee;vertical-align:top}.m4-operator td small{display:block;color:#6b7b72;margin-top:6px;font-size:11px}.m4-id{font-family:monospace;overflow-wrap:anywhere;max-width:190px}.m4-status{display:inline-block;padding:5px 10px;border-radius:20px;background:#edf2ef;font-size:12px;font-weight:650}.m4-status-pending{background:#fffbeb;color:#92400e}.m4-status-approved{background:#eff6ff;color:#1d4ed8}.m4-status-completed{background:#ecfdf5;color:#047857}.m4-status-cancelled{background:#fff1f2;color:#be123c}.m4-state{min-height:230px;padding:40px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#65746e;text-align:center}.m4-state h3{font-size:18px;font-weight:650;color:#172b26}.m4-error{color:#9f1239}.m4-notice{background:#f0fdf4;padding:14px 22px;font-size:14px}.m4-pagination{display:flex;justify-content:space-between;align-items:center;padding:18px;gap:12px;border-top:1px solid #edf0ee;font-size:12px;color:#65746e}.m4-pagination button{padding:8px 12px;border:1px solid #dce8e1;border-radius:8px;margin-left:8px}@keyframes m4-enter{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}@media(max-width:900px){.m4-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.m4-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:550px){.m4-heading{align-items:flex-start;flex-direction:column}.m4-heading h2{font-size:23px}.m4-metric{padding:16px}.m4-filters{grid-template-columns:1fr}.m4-pagination{flex-wrap:wrap}}@media(prefers-reduced-motion:reduce){.m4-operator *{animation:none!important;transition:none!important}}
+.m4-operator{color:#172b26;max-width:1440px;margin:auto}.m4-heading{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}.m4-eyebrow{font-size:11px;letter-spacing:.13em;font-weight:700;color:#047857}.m4-heading h2{font-size:28px;font-weight:750;margin:7px 0}.m4-heading p,.m4-caption{color:#65746e;font-size:13px}.m4-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#047857;color:white;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:650;white-space:nowrap;transition:background .15s}.m4-button:hover{background:#065f46}.m4-button:disabled,.m4-pagination button:disabled{opacity:.5;cursor:not-allowed}.m4-button:focus-visible,.m4-tabs button:focus-visible,.m4-pagination button:focus-visible{outline:3px solid #34d399;outline-offset:3px}.m4-secondary{background:#eef6f2;color:#065f46}.m4-secondary:hover{background:#d1fae5}.m4-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.m4-metric{background:white;border:1px solid #dce8e1;border-radius:18px;padding:22px;box-shadow:0 3px 12px #16352a05;animation:m4-enter .2s ease-out}.m4-metric svg{color:#059669}.m4-metric p{font-size:13px;color:#65746e;margin:14px 0 5px}.m4-metric strong{font-size:32px}.m4-caption{margin:12px 0 22px}.m4-panel{background:white;border:1px solid #dce8e1;border-radius:18px;overflow:hidden}.m4-tabs{display:flex;gap:5px;padding:16px;border-bottom:1px solid #edf0ee;overflow-x:auto}.m4-tabs button{padding:10px 14px;white-space:nowrap;color:#596961;border-radius:9px;font-size:13px;font-weight:600}.m4-tabs button[aria-pressed=true]{background:#ecfdf5;color:#047857}.m4-filters{padding:22px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;background:#f8fbf9;animation:m4-enter .18s ease-out}.m4-filters label{font-size:12px;font-weight:650;color:#40564b}.m4-filters input,.m4-filters select{display:block;width:100%;border:1px solid #cad8d0;background:white;border-radius:8px;padding:10px;margin-top:6px;font-size:14px}.m4-filter-actions{display:flex;gap:8px;align-items:end}.m4-table-wrap{overflow-x:auto;animation:m4-enter .18s ease-out}.m4-operator table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}.m4-operator th{padding:15px 18px;background:#f8faf9;color:#65746e;font-size:11px;text-transform:uppercase;letter-spacing:.04em}.m4-operator td{padding:18px;border-top:1px solid #edf0ee;vertical-align:top}.m4-operator td small{display:block;color:#6b7b72;margin-top:6px;font-size:11px}.m4-id{font-family:monospace;overflow-wrap:anywhere;max-width:190px}.m4-status{display:inline-block;padding:5px 10px;border-radius:20px;background:#edf2ef;font-size:12px;font-weight:650}.m4-status-pending{background:#fffbeb;color:#92400e}.m4-status-approved{background:#eff6ff;color:#1d4ed8}.m4-status-completed{background:#ecfdf5;color:#047857}.m4-status-cancelled{background:#fff1f2;color:#be123c}.m4-state{min-height:230px;padding:40px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#65746e;text-align:center}.m4-state h3{font-size:18px;font-weight:650;color:#172b26}.m4-error{color:#9f1239}.m4-notice{background:#f0fdf4;padding:14px 22px;font-size:14px}.m4-pagination{display:flex;justify-content:space-between;align-items:center;padding:18px;gap:12px;border-top:1px solid #edf0ee;font-size:12px;color:#65746e}.m4-pagination button{padding:8px 12px;border:1px solid #dce8e1;border-radius:8px;margin-left:8px}@keyframes m4-enter{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}@media(max-width:900px){.m4-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.m4-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:550px){.m4-heading{align-items:flex-start;flex-direction:column}.m4-heading h2{font-size:23px}.m4-metric{padding:16px}.m4-filters{grid-template-columns:1fr}.m4-pagination{flex-wrap:wrap}}@media(prefers-reduced-motion:reduce){.m4-operator *,.m4-dashboard *{animation:none!important;transition:none!important}}
+
+/* =========================================================================
+   Member 4: Operator Dashboard – metrics-only view with animations
+   ========================================================================= */
+.m4-dashboard{max-width:1200px;margin:auto;display:flex;flex-direction:column;gap:24px}
+
+/* Welcome banner */
+.m4-dash-banner{display:flex;justify-content:space-between;align-items:center;gap:20px;background:linear-gradient(135deg,#065f46 0%,#0f766e 50%,#047857 100%);border-radius:20px;padding:28px 32px;color:white;box-shadow:0 8px 32px rgba(5,150,105,.18)}
+.m4-dash-banner-content{display:flex;align-items:center;gap:18px}
+.m4-dash-banner-icon{width:52px;height:52px;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.m4-dash-banner h2{font-size:22px;font-weight:750;margin:0 0 4px}
+.m4-dash-banner p{font-size:14px;opacity:.8;margin:0}
+.m4-dash-refresh{background:rgba(255,255,255,.2)!important;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);border-radius:12px!important}
+.m4-dash-refresh:hover{background:rgba(255,255,255,.3)!important}
+
+/* Error state */
+.m4-dash-error{background:#fff1f2;border:1px solid #fecdd3;border-radius:14px;padding:20px 24px;color:#9f1239;display:flex;align-items:center;gap:16px}
+.m4-dash-error p{flex:1;margin:0;font-size:14px}
+
+/* Metric cards grid */
+.m4-dash-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.m4-dash-card{border-radius:20px;border-width:1px;border-style:solid;padding:24px;position:relative;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease;cursor:default}
+.m4-dash-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.08)}
+.m4-dash-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.m4-dash-card-badge{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.m4-dash-card-value{display:flex;flex-direction:column;gap:4px}
+.m4-dash-card-value strong{font-size:36px;font-weight:800;line-height:1}
+.m4-dash-card-label{font-size:14px;font-weight:650;opacity:.85}
+.m4-dash-card-sub{font-size:12px;margin-top:8px;opacity:.6}
+
+/* Status bar */
+.m4-dash-status{background:white;border:1px solid #e5e7eb;border-radius:16px;padding:18px 24px;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+.m4-dash-status-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.m4-dash-status-indicator{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:650;color:#111827}
+.m4-dash-status-indicator svg{color:#059669}
+.m4-dash-status-note{font-size:13px;color:#6b7280}
+.m4-dash-progress{margin-top:12px;height:3px;border-radius:2px;background:linear-gradient(90deg,#34d399,#06b6d4,#34d399);background-size:200% 100%;animation:m4-shimmer 1.5s ease-in-out infinite}
+
+/* Grid system status */
+.m4-dash-grid-status{display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,#0f766e,#065f46);border-radius:16px;padding:22px 28px;color:white;box-shadow:0 6px 24px rgba(15,118,110,.15)}
+.m4-dash-grid-status-icon{width:48px;height:48px;background:rgba(126,232,196,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;position:relative;flex-shrink:0}
+.m4-dash-grid-status h3{font-size:16px;font-weight:700;margin:0 0 4px}
+.m4-dash-grid-status p{font-size:13px;opacity:.75;margin:0}
+
+/* Pulse indicator */
+.m4-dash-pulse{position:absolute;inset:0;border-radius:14px;background:rgba(126,232,196,.3);animation:m4-pulse 2s ease-in-out infinite}
+
+/* =========================================================================
+   Dashboard Animations
+   ========================================================================= */
+@keyframes m4-fade-down{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes m4-fade-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes m4-scale-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes m4-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes m4-pulse{0%,100%{opacity:0}50%{opacity:1}}
+
+.m4-anim-fade-down{animation:m4-fade-down .5s cubic-bezier(.22,1,.36,1) both}
+.m4-anim-fade-up{animation:m4-fade-up .5s cubic-bezier(.22,1,.36,1) both}
+.m4-anim-scale-in{animation:m4-scale-in .45s cubic-bezier(.22,1,.36,1) both}
+
+/* =========================================================================
+   Responsive – Dashboard
+   ========================================================================= */
+@media(max-width:1024px){.m4-dash-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.m4-dash-banner{flex-direction:column;align-items:flex-start;padding:22px}.m4-dash-banner h2{font-size:19px}.m4-dash-grid{grid-template-columns:1fr}.m4-dash-card-value strong{font-size:30px}.m4-dash-status-row{flex-direction:column;align-items:flex-start;gap:6px}}

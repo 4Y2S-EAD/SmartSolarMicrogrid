@@ -1,6 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import Dashboard from '@/pages/Dashboard';
+import OperatorDashboard from '@/member4/operator/OperatorDashboard';
 import OperatorReservations from '@/member4/operator/OperatorReservations';
 import ProsumerManagement from '@/pages/ProsumerManagement';
 import HubManagement from '@/pages/HubManagement';
@@ -88,7 +89,7 @@ function App() {
   };
 
   const operatorPages: Record<string, React.ReactNode> = {
-    dashboard: <OperatorReservations />,
+    dashboard: <OperatorDashboard />,
     reservations: <OperatorReservations />,
     'qr-flow': <QrFlow />,
   };
