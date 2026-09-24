@@ -2,6 +2,8 @@ package com.smartsolar.microgrid.member1.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -35,6 +37,23 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
         setupQuickActions()
         setupBottomNavigation()
         setupSidebar()
+        setupAnimations()
+    }
+
+    // STAGGERED ENTRANCE ANIMATIONS
+    private fun setupAnimations() {
+        // Quick action buttons — staggered slide-in
+        val quickActionIds = listOf(
+            R.id.btnQrApproval, R.id.btnManagement,
+            R.id.btnMonitorStations, R.id.btnReservations,
+            R.id.btnUsers, R.id.btnLogout
+        )
+        quickActionIds.forEachIndexed { index, id ->
+            val btn = findViewById<View>(id) ?: return@forEachIndexed
+            val anim = AnimationUtils.loadAnimation(this, R.anim.m4_slide_in_left)
+            anim.startOffset = (index * 80).toLong()
+            btn.startAnimation(anim)
+        }
     }
 
     // INITIALIZE VIEWS
