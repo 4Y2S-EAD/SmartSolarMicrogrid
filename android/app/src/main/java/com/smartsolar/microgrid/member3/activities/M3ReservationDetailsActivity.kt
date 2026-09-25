@@ -585,8 +585,8 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
         // Selected form state
         var targetStationId = reservation.stationId
         var targetSlotId = reservation.slotId
-        var targetStartTime = reservation.startTime.ifBlank { "09:00 AM" }
-        var targetEndTime = reservation.endTime.ifBlank { "10:00 AM" }
+        var targetStartTime = sanitizeTime(reservation.startTime, "01:00 AM")
+        var targetEndTime = sanitizeTime(reservation.endTime, "01:00 AM")
 
         val targetCalendar = Calendar.getInstance()
         val parsedDate = parseIsoDate(reservation.bookingDate)
@@ -918,11 +918,48 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
     private fun parse12HourParts(timeStr: String): Pair<Int, Int> {
         return try {
             val sdf = SimpleDateFormat("hh:mm a", Locale.US)
-            val d = sdf.parse(timeStr.trim()) ?: return Pair(9, 0)
+            val d = sdf.parse(timeStr.trim()) ?: return Pair(1, 0)
             val cal = Calendar.getInstance().apply { time = d }
             Pair(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
         } catch (_: Exception) {
-            Pair(9, 0)
+            Pair(1, 0)
+        }
+    }
+
+    private fun sanitizeTime(rawTime: String?, fallback: String = "01:00 AM"): String {
+        if (rawTime.isNullOrBlank()) return fallback
+        val trimmed = rawTime.trim()
+        if (trimmed.matches(Regex("^(0?[1-9]|1[0-2]):[0-5][0-9]\\s?(AM|PM)$", RegexOption.IGNORE_CASE))) {
+            return try {
+                val sdf = SimpleDateFormat("hh:mm a", Locale.US)
+                val d = sdf.parse(trimmed)
+                if (d != null) SimpleDateFormat("hh:mm a", Locale.US).format(d) else fallback
+            } catch (_: Exception) {
+                fallback
+            }
+        }
+        return try {
+            val timePart = when {
+                trimmed.contains("T") -> trimmed.substringAfter("T").substringBefore(".").substringBefore("Z").trim()
+                trimmed.contains(" ") && trimmed.contains(":") -> trimmed.substringAfter(" ").substringBefore(".").trim()
+                else -> trimmed
+            }
+            val parts = timePart.split(":")
+            if (parts.size >= 2) {
+                val h = parts[0].toIntOrNull() ?: 1
+                val m = parts[1].toIntOrNull() ?: 0
+                val amPm = if (h < 12) "AM" else "PM"
+                val h12 = when {
+                    h == 0 -> 12
+                    h > 12 -> h - 12
+                    else -> h
+                }
+                String.format(Locale.US, "%02d:%02d %s", h12, m, amPm)
+            } else {
+                fallback
+            }
+        } catch (_: Exception) {
+            fallback
         }
     }
 

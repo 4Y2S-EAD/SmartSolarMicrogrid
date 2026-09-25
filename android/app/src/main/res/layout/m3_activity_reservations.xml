@@ -60,6 +60,19 @@
                         android:textSize="11sp" />
                 </LinearLayout>
 
+                <!-- Add Reservation Button -->
+                <ImageView
+                    android:id="@+id/btnAddReservation"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@android:drawable/ic_input_add"
+                    app:tint="#FFFFFF"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="4dp"
+                    android:layout_marginEnd="6dp" />
+
                 <!-- Refresh Button -->
                 <ImageView
                     android:id="@+id/btnRefresh"

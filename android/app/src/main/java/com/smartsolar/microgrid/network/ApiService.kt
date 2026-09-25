@@ -107,4 +107,16 @@ interface ApiService {
         @Path("id") id: String,
         @Body request: CancelReservationRequest
     ): Response<MessageResponse>
+
+    // Creates a new reservation for prosumer
+    @POST("reservations")
+    suspend fun createReservation(
+        @Body request: CreateReservationRequest
+    ): Response<ReservationSummaryItem>
+
+    // Generates signed QR code for an approved or newly created reservation
+    @POST("reservations/{id}/generate-qr")
+    suspend fun generateQrCode(
+        @Path("id") id: String
+    ): Response<GenerateQrResponse>
 }

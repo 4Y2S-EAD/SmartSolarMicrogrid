@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.member2.activities.M2StationsActivity
+import com.smartsolar.microgrid.member3.activities.M3CreateReservationActivity
 import com.smartsolar.microgrid.member3.activities.M3ReservationsActivity
 import kotlinx.coroutines.launch
 
@@ -31,6 +32,7 @@ class HomeActivity : AppCompatActivity() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
         val btnFindStations = findViewById<Button>(R.id.btnFindStations)
+        val btnMakeReservation = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnMakeReservation)
         val btnMyReservations = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnMyReservations)
         val btnRequestDeactivation = findViewById<Button>(R.id.btnRequestDeactivation)
         val tvWelcomeName = findViewById<TextView>(R.id.tvWelcomeName)
@@ -105,6 +107,11 @@ class HomeActivity : AppCompatActivity() {
         btnFindStations.setOnClickListener {
             // M2 Integration: Open Stations screen from Grid Button
             startActivity(Intent(this, M2StationsActivity::class.java))
+        }
+
+        // M3 Integration: Make a Reservation from Quick Action
+        btnMakeReservation?.setOnClickListener {
+            startActivity(Intent(this, M3CreateReservationActivity::class.java))
         }
 
         // M3 Integration: Open My Reservations from Quick Action

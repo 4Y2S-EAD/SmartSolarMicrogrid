@@ -1,5 +1,6 @@
 package com.smartsolar.microgrid.member3.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -123,6 +124,10 @@ class M3ReservationsActivity : AppCompatActivity() {
             finish()
         }
 
+        findViewById<ImageView>(R.id.btnAddReservation)?.setOnClickListener {
+            startActivity(Intent(this, M3CreateReservationActivity::class.java))
+        }
+
         findViewById<ImageView>(R.id.btnRefresh).setOnClickListener {
             loadReservations()
         }
@@ -140,6 +145,11 @@ class M3ReservationsActivity : AppCompatActivity() {
                 loadReservations()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadReservations()
     }
 
     private fun loadReservations() {
