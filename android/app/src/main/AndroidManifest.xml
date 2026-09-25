@@ -94,6 +94,10 @@
             android:name=".member3.activities.M3ReservationsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".member3.activities.M3ReservationDetailsActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

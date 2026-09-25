@@ -109,7 +109,10 @@ class M3ReservationsActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         adapter = M3ReservationsAdapter(emptyList()) { item ->
-            // Click handler
+            val intent = android.content.Intent(this, M3ReservationDetailsActivity::class.java).apply {
+                putExtra(M3ReservationDetailsActivity.EXTRA_RESERVATION_ID, item.reservationId)
+            }
+            startActivity(intent)
         }
         rvReservations.layoutManager = LinearLayoutManager(this)
         rvReservations.adapter = adapter

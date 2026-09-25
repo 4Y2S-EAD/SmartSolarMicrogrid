@@ -57,6 +57,10 @@ interface ApiService {
     @GET("reservations/user/{nic}/dashboard")
     suspend fun getUserReservationDashboard(@Path("nic") nic: String): Response<UserReservationDashboardResponse>
 
+    // Fetches single reservation details by ID
+    @GET("reservations/{id}")
+    suspend fun getReservationById(@Path("id") id: String): Response<ReservationSummaryItem>
+
     // Fetches paginated reservations by status for a user
     @GET("reservations/user/{nic}/approved")
     suspend fun getApprovedReservations(

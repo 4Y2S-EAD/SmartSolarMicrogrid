@@ -201,7 +201,7 @@
                 android:id="@+id/btnQrCode"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="QR Code"
+                android:text="QR"
                 android:textSize="12sp"
                 android:textColor="#059669"
                 app:icon="@drawable/ic_qr_code_24"
@@ -214,6 +214,23 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:visibility="gone" />
+
+            <!-- View Details Button (Visible for all statuses) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnViewDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Details"
+                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                app:icon="@android:drawable/ic_menu_info_details"
+                app:iconTint="#FFFFFF"
+                app:iconSize="16dp"
+                app:cornerRadius="8dp"
+                app:backgroundTint="#059669"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:layout_marginStart="8dp" />
         </LinearLayout>
 
     </LinearLayout>

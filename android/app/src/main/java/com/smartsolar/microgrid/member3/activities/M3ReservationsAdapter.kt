@@ -28,6 +28,7 @@ class M3ReservationsAdapter(
         val tvCancellationReason: TextView = view.findViewById(R.id.tvCancellationReason)
         val tvReservationId: TextView = view.findViewById(R.id.tvReservationId)
         val btnQrCode: MaterialButton = view.findViewById(R.id.btnQrCode)
+        val btnViewDetails: MaterialButton = view.findViewById(R.id.btnViewDetails)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReservationViewHolder {
@@ -95,8 +96,25 @@ class M3ReservationsAdapter(
             holder.btnQrCode.visibility = View.GONE
         }
 
+        // Details Button (Always visible)
+        holder.btnViewDetails.setOnClickListener {
+            val context = holder.itemView.context
+            val intent = android.content.Intent(context, M3ReservationDetailsActivity::class.java).apply {
+                putExtra(M3ReservationDetailsActivity.EXTRA_RESERVATION_ID, item.reservationId)
+            }
+            context.startActivity(intent)
+        }
+
         holder.itemView.setOnClickListener {
-            onItemClick?.invoke(item)
+            if (onItemClick != null) {
+                onItemClick.invoke(item)
+            } else {
+                val context = holder.itemView.context
+                val intent = android.content.Intent(context, M3ReservationDetailsActivity::class.java).apply {
+                    putExtra(M3ReservationDetailsActivity.EXTRA_RESERVATION_ID, item.reservationId)
+                }
+                context.startActivity(intent)
+            }
         }
     }
 
