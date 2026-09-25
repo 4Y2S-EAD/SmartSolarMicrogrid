@@ -54,7 +54,7 @@ class OperatorReservationFlowTest {
             awaitHidden(R.id.m4SummaryLoading)
             val summary = runBlocking { ApiClient.apiService.getOperatorReservations(emptyMap()).body()!!.summary }
             onView(withId(R.id.m4ActiveCount)).check(matches(withText(summary.activeCount.toString())))
-            onView(withId(R.id.m4OpenAll)).perform(scrollTo())
+            onView(withId(R.id.m4CardActive)).perform(scrollTo())
             capture("android-dashboard")
             onView(withId(R.id.navOperatorStations)).perform(click())
             awaitHidden(R.id.m4Loading)
@@ -92,6 +92,7 @@ class OperatorReservationFlowTest {
             scenario.recreate()
             awaitHidden(R.id.m4OperatorLoading)
             onView(allOf(withId(R.id.m4ReservationStatus), isDisplayed())).check(matches(withText("Approved")))
+            onView(withId(R.id.m4TabSearch)).perform(click())
             onView(withId(R.id.m4FilterId)).perform(scrollTo(), replaceText("000000000000000000000000"), closeSoftKeyboard())
             onView(withId(R.id.m4FilterSubmit)).perform(scrollTo(), click())
             awaitHidden(R.id.m4OperatorLoading)

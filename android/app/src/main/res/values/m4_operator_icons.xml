@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="m4_operator_back">Back</string>
+    <string name="m4_operator_refresh">Refresh reservations</string>
+    <string name="m4_operator_previous">Previous page</string>
+    <string name="m4_operator_next">Next page</string>
+</resources>
