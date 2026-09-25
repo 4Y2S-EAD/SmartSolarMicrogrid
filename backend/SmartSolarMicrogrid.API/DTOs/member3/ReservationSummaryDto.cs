@@ -22,10 +22,19 @@ namespace SmartSolarMicrogrid.API.DTOs.member3
     public string EndTime { get; set; } = null!;
     public string Status { get; set; } = null!;
     public string? QrToken { get; set; }
+    public string? OperatorId { get; set; }
     public DateTime? VerifiedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
     public string? CancellationReason { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    // Station & Slot metadata
+    public double? StationCapacityKwh { get; set; }
+    public int? BatterySlotCount { get; set; }
+    public int? AvailableSlotCount { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public double? SlotCapacityKwh { get; set; }
   }
 }

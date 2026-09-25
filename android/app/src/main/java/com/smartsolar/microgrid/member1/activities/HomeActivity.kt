@@ -13,6 +13,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.member2.activities.M2StationsActivity
+import com.smartsolar.microgrid.member3.activities.M3CreateReservationActivity
+import com.smartsolar.microgrid.member3.activities.M3ReservationsActivity
 import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
@@ -30,6 +32,8 @@ class HomeActivity : AppCompatActivity() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
         val btnFindStations = findViewById<Button>(R.id.btnFindStations)
+        val btnMakeReservation = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnMakeReservation)
+        val btnMyReservations = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnMyReservations)
         val btnRequestDeactivation = findViewById<Button>(R.id.btnRequestDeactivation)
         val tvWelcomeName = findViewById<TextView>(R.id.tvWelcomeName)
 
@@ -38,6 +42,7 @@ class HomeActivity : AppCompatActivity() {
         if (nic != null) {
             tvWelcomeName.text = "Loading..."
             fetchUserProfile(nic, tvWelcomeName)
+            fetchReservationDashboardStats(nic)
         } else {
             tvWelcomeName.text = "Welcome User"
         }
@@ -55,6 +60,12 @@ class HomeActivity : AppCompatActivity() {
                 // M2 Integration: Open Stations screen from Sidebar
                 R.id.nav_stations -> {
                     startActivity(Intent(this, M2StationsActivity::class.java))
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+
+                // M3 Integration: Open My Reservations from Sidebar
+                R.id.nav_bookings -> {
+                    startActivity(Intent(this, M3ReservationsActivity::class.java))
                     drawerLayout.closeDrawer(GravityCompat.START)
                 }
 
@@ -78,6 +89,12 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
 
+                // M3 Integration: Open My Reservations from Bottom Bar
+                R.id.bottom_bookings -> {
+                    startActivity(Intent(this, M3ReservationsActivity::class.java))
+                    true
+                }
+
                 R.id.bottom_profile -> {
                     startActivity(Intent(this, ProfileActivity::class.java))
                     true
@@ -92,8 +109,44 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this, M2StationsActivity::class.java))
         }
 
+        // M3 Integration: Make a Reservation from Quick Action
+        btnMakeReservation?.setOnClickListener {
+            startActivity(Intent(this, M3CreateReservationActivity::class.java))
+        }
+
+        // M3 Integration: Open My Reservations from Quick Action
+        btnMyReservations?.setOnClickListener {
+            startActivity(Intent(this, M3ReservationsActivity::class.java))
+        }
+
         btnRequestDeactivation.setOnClickListener {
             startActivity(Intent(this, DeactivationActivity::class.java))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val nic = com.smartsolar.microgrid.network.TokenManager.getNic()
+        if (nic != null) {
+            fetchReservationDashboardStats(nic)
+        }
+    }
+
+    private fun fetchReservationDashboardStats(nic: String) {
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            try {
+                val response = com.smartsolar.microgrid.network.ApiClient.apiService.getUserReservationDashboard(nic)
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val stats = response.body()!!
+                        findViewById<TextView>(R.id.tvActiveCount)?.text = stats.approvedCount.toString()
+                        findViewById<TextView>(R.id.tvPendingCount)?.text = stats.pendingCount.toString()
+                        findViewById<TextView>(R.id.tvCompletedCount)?.text = stats.completedCount.toString()
+                    }
+                }
+            } catch (e: Exception) {
+                // Keep default 0 in case of error
+            }
         }
     }
 

@@ -24,3 +24,31 @@ data class UpdateProfileRequest(
 data class DeactivationRequest(
     val reason: String
 )
+
+data class UpdateReservationRequest(
+    val stationId: String,
+    val slotId: String,
+    val bookingDate: String,
+    val startTime: String,
+    val endTime: String
+)
+
+data class CancelReservationRequest(
+    val cancellationReason: String
+)
+
+data class CreateReservationRequest(
+    val prosumerNic: String,
+    val stationId: String,
+    val slotId: String,
+    val bookingDate: String,
+    val startTime: String,
+    val endTime: String
+)
+
+data class GenerateQrResponse(
+    val message: String? = null,
+    val reservationId: String? = null,
+    val qrToken: String? = null,
+    val generatedAt: String? = null
+)
