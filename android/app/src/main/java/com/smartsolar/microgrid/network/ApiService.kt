@@ -93,4 +93,18 @@ interface ApiService {
         @Query("page") page: Int = 1,
         @Query("pageSize") pageSize: Int = 10
     ): Response<PaginatedReservationsResponse>
+
+    // Updates an existing reservation schedule, station or slot
+    @PUT("reservations/{id}")
+    suspend fun updateReservation(
+        @Path("id") id: String,
+        @Body request: UpdateReservationRequest
+    ): Response<ReservationSummaryItem>
+
+    // Cancels a reservation with a cancellation reason
+    @PUT("reservations/{id}/cancel")
+    suspend fun cancelReservation(
+        @Path("id") id: String,
+        @Body request: CancelReservationRequest
+    ): Response<MessageResponse>
 }

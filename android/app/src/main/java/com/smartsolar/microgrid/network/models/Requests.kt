@@ -24,3 +24,15 @@ data class UpdateProfileRequest(
 data class DeactivationRequest(
     val reason: String
 )
+
+data class UpdateReservationRequest(
+    val stationId: String,
+    val slotId: String,
+    val bookingDate: String,
+    val startTime: String,
+    val endTime: String
+)
+
+data class CancelReservationRequest(
+    val cancellationReason: String
+)

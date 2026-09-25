@@ -1,6 +1,8 @@
 package com.smartsolar.microgrid.member3.activities
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -10,9 +12,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.RadioButton
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -23,11 +30,20 @@ import com.google.android.material.card.MaterialCardView
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.member3.utils.QrCodeHelper
 import com.smartsolar.microgrid.network.ApiClient
+import com.smartsolar.microgrid.network.models.BookingSlot
+import com.smartsolar.microgrid.network.models.CancelReservationRequest
 import com.smartsolar.microgrid.network.models.ReservationSummaryItem
+import com.smartsolar.microgrid.network.models.Station
+import com.smartsolar.microgrid.network.models.UpdateReservationRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class M3ReservationDetailsActivity : AppCompatActivity() {
 
@@ -93,6 +109,12 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
     private lateinit var tvDetailCompletedAt: TextView
     private lateinit var layoutTimelineUpdated: LinearLayout
     private lateinit var tvDetailUpdatedAt: TextView
+
+    // Action Controls (Update & Cancel Booking)
+    private lateinit var layoutActionButtons: LinearLayout
+    private lateinit var btnUpdateReservation: MaterialButton
+    private lateinit var btnCancelReservation: MaterialButton
+    private lateinit var tvActionNotice: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -163,6 +185,12 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
         layoutTimelineUpdated = findViewById(R.id.layoutTimelineUpdated)
         tvDetailUpdatedAt = findViewById(R.id.tvDetailUpdatedAt)
 
+        // Action Buttons
+        layoutActionButtons = findViewById(R.id.layoutActionButtons)
+        btnUpdateReservation = findViewById(R.id.btnUpdateReservation)
+        btnCancelReservation = findViewById(R.id.btnCancelReservation)
+        tvActionNotice = findViewById(R.id.tvActionNotice)
+
         setupWebView()
     }
 
@@ -197,6 +225,18 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
         btnOpenGoogleMaps.setOnClickListener {
             openLocationInGoogleMaps()
         }
+
+        btnCancelReservation.setOnClickListener {
+            currentReservation?.let { reservation ->
+                showCancelDialog(reservation)
+            }
+        }
+
+        btnUpdateReservation.setOnClickListener {
+            currentReservation?.let { reservation ->
+                showUpdateDialog(reservation)
+            }
+        }
     }
 
     private fun openLocationInGoogleMaps() {
@@ -215,7 +255,6 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
             if (mapIntent.resolveActivity(packageManager) != null) {
                 startActivity(mapIntent)
             } else {
-                // Fallback to browser or any map handler
                 val webMapIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng"))
                 startActivity(webMapIntent)
             }
@@ -235,7 +274,6 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
                     val reservation = response.body()!!
                     currentReservation = reservation
 
-                    // Check if we need to fetch additional station or slot metadata
                     var stationCapacity = reservation.stationCapacityKwh
                     var batterySlots = reservation.batterySlotCount
                     var availableSlots = reservation.availableSlotCount
@@ -244,7 +282,7 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
                     var stationStatus = "Active"
                     var slotCapacity = reservation.slotCapacityKwh
 
-                    // Fetch Station details if not fully present
+                    // Fetch Station details if not fully joined
                     if (stationLat == null || stationCapacity == null) {
                         try {
                             val stationResp = ApiClient.apiService.getStationById(reservation.stationId)
@@ -395,8 +433,8 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
         // Map section
         if (stationLat != null && stationLng != null && stationLat != 0.0 && stationLng != 0.0) {
             layoutStationMapContainer.visibility = View.VISIBLE
-            val formattedLat = String.format("%.4f", stationLat)
-            val formattedLng = String.format("%.4f", stationLng)
+            val formattedLat = String.format(Locale.US, "%.4f", stationLat)
+            val formattedLng = String.format(Locale.US, "%.4f", stationLng)
             tvDetailCoordinates.text = "$formattedLat°, $formattedLng°"
 
             val mapHtml = buildLeafletMapHtml(stationLat, stationLng, item.stationName)
@@ -439,6 +477,475 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
             tvDetailUpdatedAt.text = formatTimestamp(item.updatedAt)
         } else {
             layoutTimelineUpdated.visibility = View.GONE
+        }
+
+        // Action Controls Visibility (Only editable when Pending or Approved)
+        val isEditable = statusUpper.contains("PEND") || statusUpper.contains("APPROV")
+        if (isEditable) {
+            btnUpdateReservation.visibility = View.VISIBLE
+            btnCancelReservation.visibility = View.VISIBLE
+            tvActionNotice.visibility = View.GONE
+        } else {
+            btnUpdateReservation.visibility = View.GONE
+            btnCancelReservation.visibility = View.GONE
+            tvActionNotice.visibility = View.VISIBLE
+            tvActionNotice.text = "This reservation is ${item.status} and can no longer be updated or cancelled."
+        }
+    }
+
+    private fun showCancelDialog(reservation: ReservationSummaryItem) {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.m3_dialog_cancel_reservation, null)
+        val etReason = dialogView.findViewById<EditText>(R.id.etCancelReason)
+        val tvError = dialogView.findViewById<TextView>(R.id.tvCancelError)
+        val pbLoading = dialogView.findViewById<ProgressBar>(R.id.pbCancelLoading)
+        val btnDismiss = dialogView.findViewById<MaterialButton>(R.id.btnCancelDismiss)
+        val btnConfirm = dialogView.findViewById<MaterialButton>(R.id.btnConfirmCancel)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnDismiss.setOnClickListener { dialog.dismiss() }
+
+        btnConfirm.setOnClickListener {
+            val reason = etReason.text.toString().trim()
+            if (reason.isBlank()) {
+                tvError.visibility = View.VISIBLE
+                tvError.text = "Please enter a cancellation reason."
+                return@setOnClickListener
+            }
+
+            if (isLessThan12HoursAway(reservation.bookingDate, reservation.startTime)) {
+                tvError.visibility = View.VISIBLE
+                tvError.text = "Reservations can only be cancelled at least 12 hours in advance."
+                return@setOnClickListener
+            }
+
+            tvError.visibility = View.GONE
+            pbLoading.visibility = View.VISIBLE
+            btnConfirm.isEnabled = false
+            btnDismiss.isEnabled = false
+
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val resp = ApiClient.apiService.cancelReservation(
+                        reservation.reservationId,
+                        CancelReservationRequest(cancellationReason = reason)
+                    )
+                    withContext(Dispatchers.Main) {
+                        pbLoading.visibility = View.GONE
+                        btnConfirm.isEnabled = true
+                        btnDismiss.isEnabled = true
+
+                        if (resp.isSuccessful) {
+                            dialog.dismiss()
+                            Toast.makeText(this@M3ReservationDetailsActivity, "Reservation cancelled successfully.", Toast.LENGTH_LONG).show()
+                            fetchReservationDetails()
+                        } else {
+                            val errorMsg = parseErrorMessage(resp.errorBody()?.string())
+                                ?: "Failed to cancel reservation (${resp.code()})"
+                            tvError.visibility = View.VISIBLE
+                            tvError.text = errorMsg
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        pbLoading.visibility = View.GONE
+                        btnConfirm.isEnabled = true
+                        btnDismiss.isEnabled = true
+                        tvError.visibility = View.VISIBLE
+                        tvError.text = "Network error: ${e.localizedMessage ?: "Unknown error"}"
+                    }
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun showUpdateDialog(reservation: ReservationSummaryItem) {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.m3_dialog_update_reservation, null)
+        val tvError = dialogView.findViewById<TextView>(R.id.tvUpdateError)
+        val spStation = dialogView.findViewById<Spinner>(R.id.spUpdateStation)
+        val pbSlots = dialogView.findViewById<ProgressBar>(R.id.pbSlotsLoading)
+        val tvNoSlots = dialogView.findViewById<TextView>(R.id.tvNoSlotsNotice)
+        val layoutSlots = dialogView.findViewById<LinearLayout>(R.id.layoutSlotList)
+        val btnPickDate = dialogView.findViewById<MaterialCardView>(R.id.btnPickDate)
+        val tvDate = dialogView.findViewById<TextView>(R.id.tvSelectedDate)
+        val btnPickStart = dialogView.findViewById<MaterialCardView>(R.id.btnPickStartTime)
+        val tvStart = dialogView.findViewById<TextView>(R.id.tvSelectedStartTime)
+        val btnPickEnd = dialogView.findViewById<MaterialCardView>(R.id.btnPickEndTime)
+        val tvEnd = dialogView.findViewById<TextView>(R.id.tvSelectedEndTime)
+        val pbUpdate = dialogView.findViewById<ProgressBar>(R.id.pbUpdateLoading)
+        val btnDismiss = dialogView.findViewById<MaterialButton>(R.id.btnUpdateDismiss)
+        val btnSave = dialogView.findViewById<MaterialButton>(R.id.btnSaveUpdate)
+
+        // Selected form state
+        var targetStationId = reservation.stationId
+        var targetSlotId = reservation.slotId
+        var targetStartTime = reservation.startTime.ifBlank { "09:00 AM" }
+        var targetEndTime = reservation.endTime.ifBlank { "10:00 AM" }
+
+        val targetCalendar = Calendar.getInstance()
+        val parsedDate = parseIsoDate(reservation.bookingDate)
+        if (parsedDate != null && parsedDate.after(Date())) {
+            targetCalendar.time = parsedDate
+        } else {
+            targetCalendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        val dateDisplayFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        tvDate.text = dateDisplayFormat.format(targetCalendar.time)
+        tvStart.text = targetStartTime
+        tvEnd.text = targetEndTime
+
+        val stationsList = mutableListOf<Station>()
+        val slotsList = mutableListOf<BookingSlot>()
+        var isInitialStationSelection = true
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        btnDismiss.setOnClickListener { dialog.dismiss() }
+
+        // Date Picker (Only today up to 7 days ahead)
+        btnPickDate.setOnClickListener {
+            val datePicker = DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    targetCalendar.set(Calendar.YEAR, year)
+                    targetCalendar.set(Calendar.MONTH, month)
+                    targetCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    tvDate.text = dateDisplayFormat.format(targetCalendar.time)
+                    tvError.visibility = View.GONE
+                },
+                targetCalendar.get(Calendar.YEAR),
+                targetCalendar.get(Calendar.MONTH),
+                targetCalendar.get(Calendar.DAY_OF_MONTH)
+            )
+
+            val minCal = Calendar.getInstance()
+            datePicker.datePicker.minDate = minCal.timeInMillis
+            val maxCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 7) }
+            datePicker.datePicker.maxDate = maxCal.timeInMillis
+            datePicker.show()
+        }
+
+        // Start Time Picker (12-hour format)
+        btnPickStart.setOnClickListener {
+            val (hour, min) = parse12HourParts(targetStartTime)
+            TimePickerDialog(
+                this,
+                { _, selectedHour, selectedMinute ->
+                    val amPm = if (selectedHour < 12) "AM" else "PM"
+                    val hour12 = when {
+                        selectedHour == 0 -> 12
+                        selectedHour > 12 -> selectedHour - 12
+                        else -> selectedHour
+                    }
+                    targetStartTime = String.format(Locale.US, "%02d:%02d %s", hour12, selectedMinute, amPm)
+                    tvStart.text = targetStartTime
+                    tvError.visibility = View.GONE
+                },
+                hour,
+                min,
+                false
+            ).show()
+        }
+
+        // End Time Picker (12-hour format)
+        btnPickEnd.setOnClickListener {
+            val (hour, min) = parse12HourParts(targetEndTime)
+            TimePickerDialog(
+                this,
+                { _, selectedHour, selectedMinute ->
+                    val amPm = if (selectedHour < 12) "AM" else "PM"
+                    val hour12 = when {
+                        selectedHour == 0 -> 12
+                        selectedHour > 12 -> selectedHour - 12
+                        else -> selectedHour
+                    }
+                    targetEndTime = String.format(Locale.US, "%02d:%02d %s", hour12, selectedMinute, amPm)
+                    tvEnd.text = targetEndTime
+                    tvError.visibility = View.GONE
+                },
+                hour,
+                min,
+                false
+            ).show()
+        }
+
+        // Function to render selectable slot cards
+        fun refreshSlotCards() {
+            layoutSlots.removeAllViews()
+            if (slotsList.isEmpty()) {
+                tvNoSlots.visibility = View.VISIBLE
+                return
+            }
+            tvNoSlots.visibility = View.GONE
+
+            for (slot in slotsList) {
+                val itemView = LayoutInflater.from(this).inflate(R.layout.m3_item_slot_selectable, layoutSlots, false)
+                val card = itemView.findViewById<MaterialCardView>(R.id.cardSelectableSlot)
+                val rb = itemView.findViewById<RadioButton>(R.id.rbSlotSelected)
+                val tvTitle = itemView.findViewById<TextView>(R.id.tvSlotTitle)
+                val tvCap = itemView.findViewById<TextView>(R.id.tvSlotCapacity)
+                val tvBadge = itemView.findViewById<TextView>(R.id.tvSlotStatusBadge)
+
+                val isSelected = (slot.slotId == targetSlotId)
+                rb.isChecked = isSelected
+
+                tvTitle.text = "Slot #${slot.slotNumber}"
+                tvCap.text = "Capacity: ${slot.capacityKwh} kWh"
+                tvBadge.text = slot.status
+
+                if (isSelected) {
+                    card.strokeColor = Color.parseColor("#059669")
+                    card.strokeWidth = 4
+                    card.setCardBackgroundColor(Color.parseColor("#ECFDF5"))
+                } else {
+                    card.strokeColor = Color.parseColor("#E5E7EB")
+                    card.strokeWidth = 2
+                    card.setCardBackgroundColor(Color.parseColor("#FFFFFF"))
+                }
+
+                card.setOnClickListener {
+                    targetSlotId = slot.slotId
+                    if (slot.startTime.isNotBlank() && slot.startTime.contains(":")) {
+                        targetStartTime = slot.startTime
+                        tvStart.text = targetStartTime
+                    }
+                    if (slot.endTime.isNotBlank() && slot.endTime.contains(":")) {
+                        targetEndTime = slot.endTime
+                        tvEnd.text = targetEndTime
+                    }
+                    tvError.visibility = View.GONE
+                    refreshSlotCards()
+                }
+
+                layoutSlots.addView(itemView)
+            }
+        }
+
+        // Function to load slots for selected station
+        fun loadSlotsForStation(stationId: String, preselectedSlotId: String?) {
+            pbSlots.visibility = View.VISIBLE
+            layoutSlots.removeAllViews()
+            tvNoSlots.visibility = View.GONE
+
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val resp = ApiClient.apiService.getStationSlots(stationId)
+                    withContext(Dispatchers.Main) {
+                        pbSlots.visibility = View.GONE
+                        if (resp.isSuccessful && resp.body() != null) {
+                            slotsList.clear()
+                            slotsList.addAll(resp.body()!!)
+
+                            if (preselectedSlotId != null && slotsList.any { it.slotId == preselectedSlotId }) {
+                                targetSlotId = preselectedSlotId
+                            } else if (slotsList.isNotEmpty()) {
+                                targetSlotId = slotsList[0].slotId
+                            } else {
+                                targetSlotId = ""
+                            }
+                            refreshSlotCards()
+                        } else {
+                            tvNoSlots.visibility = View.VISIBLE
+                            tvNoSlots.text = "Could not fetch slots for this station."
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        pbSlots.visibility = View.GONE
+                        tvNoSlots.visibility = View.VISIBLE
+                        tvNoSlots.text = "Network error loading slots."
+                    }
+                }
+            }
+        }
+
+        // Fetch Stations from backend
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val resp = ApiClient.apiService.getStations()
+                withContext(Dispatchers.Main) {
+                    if (resp.isSuccessful && resp.body() != null) {
+                        stationsList.clear()
+                        stationsList.addAll(resp.body()!!.filter { it.status.equals("Active", ignoreCase = true) })
+                        if (stationsList.isEmpty()) {
+                            stationsList.addAll(resp.body()!!)
+                        }
+
+                        val stationNames = stationsList.map { it.stationName }
+                        val adapter = ArrayAdapter(this@M3ReservationDetailsActivity, android.R.layout.simple_spinner_dropdown_item, stationNames)
+                        spStation.adapter = adapter
+
+                        val currentIndex = stationsList.indexOfFirst { it.stationId == targetStationId }
+                        if (currentIndex >= 0) {
+                            spStation.setSelection(currentIndex)
+                        }
+
+                        spStation.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                                val selectedStation = stationsList[position]
+                                if (isInitialStationSelection) {
+                                    isInitialStationSelection = false
+                                    loadSlotsForStation(selectedStation.stationId, reservation.slotId)
+                                } else {
+                                    if (targetStationId != selectedStation.stationId) {
+                                        targetStationId = selectedStation.stationId
+                                        targetSlotId = ""
+                                        loadSlotsForStation(targetStationId, null)
+                                    }
+                                }
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>?) {}
+                        }
+                    } else {
+                        tvError.visibility = View.VISIBLE
+                        tvError.text = "Failed to load stations."
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    tvError.visibility = View.VISIBLE
+                    tvError.text = "Failed to load stations: ${e.localizedMessage}"
+                }
+            }
+        }
+
+        // Save Changes button
+        btnSave.setOnClickListener {
+            if (targetStationId.isBlank()) {
+                tvError.visibility = View.VISIBLE
+                tvError.text = "Please select a station."
+                return@setOnClickListener
+            }
+
+            if (targetSlotId.isBlank()) {
+                tvError.visibility = View.VISIBLE
+                tvError.text = "Please select a battery slot."
+                return@setOnClickListener
+            }
+
+            // Check 7 day limit
+            val maxAllowedCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 7) }
+            if (targetCalendar.after(maxAllowedCal)) {
+                tvError.visibility = View.VISIBLE
+                tvError.text = "Reservation reschedule must be within the 7 day period."
+                return@setOnClickListener
+            }
+
+            // Check if current reservation has at least 12 hours remaining
+            if (isLessThan12HoursAway(reservation.bookingDate, reservation.startTime)) {
+                tvError.visibility = View.VISIBLE
+                tvError.text = "Reservations can only be modified at least 12 hours in advance."
+                return@setOnClickListener
+            }
+
+            val isoDate = String.format(
+                Locale.US,
+                "%04d-%02d-%02dT00:00:00.000Z",
+                targetCalendar.get(Calendar.YEAR),
+                targetCalendar.get(Calendar.MONTH) + 1,
+                targetCalendar.get(Calendar.DAY_OF_MONTH)
+            )
+
+            tvError.visibility = View.GONE
+            pbUpdate.visibility = View.VISIBLE
+            btnSave.isEnabled = false
+            btnDismiss.isEnabled = false
+
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val updateReq = UpdateReservationRequest(
+                        stationId = targetStationId,
+                        slotId = targetSlotId,
+                        bookingDate = isoDate,
+                        startTime = targetStartTime,
+                        endTime = targetEndTime
+                    )
+                    val resp = ApiClient.apiService.updateReservation(reservation.reservationId, updateReq)
+                    withContext(Dispatchers.Main) {
+                        pbUpdate.visibility = View.GONE
+                        btnSave.isEnabled = true
+                        btnDismiss.isEnabled = true
+
+                        if (resp.isSuccessful) {
+                            dialog.dismiss()
+                            Toast.makeText(this@M3ReservationDetailsActivity, "Reservation updated successfully!", Toast.LENGTH_LONG).show()
+                            fetchReservationDetails()
+                        } else {
+                            val err = parseErrorMessage(resp.errorBody()?.string())
+                                ?: "Failed to update reservation (${resp.code()})"
+                            tvError.visibility = View.VISIBLE
+                            tvError.text = err
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        pbUpdate.visibility = View.GONE
+                        btnSave.isEnabled = true
+                        btnDismiss.isEnabled = true
+                        tvError.visibility = View.VISIBLE
+                        tvError.text = "Network error: ${e.localizedMessage ?: "Unknown error"}"
+                    }
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun isLessThan12HoursAway(bookingDateStr: String, startTimeStr: String): Boolean {
+        return try {
+            val datePart = bookingDateStr.substringBefore("T")
+            val sdf = SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.US)
+            val scheduledDate = sdf.parse("$datePart $startTimeStr") ?: return false
+            val remainingMillis = scheduledDate.time - System.currentTimeMillis()
+            remainingMillis < (12L * 60 * 60 * 1000)
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun parse12HourParts(timeStr: String): Pair<Int, Int> {
+        return try {
+            val sdf = SimpleDateFormat("hh:mm a", Locale.US)
+            val d = sdf.parse(timeStr.trim()) ?: return Pair(9, 0)
+            val cal = Calendar.getInstance().apply { time = d }
+            Pair(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
+        } catch (_: Exception) {
+            Pair(9, 0)
+        }
+    }
+
+    private fun parseIsoDate(isoDateStr: String): Date? {
+        return try {
+            val datePart = isoDateStr.substringBefore("T")
+            SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(datePart)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun parseErrorMessage(rawError: String?): String? {
+        if (rawError.isNullOrBlank()) return null
+        return try {
+            val json = JSONObject(rawError)
+            when {
+                json.has("message") -> json.getString("message")
+                json.has("Message") -> json.getString("Message")
+                else -> rawError
+            }
+        } catch (_: Exception) {
+            rawError
         }
     }
 

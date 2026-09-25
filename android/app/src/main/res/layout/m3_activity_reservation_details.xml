@@ -946,6 +946,72 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Action Controls (Update & Cancel Booking) -->
+                <LinearLayout
+                    android:id="@+id/layoutActionButtons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <!-- Update Button -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnUpdateReservation"
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="1"
+                            android:text="Update Schedule"
+                            android:textSize="13sp"
+                            android:textColor="#059669"
+                            app:icon="@android:drawable/ic_menu_edit"
+                            app:iconTint="#059669"
+                            app:iconSize="18dp"
+                            app:iconGravity="textStart"
+                            app:strokeColor="#A7F3D0"
+                            app:strokeWidth="1.5dp"
+                            app:backgroundTint="#ECFDF5"
+                            app:cornerRadius="12dp"
+                            android:layout_marginEnd="6dp" />
+
+                        <!-- Cancel Button (Red) -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnCancelReservation"
+                            android:layout_width="0dp"
+                            android:layout_height="50dp"
+                            android:layout_weight="1"
+                            android:text="Cancel Booking"
+                            android:textSize="13sp"
+                            android:textColor="#FFFFFF"
+                            app:icon="@android:drawable/ic_menu_delete"
+                            app:iconTint="#FFFFFF"
+                            app:iconSize="18dp"
+                            app:iconGravity="textStart"
+                            app:backgroundTint="#DC2626"
+                            app:cornerRadius="12dp"
+                            android:layout_marginStart="6dp" />
+                    </LinearLayout>
+
+                    <!-- Status notice when locked -->
+                    <TextView
+                        android:id="@+id/tvActionNotice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="This reservation can no longer be updated or cancelled."
+                        android:textColor="#9CA3AF"
+                        android:textSize="12sp"
+                        android:textStyle="italic"
+                        android:gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:visibility="gone" />
+                </LinearLayout>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
