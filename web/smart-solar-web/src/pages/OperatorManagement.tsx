@@ -9,12 +9,15 @@ import EmptyState from '@/components/ui/EmptyState';
 import { Radio, Plus, Pencil, Power, User } from 'lucide-react';
 
 type OperatorForm = {
+  nic?: string;
+  email?: string;
+  password?: string;
   badge_id: string;
   full_name: string;
   assigned_hub_id: string;
 };
 
-const emptyForm: OperatorForm = { badge_id: '', full_name: '', assigned_hub_id: '' };
+const emptyForm: OperatorForm = { nic: '', email: '', password: '', badge_id: '', full_name: '', assigned_hub_id: '' };
 
 export default function OperatorManagement() {
   const [operators, setOperators] = useState<Operator[]>([]);
@@ -29,15 +32,28 @@ export default function OperatorManagement() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [operators, hubs] = await Promise.all([
-        ApiService.getOperators(),
+      const [users, hubsList] = await Promise.all([
+        ApiService.getUsers(),
         ApiService.getHubs(),
       ]);
-      setOperators(operators || []);
-      const activeHubs = (hubs || [])
-        .filter(h => h.status === 'active')
+      const activeHubs = (hubsList || [])
+        .filter(h => h.status?.toLowerCase() === 'active')
         .sort((a, b) => (a.stationName || '').localeCompare(b.stationName || ''));
       setHubs(activeHubs);
+
+      const ops: Operator[] = (users || [])
+        .filter(u => u.role === 'grid_operator')
+        .map(u => ({
+          id: u.id || u.nic || '',
+          user_id: u.id,
+          badge_id: u.badge_id || '',
+          full_name: u.full_name,
+          assigned_hub_id: u.assigned_hub_id,
+          status: u.status as 'active' | 'inactive',
+          created_at: u.created_at,
+          assigned_hub: activeHubs.find(h => h.stationId === u.assigned_hub_id)
+        }));
+      setOperators(ops);
     } catch (err) {
       console.error('Failed to load operators/hubs:', err);
     } finally {
@@ -60,19 +76,30 @@ export default function OperatorManagement() {
       setFormError('Badge ID and full name are required.');
       return;
     }
-    const payload = {
-      badge_id: form.badge_id,
-      full_name: form.full_name,
-      assigned_hub_id: form.assigned_hub_id || null,
-    };
+    
+    if (!editOp && (!form.nic || !form.email || !form.password)) {
+      setFormError('NIC, Email and Password are required for new operators.');
+      return;
+    }
+
     setSaving(true);
     try {
       if (editOp) {
-        const { error } = await Promise.resolve({data: null, error: null});
-        if (error) throw error;
+        await ApiService.updateUser(editOp.id, {
+          full_name: form.full_name,
+          badge_id: form.badge_id,
+          assigned_hub_id: form.assigned_hub_id || null,
+        });
       } else {
-        const { error } = await Promise.resolve({data: null, error: null});
-        if (error) throw error;
+        await ApiService.createUser({
+          nic: form.nic,
+          full_name: form.full_name,
+          email: form.email,
+          password: form.password,
+          role: 'grid_operator',
+          badge_id: form.badge_id,
+          assigned_hub_id: form.assigned_hub_id || null,
+        });
       }
       setAddOpen(false);
       setEditOp(null);
@@ -86,9 +113,13 @@ export default function OperatorManagement() {
   };
 
   const toggleStatus = async (op: Operator) => {
-    const newStatus = op.status === 'active' ? 'inactive' : 'active';
-    await Promise.resolve({data: null, error: null});
-    load();
+    const newStatus = op.status === 'active' ? 'deactivated' : 'active';
+    try {
+      await ApiService.updateUserStatus(op.id, newStatus);
+      load();
+    } catch (err) {
+      console.error('Failed to toggle status:', err);
+    }
   };
 
   return (
@@ -96,7 +127,7 @@ export default function OperatorManagement() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500">
           Manage grid operators who scan QR codes and finalize energy transactions.
-          For role-based user accounts, use the User Management page.
+          Assign each operator to a specific Microgrid Hub.
         </p>
         <Button onClick={openAdd}>
           <Plus className="h-4 w-4" />
@@ -156,6 +187,13 @@ export default function OperatorManagement() {
         }
       >
         <div className="space-y-4">
+          {!editOp && (
+            <>
+              <Input label="NIC *" value={form.nic || ''} onChange={(e) => setForm({ ...form, nic: e.target.value })} placeholder="123456789V" />
+              <Input label="Email *" value={form.email || ''} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="operator@example.com" />
+              <Input label="Password *" type="password" value={form.password || ''} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="••••••••" />
+            </>
+          )}
           <Input label="Badge ID *" value={form.badge_id} onChange={(e) => setForm({ ...form, badge_id: e.target.value })} placeholder="OP-003" />
           <Input label="Full Name *" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} placeholder="John Smith" />
           <div>
