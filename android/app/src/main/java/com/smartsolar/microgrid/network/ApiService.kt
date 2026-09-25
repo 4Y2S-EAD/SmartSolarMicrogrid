@@ -11,6 +11,12 @@ import retrofit2.http.Query
 import com.smartsolar.microgrid.member4.maps.StationMapResponse
 
 interface ApiService {
+    // Member 4: send the scanned credential to the central API, then reuse existing completion.
+    @POST("operator/verify-qr")
+    suspend fun verifyOperatorQr(@Body request: com.smartsolar.microgrid.member4.qr.VerifyQrRequest): Response<com.smartsolar.microgrid.member4.qr.VerifyQrResponse>
+    @PUT("reservations/{id}/complete")
+    suspend fun completeOperatorTransfer(@Path("id") id: String): Response<com.smartsolar.microgrid.member4.qr.CompleteTransferResponse>
+
     // Member 4: reservation reads and the existing Member 3 approval write.
     @GET("operator/reservations")
     suspend fun getOperatorReservations(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
