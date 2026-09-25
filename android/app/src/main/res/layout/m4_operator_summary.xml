@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Member 4: reservation metrics summary – dashboard only (no navigation duplication). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="4dp">
+
+    <!-- Section header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/m4SummaryTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reservation Metrics"
+                android:textSize="18sp"
+                android:textColor="#111827"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/m4SummaryMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text=""
+                android:textSize="12sp"
+                android:textColor="#6B7280"
+                android:accessibilityLiveRegion="polite" />
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/m4SummaryRefresh"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Refresh"
+            android:textAllCaps="false"
+            android:textSize="12sp"
+            app:cornerRadius="20dp"
+            app:icon="@android:drawable/stat_notify_sync"
+            app:iconSize="16dp" />
+
+    </LinearLayout>
+
+    <!-- Progress indicator -->
+    <ProgressBar
+        android:id="@+id/m4SummaryLoading"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+    <!-- Metric cards – row 1 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <!-- ACTIVE BOOKINGS -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/m4CardActive"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="#ECFDF5">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="#337EE8C4"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_ad_24"
+                        app:tint="#059669"
+                        android:contentDescription="Active bookings icon" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/m4ActiveCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textSize="28sp"
+                    android:textColor="#065F46"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/m4ActiveCountLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Active Bookings"
+                    android:textSize="11sp"
+                    android:textColor="#047857" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- PENDING RESERVATIONS -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/m4CardPending"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="#FFFBEB">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="#33FCD34D"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_add_notes_24"
+                        app:tint="#D97706"
+                        android:contentDescription="Pending reservations icon" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/m4PendingCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textSize="28sp"
+                    android:textColor="#92400E"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/m4PendingCountLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Pending"
+                    android:textSize="11sp"
+                    android:textColor="#B45309" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <!-- Metric cards – row 2 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- APPROVED RESERVATIONS -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/m4CardApproved"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="#EFF6FF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="#3393C5FD"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_app_badging_24"
+                        app:tint="#2563EB"
+                        android:contentDescription="Approved reservations icon" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/m4ApprovedCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textSize="28sp"
+                    android:textColor="#1E40AF"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/m4ApprovedCountLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Approved"
+                    android:textSize="11sp"
+                    android:textColor="#1D4ED8" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- COMPLETED RESERVATIONS -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/m4CardCompleted"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="#F5F3FF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="#33C4B5FD"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_qr_code_24"
+                        app:tint="#7C3AED"
+                        android:contentDescription="Completed reservations icon" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/m4CompletedCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textSize="28sp"
+                    android:textColor="#5B21B6"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/m4CompletedCountLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Completed"
+                    android:textSize="11sp"
+                    android:textColor="#6D28D9" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</LinearLayout>

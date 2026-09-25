@@ -86,7 +86,7 @@
                         <!-- App Name -->
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="315dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
@@ -110,15 +110,14 @@
 
                         </LinearLayout>
 
-                        <!-- Notification -->
-
                         <ImageView
-                            android:id="@+id/ivNotification"
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@android:drawable/ic_popup_reminder"
-                            android:contentDescription="Notifications"
-                            app:tint="#FFFFFF" />
+                            android:id="@+id/btnMenu"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:src="@android:drawable/ic_menu_sort_by_size"
+                            app:tint="#FFF" />
+
+                        <!-- Notification -->
 
                     </LinearLayout>
 
@@ -178,13 +177,6 @@
                                 android:textStyle="bold" />
 
                         </LinearLayout>
-                        
-                        <ImageView
-                            android:id="@+id/btnMenu"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:src="@android:drawable/ic_menu_sort_by_size"
-                            app:tint="#FFF"/>
 
                     </LinearLayout>
 
@@ -264,224 +256,13 @@
 
 
             <!-- ================================================= -->
-            <!-- SYSTEM OVERVIEW -->
-            <!-- ================================================= -->
+            <!-- Member 4: live reservation dashboard, preserving existing quick actions. -->
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/m4OperatorSummaryContainer"
+                android:name="com.smartsolar.microgrid.member4.operator.OperatorSummaryFragment"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
-                android:text="System Overview"
-                android:textColor="#111827"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-
-            <!-- ================================================= -->
-            <!-- STATISTICS ROW -->
-            <!-- ================================================= -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal"
-                android:paddingHorizontal="12dp"
-                android:weightSum="4">
-
-
-                <!-- ACTIVE STATIONS -->
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="105dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="#DCFCE7"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="7dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_share_location_24"
-                            app:tint="#16A34A" />
-
-                        <TextView
-                            android:id="@+id/tvActiveStations"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="12"
-                            android:textColor="#111827"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Active\nStations"
-                            android:textColor="#6B7280"
-                            android:textSize="10sp" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-
-                <!-- PENDING QR APPROVALS -->
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="105dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="#FEF3C7"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="7dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_qr_code_24"
-                            app:tint="#D97706" />
-
-                        <TextView
-                            android:id="@+id/tvPendingQr"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="5"
-                            android:textColor="#111827"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Pending\nApprovals"
-                            android:textColor="#6B7280"
-                            android:textSize="10sp" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-
-                <!-- ACTIVE USERS -->
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="105dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="#DBEAFE"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="7dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_account_circle_24"
-                            app:tint="#2563EB" />
-
-                        <TextView
-                            android:id="@+id/tvActiveUsers"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="48"
-                            android:textColor="#111827"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Active\nUsers"
-                            android:textColor="#6B7280"
-                            android:textSize="10sp" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-
-                <!-- TODAY BOOKINGS -->
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="105dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="#F3E8FF"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="7dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_add_notes_24"
-                            app:tint="#9333EA" />
-
-                        <TextView
-                            android:id="@+id/tvTodayBookings"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="8"
-                            android:textColor="#111827"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Today's\nBookings"
-                            android:textColor="#6B7280"
-                            android:textSize="10sp" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
-
-
-            <!-- ================================================= -->
             <!-- QUICK ACTIONS -->
             <!-- ================================================= -->
 
