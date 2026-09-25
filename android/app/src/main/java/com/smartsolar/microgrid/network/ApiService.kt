@@ -49,6 +49,10 @@ interface ApiService {
         @Query("radiusKm") radiusKm: Double? = null
     ): Response<StationMapResponse>
 
+    // Fetches single station details by ID
+    @GET("stations/{id}")
+    suspend fun getStationById(@Path("id") stationId: String): Response<Station>
+
     // Fetches all available booking slots for a specific station
     @GET("stations/{id}/slots")
     suspend fun getStationSlots(@Path("id") stationId: String): Response<List<BookingSlot>>

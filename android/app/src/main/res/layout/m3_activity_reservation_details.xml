@@ -139,7 +139,7 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Top Station & Status -->
+                <!-- Top Station & Status Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -152,87 +152,67 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="20dp">
 
+                        <FrameLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_rounded_input"
+                            android:backgroundTint="#ECFDF5">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:layout_gravity="center"
+                                android:src="@android:drawable/ic_menu_compass"
+                                app:tint="#059669" />
+                        </FrameLayout>
+
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <FrameLayout
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:background="@drawable/bg_rounded_input"
-                                android:backgroundTint="#ECFDF5">
-
-                                <ImageView
-                                    android:layout_width="26dp"
-                                    android:layout_height="26dp"
-                                    android:layout_gravity="center"
-                                    android:src="@android:drawable/ic_menu_compass"
-                                    app:tint="#059669" />
-                            </FrameLayout>
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="14dp"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:id="@+id/tvDetailStationName"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Station Name"
-                                    android:textColor="#111827"
-                                    android:textSize="18sp"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:id="@+id/tvDetailSlotNumber"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Slot No. 1"
-                                    android:textColor="#059669"
-                                    android:textSize="13sp"
-                                    android:textStyle="bold"
-                                    android:layout_marginTop="2dp" />
-                            </LinearLayout>
+                            android:layout_weight="1"
+                            android:layout_marginStart="14dp"
+                            android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/tvDetailStatusBadge"
+                                android:id="@+id/tvDetailStationName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Approved"
-                                android:textSize="12sp"
+                                android:text="Station Name"
+                                android:textColor="#111827"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvDetailSlotNumber"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Slot No. 1"
+                                android:textColor="#059669"
+                                android:textSize="13sp"
                                 android:textStyle="bold"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="6dp"
-                                android:textColor="#15803D"
-                                android:background="@drawable/bg_rounded_input"
-                                android:backgroundTint="#DCFCE7" />
+                                android:layout_marginTop="2dp" />
                         </LinearLayout>
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#F3F4F6"
-                            android:layout_marginVertical="14dp" />
-
                         <TextView
-                            android:id="@+id/tvDetailReservationId"
+                            android:id="@+id/tvDetailStatusBadge"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Reservation Reference: #..."
-                            android:textColor="#6B7280"
-                            android:textSize="12sp" />
+                            android:text="Approved"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:textColor="#15803D"
+                            android:background="@drawable/bg_rounded_input"
+                            android:backgroundTint="#DCFCE7" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Reservation Information Card -->
+                <!-- Booking Information Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -326,7 +306,7 @@
                                 android:textStyle="bold" />
                         </LinearLayout>
 
-                        <!-- Prosumer NIC -->
+                        <!-- Station Name Row (Replaced Station ID) -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -337,21 +317,21 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Prosumer NIC"
+                                android:text="Station Name"
                                 android:textColor="#6B7280"
                                 android:textSize="13sp" />
 
                             <TextView
-                                android:id="@+id/tvDetailProsumerNic"
+                                android:id="@+id/tvDetailBookingStationName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="201234567890"
+                                android:text="Solar Hub Station"
                                 android:textColor="#111827"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
-                        <!-- Station ID Reference -->
+                        <!-- Slot Number Row -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -362,18 +342,45 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Station ID"
+                                android:text="Reserved Slot"
                                 android:textColor="#6B7280"
                                 android:textSize="13sp" />
 
                             <TextView
-                                android:id="@+id/tvDetailStationId"
+                                android:id="@+id/tvDetailBookingSlotNumber"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="678..."
-                                android:textColor="#4B5563"
-                                android:textSize="12sp"
-                                android:fontFamily="monospace" />
+                                android:text="Slot 1"
+                                android:textColor="#059669"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Slot Capacity Row -->
+                        <LinearLayout
+                            android:id="@+id/layoutSlotCapacity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="10dp"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Slot Capacity"
+                                android:textColor="#6B7280"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvDetailBookingSlotCapacity"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="15.0 kWh"
+                                android:textColor="#111827"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -532,8 +539,241 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Audit & Activity Timeline Card -->
+                <!-- Station Details & Map Card (Matches ViewReservation.tsx) -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardStationDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#E5E7EB">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <!-- Header -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@android:drawable/ic_menu_compass"
+                                app:tint="#059669" />
+
+                            <TextView
+                                android:id="@+id/tvStationInfoTitle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Station Information"
+                                android:textColor="#111827"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:layout_marginStart="8dp" />
+
+                            <TextView
+                                android:id="@+id/tvDetailStationStatusBadge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Active"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:textColor="#15803D"
+                                android:background="@drawable/bg_rounded_input"
+                                android:backgroundTint="#DCFCE7"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="3dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#F3F4F6"
+                            android:layout_marginVertical="12dp" />
+
+                        <!-- Station Stats Grid (Capacity, Total Slots, Available Slots) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                            <!-- Capacity -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:background="@drawable/bg_rounded_input"
+                                android:backgroundTint="#F9FAFB"
+                                android:padding="10dp"
+                                android:layout_marginEnd="4dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Capacity"
+                                    android:textColor="#6B7280"
+                                    android:textSize="11sp" />
+
+                                <TextView
+                                    android:id="@+id/tvDetailStationCapacity"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="#111827"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <!-- Battery Slots -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:background="@drawable/bg_rounded_input"
+                                android:backgroundTint="#F9FAFB"
+                                android:padding="10dp"
+                                android:layout_marginHorizontal="2dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Total Slots"
+                                    android:textColor="#6B7280"
+                                    android:textSize="11sp" />
+
+                                <TextView
+                                    android:id="@+id/tvDetailTotalSlots"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="#111827"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <!-- Available Slots -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:background="@drawable/bg_rounded_input"
+                                android:backgroundTint="#F9FAFB"
+                                android:padding="10dp"
+                                android:layout_marginStart="4dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Available"
+                                    android:textColor="#6B7280"
+                                    android:textSize="11sp" />
+
+                                <TextView
+                                    android:id="@+id/tvDetailAvailableSlots"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="—"
+                                    android:textColor="#059669"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Map & Location Container -->
+                        <LinearLayout
+                            android:id="@+id/layoutStationMapContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginTop="14dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="8dp">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Station Location Map"
+                                    android:textColor="#374151"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvDetailCoordinates"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="6.9271°, 79.8612°"
+                                    android:textColor="#059669"
+                                    android:textSize="11sp"
+                                    android:fontFamily="monospace"
+                                    android:background="@drawable/bg_rounded_input"
+                                    android:backgroundTint="#ECFDF5"
+                                    android:paddingHorizontal="8dp"
+                                    android:paddingVertical="2dp" />
+                            </LinearLayout>
+
+                            <!-- Interactive Map -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="180dp"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="1dp"
+                                app:strokeColor="#E5E7EB"
+                                app:cardBackgroundColor="#F9FAFB">
+
+                                <WebView
+                                    android:id="@+id/wvStationMap"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <!-- Open in Google Maps Button -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnOpenGoogleMaps"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:text="Open Location in Google Maps"
+                                android:textSize="13sp"
+                                android:textColor="#059669"
+                                app:icon="@android:drawable/ic_menu_mapmode"
+                                app:iconTint="#059669"
+                                app:iconSize="18dp"
+                                app:iconGravity="textStart"
+                                app:strokeColor="#A7F3D0"
+                                app:strokeWidth="1dp"
+                                app:backgroundTint="#ECFDF5"
+                                app:cornerRadius="10dp"
+                                android:layout_marginTop="10dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Activity Timeline Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardTimelineDetails"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -579,6 +819,7 @@
 
                         <!-- Created At -->
                         <LinearLayout
+                            android:id="@+id/layoutTimelineCreated"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
@@ -597,22 +838,23 @@
                                 android:layout_height="wrap_content"
                                 android:text="—"
                                 android:textColor="#111827"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
+                                android:textSize="12sp" />
                         </LinearLayout>
 
                         <!-- Verified At -->
                         <LinearLayout
+                            android:id="@+id/layoutTimelineVerified"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone">
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Verified by"
+                                android:text="Verified At"
                                 android:textColor="#6B7280"
                                 android:textSize="12sp" />
 
@@ -620,17 +862,45 @@
                                 android:id="@+id/tvDetailVerifiedAt"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Pending verification"
+                                android:text="—"
                                 android:textColor="#111827"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- Verified By -->
+                        <LinearLayout
+                            android:id="@+id/layoutTimelineVerifiedBy"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Verified By (Operator)"
+                                android:textColor="#6B7280"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvDetailVerifiedBy"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="—"
+                                android:textColor="#059669"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
                         <!-- Completed At -->
                         <LinearLayout
+                            android:id="@+id/layoutTimelineCompleted"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone">
 
                             <TextView
                                 android:layout_width="0dp"
@@ -644,13 +914,14 @@
                                 android:id="@+id/tvDetailCompletedAt"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Not completed"
+                                android:text="—"
                                 android:textColor="#111827"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
                         <!-- Updated At -->
                         <LinearLayout
+                            android:id="@+id/layoutTimelineUpdated"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"

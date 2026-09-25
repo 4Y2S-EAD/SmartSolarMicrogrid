@@ -60,9 +60,16 @@ data class ReservationSummaryItem(
     val endTime: String = "",
     val status: String = "",
     val qrToken: String? = null,
+    val operatorId: String? = null,
     val verifiedAt: String? = null,
     val completedAt: String? = null,
     val cancellationReason: String? = null,
     val createdAt: String? = null,
-    val updatedAt: String? = null
+    val updatedAt: String? = null,
+    val stationCapacityKwh: Double? = null,
+    val batterySlotCount: Int? = null,
+    val availableSlotCount: Int? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val slotCapacityKwh: Double? = null
 )
