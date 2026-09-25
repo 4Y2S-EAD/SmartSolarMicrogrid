@@ -313,36 +313,19 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
       });
     }
 
-    //  Complete Reservation (PUT: api/reservations/{id}/complete)
+    // Member 4 integration: retain the existing completion route and delegate authoritative checks.
     [HttpPut("{id}/complete")]
-    public async Task<IActionResult> CompleteReservation(string id, [FromQuery] string? operatorId = null)
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "GridOperator,gridoperator")]
+    public async Task<IActionResult> CompleteReservation(string id,
+      [FromServices] SmartSolarMicrogrid.API.Services.member4.OperatorQrVerificationService qrService,
+      System.Threading.CancellationToken ct)
     {
-      var reservation = await _mongoDbService.EnergyReservations.Find(r => r.ReservationId == id).FirstOrDefaultAsync();
-      if (reservation == null)
-      {
-        return NotFound(new { Message = "Reservation not found." });
-      }
-
-      if (reservation.Status != ReservationStatus.Approved)
-      {
-        return BadRequest(new { Message = $"Only approved reservations can be marked as completed. Current status: {reservation.Status}" });
-      }
-
-      DateTime now = DateTime.UtcNow;
-      var updateDef = Builders<EnergyReservation>.Update
-          .Set(r => r.Status, ReservationStatus.Completed)
-          .Set(r => r.CompletedAt, now)
-          .Set(r => r.OperatorId, operatorId ?? "OP-DEFAULT")
-          .Set(r => r.UpdatedAt, now);
-
-      await _mongoDbService.EnergyReservations.UpdateOneAsync(r => r.ReservationId == id, updateDef);
-
-      return Ok(new
-      {
-        Message = "Energy transfer finalized. Reservation completed.",
-        ReservationId = id,
-        Status = ReservationStatus.Completed.ToString()
-      });
+      // Operator identity comes exclusively from JWT; query-string operator IDs are never trusted.
+      try { return Ok(await qrService.CompleteAsync(id, User, ct)); }
+      catch (SmartSolarMicrogrid.API.DTOs.member4.QrVerificationException ex)
+      { return StatusCode(ex.StatusCode, new { Message = ex.Message, Code = ex.Code }); }
+      catch (Exception ex) when (ex is MongoException or TimeoutException)
+      { return StatusCode(503, new { Message = "Completion could not be confirmed. Refresh reservations before trying again." }); }
     }
 
     // Cancel Reservation (PUT: api/reservations/{id}/cancel)

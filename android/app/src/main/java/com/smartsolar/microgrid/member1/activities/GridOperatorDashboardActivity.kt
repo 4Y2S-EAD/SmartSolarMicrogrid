@@ -74,7 +74,7 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
     private fun setupQuickActions() {
         // QR Approvals
         btnQrApproval.setOnClickListener {
-            Toast.makeText(this, "QR Approvals", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, com.smartsolar.microgrid.member4.qr.OperatorQrScannerActivity::class.java))
         }
         // System Management
         btnManagement.setOnClickListener {
@@ -133,7 +133,7 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
 
                 // APPROVALS
                 R.id.navOperatorApprovals -> {
-                    Toast.makeText(this, "QR Approvals", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, com.smartsolar.microgrid.member4.qr.OperatorQrScannerActivity::class.java))
                     true
                 }
 

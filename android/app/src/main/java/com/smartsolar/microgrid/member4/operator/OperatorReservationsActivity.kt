@@ -26,6 +26,7 @@ class OperatorReservationsActivity : AppCompatActivity() {
     private val model: OperatorReservationsViewModel by viewModels()
     private lateinit var adapter: OperatorReservationAdapter
     private var statuses: List<String> = emptyList()
+    private var filtersExpanded = false
     private var renderedPage: OperatorReservationPage? = null
     private val fields = mapOf("reservationId" to R.id.m4FilterId, "prosumerNic" to R.id.m4FilterNic,
         "station" to R.id.m4FilterStation, "bookingDate" to R.id.m4FilterDate)
@@ -33,19 +34,27 @@ class OperatorReservationsActivity : AppCompatActivity() {
         // Bind navigation and inputs once; the ViewModel survives screen recreation.
         super.onCreate(savedInstanceState)
         setContentView(R.layout.m4_operator_reservations)
+        filtersExpanded = savedInstanceState?.getBoolean("filtersExpanded") ?: (intent.getStringExtra("view") == "search")
         if (savedInstanceState == null) model.select(intent.getStringExtra("view") ?: "all")
         adapter = OperatorReservationAdapter(model::approve)
         findViewById<RecyclerView>(R.id.m4ReservationList).apply { layoutManager = LinearLayoutManager(this@OperatorReservationsActivity); adapter = this@OperatorReservationsActivity.adapter }
         findViewById<View>(R.id.m4OperatorBack).setOnClickListener { finish() }
         findViewById<View>(R.id.m4OperatorRefresh).setOnClickListener { model.refresh() }
         mapOf(R.id.m4TabAll to "all", R.id.m4TabPending to "pending", R.id.m4TabApproved to "approved",
-            R.id.m4TabCompleted to "completed", R.id.m4TabHistory to "history", R.id.m4TabSearch to "search").forEach { (id, target) ->
-            findViewById<View>(id).setOnClickListener { model.select(target) }
+            R.id.m4TabCompleted to "completed", R.id.m4TabHistory to "history").forEach { (id, target) ->
+            findViewById<View>(id).setOnClickListener { filtersExpanded = false; model.select(target) }
+        }
+        findViewById<View>(R.id.m4TabSearch).setOnClickListener {
+            filtersExpanded = !filtersExpanded
+            renderSearchPanel()
         }
         fields.forEach { (key, id) -> findViewById<EditText>(id).setText(model.state.value.filters[key].orEmpty()) }
         findViewById<View>(R.id.m4FilterSubmit).setOnClickListener {
             val values = fields.mapValues { (_, id) -> findViewById<EditText>(id).text.toString().trim() }.toMutableMap()
             values["status"] = statuses.getOrNull(findViewById<Spinner>(R.id.m4FilterStatus).selectedItemPosition - 1).orEmpty()
+            filtersExpanded = false
+            (getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
+                .hideSoftInputFromWindow(findViewById<View>(R.id.m4FilterSubmit).windowToken, 0)
             model.search(values)
         }
         findViewById<View>(R.id.m4FilterClear).setOnClickListener {
@@ -61,10 +70,30 @@ class OperatorReservationsActivity : AppCompatActivity() {
         findViewById<View>(R.id.m4NextPage).setOnClickListener { model.page(1) }
         lifecycleScope.launch { repeatOnLifecycle(Lifecycle.State.STARTED) { model.state.collect { render(it) } } }
     }
+    override fun onSaveInstanceState(outState: Bundle) {
+        // Restore expanded filter controls without changing the submitted server query.
+        outState.putBoolean("filtersExpanded", filtersExpanded)
+        super.onSaveInstanceState(outState)
+    }
+    private fun renderSearchPanel() {
+        // Keep search separate from status navigation, and leave room for results after submission.
+        val panel = findViewById<View>(R.id.m4OperatorFilters)
+        if (filtersExpanded && !panel.isVisible && android.animation.ValueAnimator.areAnimatorsEnabled()) {
+            panel.alpha = 0f
+            panel.animate().alpha(1f).setDuration(180).start()
+        }
+        panel.isVisible = filtersExpanded
+        findViewById<MaterialButton>(R.id.m4TabSearch).apply {
+            setText(if (filtersExpanded) R.string.m4_close_search_filters
+                else if (model.state.value.view == "search") R.string.m4_edit_search_filters
+                else R.string.m4_search_bookings_filters)
+            isSelected = filtersExpanded
+        }
+    }
     private fun render(state: OperatorReservationState) {
         // Display server results and metadata without local filtering, status transitions or counts.
         findViewById<View>(R.id.m4OperatorLoading).isVisible = state.loading
-        findViewById<View>(R.id.m4OperatorFilters).isVisible = state.view == "search"
+        renderSearchPanel()
         findViewById<TextView>(R.id.m4OperatorTitle).text = when(state.view) { "pending" -> "Pending reservations"; "approved" -> "Approved reservations"; "completed" -> "Completed reservations"; "history" -> "Booking history"; "search" -> "Search bookings"; else -> "All reservations" }
         if (statuses != state.statusOptions) {
             statuses = state.statusOptions

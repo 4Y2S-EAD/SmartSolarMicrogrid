@@ -89,6 +89,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 
+    // Member 4: CameraX supplies the live camera; the existing ZXing core decodes QR frames.
+    implementation("androidx.camera:camera-camera2:1.4.2")
+    implementation("androidx.camera:camera-lifecycle:1.4.2")
+    implementation("androidx.camera:camera-view:1.4.2")
+
     // QR Code Generation
     implementation("com.google.zxing:core:3.5.3")
 

@@ -1,0 +1,6 @@
+<resources>
+    <string name="m4_search_bookings_filters">Search bookings and filters</string>
+    <string name="m4_close_search_filters">Close search filters</string>
+    <string name="m4_edit_search_filters">Edit search filters</string>
+    <string name="m4_apply_search">Show results</string>
+</resources>
