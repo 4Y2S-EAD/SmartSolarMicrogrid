@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<!-- Member 4: real reservation record and existing approval action. -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" app:cardCornerRadius="18dp" app:cardElevation="1dp" app:cardBackgroundColor="#FFFFFF">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="18dp">
+        <TextView android:id="@+id/m4ReservationStation" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="" android:textSize="18sp" android:textColor="#193C2D" android:textStyle="bold"/>
+        <TextView android:id="@+id/m4ReservationStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textSize="13sp" android:textColor="#193C2D" android:textStyle="bold" android:layout_marginVertical="8dp"/>
+        <TextView android:id="@+id/m4ReservationId" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="" android:textSize="12sp" android:textColor="#193C2D" android:textIsSelectable="true"/>
+        <TextView android:id="@+id/m4ReservationInfo" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="" android:textSize="14sp" android:textColor="#193C2D" android:layout_marginTop="8dp" android:lineSpacingExtra="4dp"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4ReservationApprove" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Approve" android:textAllCaps="false" app:cornerRadius="12dp"/>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

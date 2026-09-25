@@ -1,3 +1,4 @@
+/* Module: Shared startup | Member 4: Register map and operator reservation query services. */
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SmartSolarMicrogrid.API.Services;
@@ -16,6 +17,8 @@ builder.Services.AddOpenApi();
 
 // Register MongoDB Service
 builder.Services.AddSingleton<MongoDbService>();
+builder.Services.AddScoped<SmartSolarMicrogrid.API.Services.member4.OperatorReservationService>();
+builder.Services.AddScoped<SmartSolarMicrogrid.API.Services.member4.StationMapService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>

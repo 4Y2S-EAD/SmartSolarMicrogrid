@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<!-- Member 4: native reservation list and server query controls. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="#F3F7F4">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:padding="12dp" android:background="#047857">
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4OperatorBack" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Back" android:textAllCaps="false" app:cornerRadius="12dp"/>
+        <TextView android:id="@+id/m4OperatorTitle" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textSize="19sp" android:textStyle="bold" android:textColor="#FFFFFF" android:paddingHorizontal="8dp"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4OperatorRefresh" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Refresh" android:textAllCaps="false" app:cornerRadius="12dp"/>
+    </LinearLayout>
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:fillViewport="true">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingHorizontal="12dp">
+            <com.google.android.material.button.MaterialButton android:id="@+id/m4TabAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="All" android:textAllCaps="false" app:cornerRadius="12dp" android:layout_marginEnd="6dp"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/m4TabPending" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Pending" android:textAllCaps="false" app:cornerRadius="12dp" android:layout_marginEnd="6dp"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/m4TabApproved" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Approved" android:textAllCaps="false" app:cornerRadius="12dp" android:layout_marginEnd="6dp"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/m4TabCompleted" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Completed" android:textAllCaps="false" app:cornerRadius="12dp" android:layout_marginEnd="6dp"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/m4TabHistory" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="History" android:textAllCaps="false" app:cornerRadius="12dp" android:layout_marginEnd="6dp"/>
+            <com.google.android.material.button.MaterialButton android:id="@+id/m4TabSearch" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Search" android:textAllCaps="false" app:cornerRadius="12dp" android:layout_marginEnd="6dp"/>
+        </LinearLayout>
+    </HorizontalScrollView>
+    <ScrollView android:id="@+id/m4OperatorFilters" android:layout_width="match_parent" android:layout_height="240dp" android:visibility="gone">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="16dp">
+            <EditText android:id="@+id/m4FilterId" android:layout_width="match_parent" android:layout_height="48dp" android:hint="Booking ID" android:contentDescription="Booking ID" android:inputType="text" android:maxLines="1" android:maxLength="24" android:importantForAutofill="no"/>
+            <EditText android:id="@+id/m4FilterNic" android:layout_width="match_parent" android:layout_height="48dp" android:hint="Prosumer NIC" android:contentDescription="Prosumer NIC" android:inputType="text" android:maxLines="1" android:maxLength="32" android:importantForAutofill="no"/>
+            <EditText android:id="@+id/m4FilterStation" android:layout_width="match_parent" android:layout_height="48dp" android:hint="Station name or ID" android:contentDescription="Station name or ID" android:inputType="text" android:maxLines="1" android:maxLength="100" android:importantForAutofill="no"/>
+            <EditText android:id="@+id/m4FilterDate" android:layout_width="match_parent" android:layout_height="48dp" android:hint="Booking date (yyyy-MM-dd)" android:contentDescription="Booking date (yyyy-MM-dd)" android:inputType="text" android:maxLines="1" android:maxLength="10" android:importantForAutofill="no" android:focusable="false"/>
+            <Spinner android:id="@+id/m4FilterStatus" android:layout_width="match_parent" android:layout_height="48dp" android:contentDescription="Reservation status"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                <com.google.android.material.button.MaterialButton android:id="@+id/m4FilterSubmit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Search" android:textAllCaps="false" app:cornerRadius="12dp"/>
+                <com.google.android.material.button.MaterialButton android:id="@+id/m4FilterClear" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Clear filters" android:textAllCaps="false" app:cornerRadius="12dp" android:layout_marginStart="8dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+    <ProgressBar android:id="@+id/m4OperatorLoading" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true"/>
+    <TextView android:id="@+id/m4OperatorMessage" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="" android:textSize="14sp" android:textColor="#193C2D" android:padding="16dp" android:accessibilityLiveRegion="polite"/>
+    <TextView android:id="@+id/m4OperatorFeedback" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="" android:textSize="14sp" android:textColor="#193C2D" android:padding="16dp" android:accessibilityLiveRegion="polite"/>
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/m4ReservationList" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:padding="12dp" android:clipToPadding="false"/>
+    <TextView android:id="@+id/m4PageInfo" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="" android:textSize="12sp" android:textColor="#193C2D" android:gravity="center"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center">
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4PreviousPage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Previous" android:textAllCaps="false" app:cornerRadius="12dp"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4NextPage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Next" android:textAllCaps="false" app:cornerRadius="12dp" android:layout_marginStart="12dp"/>
+    </LinearLayout>
+</LinearLayout>
