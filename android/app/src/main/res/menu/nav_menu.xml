@@ -3,8 +3,8 @@
     <group android:checkableBehavior="single">
         <item android:id="@+id/nav_home" android:title="Home" android:icon="@android:drawable/ic_menu_myplaces" />
         <item android:id="@+id/nav_stations" android:title="Nearby Stations" android:icon="@android:drawable/ic_menu_mapmode" />
-        <item android:id="@+id/nav_bookings" android:title="My Bookings" android:icon="@android:drawable/ic_menu_today" />
-        <item android:id="@+id/nav_history" android:title="Booking History" android:icon="@android:drawable/ic_menu_recent_history" />
+        <item android:id="@+id/nav_bookings" android:title="My Reservations" android:icon="@android:drawable/ic_menu_today" />
+        <item android:id="@+id/nav_history" android:title="Reservation History" android:icon="@android:drawable/ic_menu_recent_history" />
         <item android:id="@+id/nav_profile" android:title="My Profile" android:icon="@android:drawable/ic_menu_info_details" />
         <item android:id="@+id/nav_settings" android:title="Settings" android:icon="@android:drawable/ic_menu_preferences" />
     </group>

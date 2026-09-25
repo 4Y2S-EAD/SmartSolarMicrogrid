@@ -91,6 +91,19 @@
             android:name=".member2.activities.M2StationDetailsActivity"
             android:exported="false" />
 
+        <!-- Member 3: Energy Reservations Screen -->
+        <activity
+            android:name=".member3.activities.M3ReservationsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".member3.activities.M3ReservationDetailsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".member3.activities.M3CreateReservationActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

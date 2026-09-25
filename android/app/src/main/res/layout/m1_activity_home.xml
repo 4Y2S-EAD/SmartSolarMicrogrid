@@ -209,7 +209,7 @@
                     android:layout_marginTop="20dp"
                     android:weightSum="4">
 
-                    <!-- Stats Box 1: Active Bookings -->
+                    <!-- Stats Box 1: Active Bookings (Approved) -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="100dp"
@@ -230,12 +230,26 @@
                                 android:layout_height="24dp"
                                 android:src="@android:drawable/ic_menu_today"
                                 app:tint="#0284C7"/>
-                            <TextView android:text="3" android:textSize="20sp" android:textStyle="bold" android:textColor="#000" android:layout_marginTop="4dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                            <TextView android:text="Active\nBookings" android:textSize="10sp" android:gravity="center" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                            <TextView
+                                android:id="@+id/tvActiveCount"
+                                android:text="0"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="#000"
+                                android:layout_marginTop="4dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                            <TextView
+                                android:text="Active\nReservations"
+                                android:textSize="10sp"
+                                android:gravity="center"
+                                android:textColor="#555"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Stats Box 2: Pending Bookings -->
+                    <!-- Stats Box 2: Pending Reservations -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="100dp"
@@ -256,12 +270,26 @@
                                 android:layout_height="24dp"
                                 android:src="@android:drawable/ic_menu_recent_history"
                                 app:tint="#EA580C"/>
-                            <TextView android:text="1" android:textSize="20sp" android:textStyle="bold" android:textColor="#000" android:layout_marginTop="4dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                            <TextView android:text="Pending\nBookings" android:textSize="10sp" android:gravity="center" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                            <TextView
+                                android:id="@+id/tvPendingCount"
+                                android:text="0"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="#000"
+                                android:layout_marginTop="4dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                            <TextView
+                                android:text="Pending\nReservations"
+                                android:textSize="10sp"
+                                android:gravity="center"
+                                android:textColor="#555"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Stats Box 3: Completed -->
+                    <!-- Stats Box 3: Completed Reservations -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="100dp"
@@ -282,8 +310,22 @@
                                 android:layout_height="24dp"
                                 android:src="@android:drawable/checkbox_on_background"
                                 app:tint="#16A34A"/>
-                            <TextView android:text="2" android:textSize="20sp" android:textStyle="bold" android:textColor="#000" android:layout_marginTop="4dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                            <TextView android:text="Completed" android:textSize="10sp" android:gravity="center" android:textColor="#555" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                            <TextView
+                                android:id="@+id/tvCompletedCount"
+                                android:text="0"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="#000"
+                                android:layout_marginTop="4dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                            <TextView
+                                android:text="Completed\nReservations"
+                                android:textSize="10sp"
+                                android:gravity="center"
+                                android:textColor="#555"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -347,11 +389,12 @@
                         app:cornerRadius="16dp"/>
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnMakeReservation"
                         android:layout_width="0dp"
                         android:layout_height="100dp"
                         android:layout_columnWeight="1"
                         android:backgroundTint="#3B82F6"
-                        android:text="Make a Booking"
+                        android:text="Make a Reservation"
                         android:textColor="#FFF"
                         app:icon="@drawable/ic_add_notes_24"
                         app:iconTint="#FFF"
@@ -359,11 +402,12 @@
                         app:cornerRadius="16dp"/>
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnMyReservations"
                         android:layout_width="0dp"
                         android:layout_height="100dp"
                         android:layout_columnWeight="1"
                         android:backgroundTint="#8B5CF6"
-                        android:text="My Bookings"
+                        android:text="My Reservations"
                         android:textColor="#FFF"
                         app:icon="@drawable/ic_ad_24"
                         app:iconTint="#FFF"

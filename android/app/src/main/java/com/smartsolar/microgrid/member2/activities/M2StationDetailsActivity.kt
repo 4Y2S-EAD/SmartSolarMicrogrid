@@ -42,7 +42,6 @@ class M2StationDetailsActivity : AppCompatActivity() {
         val tvDetailSlots: TextView = findViewById(R.id.tvDetailSlots)
         val btnBackDetails: ImageView = findViewById(R.id.btnBackDetails)
         val btnBookStation: Button = findViewById(R.id.btnBookStation)
-        val ivDetailStationImage: ImageView = findViewById(R.id.ivDetailStationImage)
 
         rvTimeSlots = findViewById(R.id.rvTimeSlots)
         pbSlotsLoading = findViewById(R.id.pbSlotsLoading)
