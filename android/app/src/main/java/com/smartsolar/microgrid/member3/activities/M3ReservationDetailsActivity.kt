@@ -97,6 +97,7 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
     private lateinit var tvDetailCoordinates: TextView
     private lateinit var wvStationMap: WebView
     private lateinit var btnOpenGoogleMaps: MaterialButton
+    private lateinit var btnStartDriving: MaterialButton
 
     // Timeline Card
     private lateinit var layoutTimelineCreated: LinearLayout
@@ -172,6 +173,7 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
         tvDetailCoordinates = findViewById(R.id.tvDetailCoordinates)
         wvStationMap = findViewById(R.id.wvStationMap)
         btnOpenGoogleMaps = findViewById(R.id.btnOpenGoogleMaps)
+        btnStartDriving = findViewById(R.id.btnStartDriving)
 
         // Timeline Card
         layoutTimelineCreated = findViewById(R.id.layoutTimelineCreated)
@@ -225,6 +227,10 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
         btnOpenGoogleMaps.setOnClickListener {
             openLocationInGoogleMaps()
         }
+        
+        btnStartDriving.setOnClickListener {
+            startDriving()
+        }
 
         btnCancelReservation.setOnClickListener {
             currentReservation?.let { reservation ->
@@ -260,6 +266,29 @@ class M3ReservationDetailsActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             val webMapIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng"))
+            startActivity(webMapIntent)
+        }
+    }
+
+    private fun startDriving() {
+        val lat = stationLatitude
+        val lng = stationLongitude
+        if (lat == null || lng == null) {
+            Toast.makeText(this, "Coordinates not available for this station", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            val navIntent = Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=$lat,$lng&mode=d"))
+            navIntent.setPackage("com.google.android.apps.maps")
+            if (navIntent.resolveActivity(packageManager) != null) {
+                startActivity(navIntent)
+            } else {
+                val webMapIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving"))
+                startActivity(webMapIntent)
+            }
+        } catch (e: Exception) {
+            val webMapIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving"))
             startActivity(webMapIntent)
         }
     }

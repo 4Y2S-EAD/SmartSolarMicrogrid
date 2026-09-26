@@ -67,6 +67,7 @@ class LoginActivity : AppCompatActivity() {
                     if (loginResponse != null) {
                         com.smartsolar.microgrid.network.TokenManager.saveToken(loginResponse.token)
                         com.smartsolar.microgrid.network.TokenManager.saveNic(loginResponse.user.nic)
+                        com.smartsolar.microgrid.network.TokenManager.saveFullName(loginResponse.user.fullName)
                         com.smartsolar.microgrid.network.TokenManager.saveRole(loginResponse.user.role)
                         
                         Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()

@@ -3,9 +3,10 @@ import { fetchBackOfficeReservations, fetchHubReservations, type BackOfficeReser
 import { useAuth } from '@/context/AuthContext';
 import StatusBadge from '@/components/ui/StatusBadge';
 import {
-  ScanLine, CheckCircle2,
-  Zap, TrendingUp,
+  CheckCircle2, ClipboardList,
+  QrCode, BadgeCheck,
 } from 'lucide-react';
+import qrImage from '@/assets/qr-image.png';
 
 export default function QrFlow() {
   const { role, profile } = useAuth();
@@ -38,10 +39,10 @@ export default function QrFlow() {
   };
 
   const statCards = [
-    { label: 'Total Reservations', value: stats.total, icon: TrendingUp, color: 'bg-gray-50 text-gray-600' },
-    { label: 'Ready for Scan (Approved)', value: stats.approved, icon: ScanLine, color: 'bg-cyan-50 text-cyan-600' },
-    { label: 'Verified', value: stats.verified, icon: ScanLine, color: 'bg-indigo-50 text-indigo-600' },
-    { label: 'Completed Transfers', value: stats.completed, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-600' },
+    { label: 'Total Reservations', value: stats.total, icon: ClipboardList, color: 'bg-slate-50 text-slate-500' },
+    { label: 'Ready for Scan (Approved)', value: stats.approved, icon: QrCode, color: 'bg-cyan-50 text-cyan-600' },
+    { label: 'Verified', value: stats.completed, icon: BadgeCheck, color: 'bg-indigo-50 text-indigo-500' },
+    { label: 'Completed Transfers', value: stats.completed, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-500' },
   ];
 
   // Show only relevant transactions (completed or verified)
@@ -50,16 +51,22 @@ export default function QrFlow() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
-            <div key={card.label} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm m4-anim-scale-in">
-              <div className={`mb-2 flex h-8 w-8 items-center justify-center rounded-lg ${card.color}`}>
-                <Icon className="h-4 w-4" />
+            <div key={card.label} className="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md animate-in fade-in slide-in-from-bottom-2">
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 ${card.color}`}>
+                <Icon className="h-6 w-6" />
               </div>
-              <div className="text-2xl font-bold text-gray-900">{loading ? '--' : card.value}</div>
-              <div className="text-xs text-gray-400">{card.label}</div>
+              <div className="min-w-0">
+                <p className="truncate text-xs font-semibold uppercase tracking-wider text-gray-500">{card.label}</p>
+                <p className="mt-1 text-2xl font-bold tabular-nums text-gray-900">
+                  {loading
+                    ? <span className="inline-block h-7 w-12 animate-pulse rounded-md bg-gray-200" />
+                    : card.value.toLocaleString()}
+                </p>
+              </div>
             </div>
           );
         })}
@@ -68,8 +75,15 @@ export default function QrFlow() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         {/* Mobile App Promotion Card (Replaces Scanner) */}
         <div className="lg:col-span-2 rounded-2xl border border-gray-100 bg-white p-8 shadow-sm flex flex-col items-center justify-center text-center space-y-6 m4-anim-fade-up">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
-            <ScanLine className="h-8 w-8" />
+          {/* Main QR Scanning Illustration */}
+          <div className="relative flex items-center justify-center">
+            <div className="relative rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-emerald-200 hover:shadow-md">
+              <img
+                src={qrImage}
+                alt="Mobile QR Scanning Illustration"
+                className="h-44 w-44 sm:h-48 sm:w-48 object-contain rounded-lg transition-transform duration-300 hover:scale-[1.02]"
+              />
+            </div>
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">Mobile QR Scanning</h2>
@@ -79,7 +93,7 @@ export default function QrFlow() {
           </div>
           <div className="w-full max-w-sm rounded-xl bg-gray-50 p-5 text-left border border-gray-100 shadow-inner">
             <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Zap className="h-4 w-4 text-indigo-500" /> Transfer Process
+              Transfer Process
             </h3>
             <ol className="space-y-4 text-sm text-gray-600">
               <li className="flex gap-3 items-start">
@@ -95,7 +109,7 @@ export default function QrFlow() {
                 <span>Verify the reservation details on-screen.</span>
               </li>
               <li className="flex gap-3 items-start">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-medium text-emerald-600 mt-0.5">4</span>
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-medium text-indigo-600 mt-0.5">4</span>
                 <span>Confirm and finalize the energy transfer.</span>
               </li>
             </ol>
@@ -125,16 +139,16 @@ export default function QrFlow() {
             ) : (
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 bg-gray-50/50 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    <th className="px-5 py-3">Reservation</th>
-                    <th className="px-5 py-3">Prosumer NIC</th>
-                    <th className="px-5 py-3">Time Window</th>
-                    <th className="px-5 py-3">Status</th>
+                  <tr className="border-b-2 border-emerald-100 bg-emerald-50 text-left text-xs font-bold uppercase tracking-wider text-gray-700">
+                    <th className="px-5 py-4">Reservation</th>
+                    <th className="px-5 py-4">Prosumer NIC</th>
+                    <th className="px-5 py-4">Time Window</th>
+                    <th className="px-5 py-4">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {transactions.map((tx) => (
-                    <tr key={tx.reservationId} className="hover:bg-gray-50/50 transition-colors">
+                    <tr key={tx.reservationId} className="hover:bg-gray-50 transition-colors">
                       <td className="px-5 py-3 font-mono text-xs font-medium text-gray-900">{tx.reservationId}</td>
                       <td className="px-5 py-3 text-gray-600">{tx.prosumerNic}</td>
                       <td className="px-5 py-3 text-gray-600">

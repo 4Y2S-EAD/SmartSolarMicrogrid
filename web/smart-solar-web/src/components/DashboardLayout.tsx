@@ -76,7 +76,7 @@ export default function DashboardLayout({ activeView, onNavigate, children }: Da
         <div className="hidden text-right sm:block">
           <div className="text-sm font-medium text-gray-900">{profile?.full_name || user?.email}</div>
           <div className={`flex items-center justify-end gap-1 text-xs ${roleInfo.color}`}>
-            <RoleIcon className="h-3 w-3" />
+          
             {roleInfo.label}
           </div>
         </div>
