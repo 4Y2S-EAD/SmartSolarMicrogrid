@@ -37,6 +37,13 @@ import java.util.Locale
 
 class M3CreateReservationActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_STATION_ID = "STATION_ID"
+        const val EXTRA_SLOT_ID = "SLOT_ID"
+    }
+
+    private var initialSlotApplied = false
+
     // Views
     private lateinit var btnBack: ImageView
     private lateinit var tvError: TextView
@@ -217,9 +224,21 @@ class M3CreateReservationActivity : AppCompatActivity() {
                             return@withContext
                         }
 
+                        val requestedStationId = intent.getStringExtra(EXTRA_STATION_ID)
+                        val initialPosition = if (requestedStationId.isNullOrBlank()) 0
+                            else stationsList.indexOfFirst { it.stationId == requestedStationId }
+                        if (initialPosition < 0) {
+                            tvError.visibility = View.VISIBLE
+                            tvError.text = "Selected station is no longer available. Please go back and choose another station."
+                            btnSubmit.isEnabled = false
+                            return@withContext
+                        }
+
                         val stationDisplayList = stationsList.map { "${it.stationName} (${it.capacityKwh} kWh Capacity)" }
                         val adapter = ArrayAdapter(this@M3CreateReservationActivity, android.R.layout.simple_spinner_dropdown_item, stationDisplayList)
                         spStation.adapter = adapter
+                        selectedStationId = stationsList[initialPosition].stationId
+                        spStation.setSelection(initialPosition)
 
                         spStation.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -234,8 +253,7 @@ class M3CreateReservationActivity : AppCompatActivity() {
                             override fun onNothingSelected(parent: AdapterView<*>?) {}
                         }
 
-                        // Trigger first station selection
-                        selectedStationId = stationsList[0].stationId
+                        // Load the station selected on the map, or retain the normal first-station default.
                         loadSlotsForStation(selectedStationId)
                     } else {
                         tvError.visibility = View.VISIBLE
@@ -253,6 +271,8 @@ class M3CreateReservationActivity : AppCompatActivity() {
     }
 
     private fun loadSlotsForStation(stationId: String) {
+        selectedSlotId = ""
+        btnSubmit.isEnabled = false
         pbSlotsLoading.visibility = View.VISIBLE
         layoutSlotList.removeAllViews()
         tvNoSlotsNotice.visibility = View.GONE
@@ -261,6 +281,7 @@ class M3CreateReservationActivity : AppCompatActivity() {
             try {
                 val resp = ApiClient.apiService.getStationSlots(stationId)
                 withContext(Dispatchers.Main) {
+                    if (selectedStationId != stationId) return@withContext
                     pbSlotsLoading.visibility = View.GONE
                     if (resp.isSuccessful && resp.body() != null) {
                         slotsList.clear()
@@ -272,9 +293,15 @@ class M3CreateReservationActivity : AppCompatActivity() {
                         }
 
                         if (slotsList.isNotEmpty()) {
-                            selectedSlotId = slotsList[0].slotId
-                            startTime = sanitizeTime(slotsList[0].startTime, "01:00 AM")
-                            endTime = sanitizeTime(slotsList[0].endTime, "01:00 AM")
+                            val requestedSlot = if (!initialSlotApplied &&
+                                stationId == intent.getStringExtra(EXTRA_STATION_ID)) {
+                                slotsList.firstOrNull { it.slotId == intent.getStringExtra(EXTRA_SLOT_ID) }
+                            } else null
+                            initialSlotApplied = true
+                            val initialSlot = requestedSlot ?: slotsList[0]
+                            selectedSlotId = initialSlot.slotId
+                            startTime = sanitizeTime(initialSlot.startTime, "01:00 AM")
+                            endTime = sanitizeTime(initialSlot.endTime, "01:00 AM")
                             tvStartTime.text = startTime
                             tvEndTime.text = endTime
                         } else {
