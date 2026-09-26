@@ -288,7 +288,7 @@ export default function OperatorReservations() {
                   <th className="px-5 py-3">Prosumer NIC</th>
                   <th className="px-5 py-3">Slot</th>
                   <th className="px-5 py-3">Booking Date</th>
-                  <th className="px-5 py-3">Time Window</th>
+                  <th className="px-5 py-5">Time Window</th>
                   <th className="px-5 py-3">Status</th>
                   <th className="px-5 py-3">Action</th>
                   <th className="px-5 py-3" />
@@ -306,8 +306,7 @@ export default function OperatorReservations() {
                       </td>
                       <td className="px-5 py-4 text-gray-600">{row.bookingDate.slice(0, 10)}</td>
                       <td className="px-5 py-4 text-gray-600">
-                        <div>{row.startTime}</div>
-                        <div className="text-xs text-gray-400">– {row.endTime}</div>
+                        <div>{row.startTime} -  {row.endTime} </div>
                       </td>
                       <td className="px-5 py-4">
                         <StatusPill status={row.status} />

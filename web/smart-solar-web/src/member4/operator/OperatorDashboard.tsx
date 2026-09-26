@@ -38,9 +38,6 @@ export default function OperatorDashboard() {
       {/* Welcome banner */}
       <div className="m4-dash-banner m4-anim-fade-down">
         <div className="m4-dash-banner-content">
-          <div className="m4-dash-banner-icon">
-            <Activity size={28} />
-          </div>
           <div>
             <h2>Welcome back, {profile?.full_name || 'Operator'}</h2>
             <p>Here's your reservation overview for {stationName || 'your assigned hub'}.</p>
@@ -76,7 +73,6 @@ export default function OperatorDashboard() {
               <div className={`m4-dash-card-badge bg-gradient-to-br ${gradient}`}>
                 <Icon size={20} color="white" />
               </div>
-              <TrendingUp size={16} className={text} style={{ opacity: 0.5 }} />
             </div>
             <div className="m4-dash-card-value">
               <strong className={text}>
@@ -93,7 +89,7 @@ export default function OperatorDashboard() {
       <div className="m4-dash-status m4-anim-fade-up" style={{ animationDelay: '400ms' }}>
         <div className="m4-dash-status-row">
           <div className="m4-dash-status-indicator">
-            <BarChart3 size={18} />
+            {/*<BarChart3 size={18} />*/}
             <span>Reservation Metrics</span>
           </div>
           <div className="m4-dash-status-note">
@@ -101,18 +97,6 @@ export default function OperatorDashboard() {
           </div>
         </div>
         {loading && <div className="m4-dash-progress" />}
-      </div>
-
-      {/* Grid status card */}
-      <div className="m4-dash-grid-status m4-anim-fade-up" style={{ animationDelay: '500ms' }}>
-        <div className="m4-dash-grid-status-icon">
-          <span className="m4-dash-pulse" />
-          <span>✓</span>
-        </div>
-        <div>
-          <h3>Microgrid System Operational</h3>
-          <p>All core services are running normally</p>
-        </div>
       </div>
     </section>
   );
