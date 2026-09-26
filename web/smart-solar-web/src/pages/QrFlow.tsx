@@ -40,7 +40,7 @@ export default function QrFlow() {
   const statCards = [
     { label: 'Total Reservations', value: stats.total, icon: TrendingUp, color: 'bg-gray-50 text-gray-600' },
     { label: 'Ready for Scan (Approved)', value: stats.approved, icon: ScanLine, color: 'bg-cyan-50 text-cyan-600' },
-    { label: 'Verified', value: stats.verified, icon: ScanLine, color: 'bg-indigo-50 text-indigo-600' },
+    { label: 'Verified', value: stats.completed, icon: ScanLine, color: 'bg-indigo-50 text-indigo-600' },
     { label: 'Completed Transfers', value: stats.completed, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-600' },
   ];
 
@@ -79,7 +79,7 @@ export default function QrFlow() {
           </div>
           <div className="w-full max-w-sm rounded-xl bg-gray-50 p-5 text-left border border-gray-100 shadow-inner">
             <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Zap className="h-4 w-4 text-indigo-500" /> Transfer Process
+              Transfer Process
             </h3>
             <ol className="space-y-4 text-sm text-gray-600">
               <li className="flex gap-3 items-start">
@@ -95,7 +95,7 @@ export default function QrFlow() {
                 <span>Verify the reservation details on-screen.</span>
               </li>
               <li className="flex gap-3 items-start">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-medium text-emerald-600 mt-0.5">4</span>
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-medium text-indigo-600 mt-0.5">4</span>
                 <span>Confirm and finalize the energy transfer.</span>
               </li>
             </ol>

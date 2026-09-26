@@ -51,10 +51,10 @@ const EMPTY_FILTERS: BackOfficeReservationFilters = {
 
 // ─── Status helpers ───────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; dot: string; bg: string; text: string }> = {
-  Pending:   { label: 'Pending',   dot: 'bg-amber-400',  bg: 'bg-amber-50',  text: 'text-amber-700'  },
-  Approved:  { label: 'Approved',  dot: 'bg-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  Completed: { label: 'Completed', dot: 'bg-indigo-400',  bg: 'bg-indigo-50',  text: 'text-indigo-700'  },
-  Cancelled: { label: 'Cancelled', dot: 'bg-rose-400',    bg: 'bg-rose-50',    text: 'text-rose-700'    },
+  Pending: { label: 'Pending', dot: 'bg-amber-400', bg: 'bg-amber-50', text: 'text-amber-700' },
+  Approved: { label: 'Approved', dot: 'bg-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-700' },
+  Completed: { label: 'Completed', dot: 'bg-indigo-400', bg: 'bg-indigo-50', text: 'text-indigo-700' },
+  Cancelled: { label: 'Cancelled', dot: 'bg-rose-400', bg: 'bg-rose-50', text: 'text-rose-700' },
 };
 
 function StatusPill({ status }: { status: string }) {
@@ -216,10 +216,10 @@ export default function ReservationManagement() {
   function toggleExpand(id: string) { setExpandedId((prev) => (prev === id ? null : id)); }
 
   const metrics = [
-    { label: 'Active Bookings',  value: data?.summary.activeCount,    Icon: Zap,          iconBg: 'bg-amber-50',   iconColor: 'text-amber-500'   },
-    { label: 'Pending',          value: data?.summary.pendingCount,   Icon: Clock3,        iconBg: 'bg-sky-50',     iconColor: 'text-sky-500'     },
-    { label: 'Approved',         value: data?.summary.approvedCount,  Icon: CalendarDays,  iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500' },
-    { label: 'Completed',        value: data?.summary.completedCount, Icon: CheckCircle2,  iconBg: 'bg-indigo-50',  iconColor: 'text-indigo-500'  },
+    { label: 'Active Bookings', value: data?.summary.activeCount, Icon: Zap, iconBg: 'bg-amber-50', iconColor: 'text-amber-500' },
+    { label: 'Pending', value: data?.summary.pendingCount, Icon: Clock3, iconBg: 'bg-sky-50', iconColor: 'text-sky-500' },
+    { label: 'Approved', value: data?.summary.approvedCount, Icon: CalendarDays, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500' },
+    { label: 'Completed', value: data?.summary.completedCount, Icon: CheckCircle2, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-500' },
   ];
 
   return (
@@ -255,9 +255,8 @@ export default function ReservationManagement() {
             <button
               key={key}
               onClick={() => switchTab(key as TabKey)}
-              className={`relative flex shrink-0 items-center gap-2 px-5 py-3.5 text-sm font-medium transition-colors focus:outline-none ${
-                activeTab === key ? 'text-amber-700' : 'text-gray-500 hover:text-gray-800'
-              }`}
+              className={`relative flex shrink-0 items-center gap-2 px-5 py-3.5 text-sm font-medium transition-colors focus:outline-none ${activeTab === key ? 'text-amber-700' : 'text-gray-500 hover:text-gray-800'
+                }`}
             >
               {key === 'search' && <SlidersHorizontal className="h-3.5 w-3.5" />}
               {label}
@@ -355,13 +354,13 @@ export default function ReservationManagement() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">
-                  <th className="px-5 py-3">Prosumer NIC</th>
-                  <th className="px-5 py-3">Station / Slot</th>
-                  <th className="px-5 py-3">Booking Date</th>
-                  <th className="px-5 py-3">Time Window</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3">Action</th>
-                  <th className="px-5 py-3" />
+                  <th className="px-5 py-5">Prosumer NIC</th>
+                  <th className="px-5 py-5">Station / Slot</th>
+                  <th className="px-5 py-5">Booking Date</th>
+                  <th className="px-5 py-5">Time Window</th>
+                  <th className="px-9 py-5">Status</th>
+                  <th className="px-5 py-5">Action</th>
+                  <th className="px-5 py-5" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -383,10 +382,9 @@ export default function ReservationManagement() {
                       </td>
                       <td className="px-5 py-4 text-gray-600">{row.bookingDate.slice(0, 10)}</td>
                       <td className="px-5 py-4 text-gray-600">
-                        <div>{row.startTime}</div>
-                        <div className="text-xs text-gray-400">– {row.endTime}</div>
+                        <div>{row.startTime} – {row.endTime}</div>
                       </td>
-                      <td className="px-5 py-4">
+                      <td className="px-12 py-4">
                         <StatusPill status={row.status} />
                         {row.cancellationReason && <div className="mt-1 text-xs text-rose-400 italic">{row.cancellationReason}</div>}
                       </td>
