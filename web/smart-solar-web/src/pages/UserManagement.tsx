@@ -149,8 +149,9 @@ export default function UserManagement() {
         await ApiService.deleteUser(p.id);
         if (p.id === user?.id) await refreshProfile();
         load();
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
+        alert(`Failed to delete user: ${err.message || 'Unknown error'}`);
       }
     }
   };

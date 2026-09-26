@@ -103,6 +103,7 @@ export type Operator = {
 
 export type UserProfile = {
   id: string;
+  nic?: string;
   email: string;
   full_name: string;
   role: 'backoffice' | 'grid_operator';
