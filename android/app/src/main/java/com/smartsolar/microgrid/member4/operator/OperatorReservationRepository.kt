@@ -8,16 +8,18 @@ import retrofit2.Response
 class OperatorReservationRepository {
     @Suppress("SENSELESS_COMPARISON") // Gson may populate null despite Kotlin non-null declarations.
     suspend fun load(view: String, page: Int, filters: Map<String, String>): OperatorReservationPage {
-        // Send criteria to the service; do not filter or count downloaded rows in Android.
+        // Send criteria to the hub-scoped service; the backend restricts results to the operator's
+        // assignedHubId from the JWT. No filtering or counting is done in Android.
         val query = mutableMapOf("page" to page.toString(), "pageSize" to "20")
         if (view == "search") query.putAll(filters.filterValues { it.isNotBlank() })
-        if (view == "approved" || view == "completed") query["status"] = if (view == "approved") "Approved" else "Completed"
         val api = ApiClient.apiService
         val response = when (view) {
-            "pending" -> api.getOperatorPending(query)
-            "history" -> api.getOperatorHistory(query)
-            "search", "approved", "completed" -> api.searchOperatorReservations(query)
-            else -> api.getOperatorReservations(query)
+            "pending"   -> api.getHubPending(query)
+            "approved"  -> api.getHubApproved(query)
+            "completed" -> api.getHubCompleted(query)
+            "history"   -> api.getHubHistory(query)
+            "search"    -> api.searchHubReservations(query)
+            else        -> api.getHubReservations(query)
         }
         checkResponse(response)
         val data = requireNotNull(response.body()) { "Invalid reservation response. Please retry." }
