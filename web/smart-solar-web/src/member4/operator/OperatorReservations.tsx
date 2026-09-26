@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 import {
   CalendarCheck2, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight,
   Clock3, RefreshCw, Search, SlidersHorizontal, Zap, XCircle, Check, AlertCircle,
+  List, History
 } from 'lucide-react';
 import {
   fetchHubReservations, approveHubReservation,
@@ -14,12 +15,12 @@ import {
 import './operator.css';
 
 const TABS = [
-  { key: 'all',       label: 'All Reservations' },
-  { key: 'pending',   label: 'Pending' },
-  { key: 'approved',  label: 'Approved' },
-  { key: 'completed', label: 'Completed' },
-  { key: 'history',   label: 'Booking History' },
-  { key: 'search',    label: 'Search & Filter' },
+  { key: 'all',       label: 'All Reservations', Icon: List },
+  { key: 'pending',   label: 'Pending',          Icon: Clock3 },
+  { key: 'approved',  label: 'Approved',         Icon: CalendarDays },
+  { key: 'completed', label: 'Completed',        Icon: CheckCircle2 },
+  { key: 'history',   label: 'Booking History',  Icon: History },
+  { key: 'search',    label: 'Search & Filter',  Icon: SlidersHorizontal },
 ] as const;
 type TabKey = (typeof TABS)[number]['key'];
 
@@ -47,15 +48,15 @@ function MetricCard({ label, value, Icon, iconBg, iconColor, loading }: {
   iconBg: string; iconColor: string; loading: boolean;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
-        <Icon className={`h-5 w-5 ${iconColor}`} />
+    <div className="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 ${iconBg}`}>
+        <Icon className={`h-6 w-6 ${iconColor}`} />
       </div>
       <div className="min-w-0">
-        <p className="truncate text-xs font-medium text-gray-500">{label}</p>
-        <p className="mt-0.5 text-2xl font-bold tabular-nums text-gray-900">
+        <p className="truncate text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</p>
+        <p className="mt-1 text-2xl font-bold tabular-nums text-gray-900">
           {loading || value == null
-            ? <span className="inline-block h-7 w-10 animate-pulse rounded-md bg-gray-200" />
+            ? <span className="inline-block h-7 w-12 animate-pulse rounded-md bg-gray-200" />
             : value.toLocaleString()}
         </p>
       </div>
@@ -164,10 +165,10 @@ export default function OperatorReservations() {
   function toggleExpand(id: string) { setExpandedId(prev => prev === id ? null : id); }
 
   const metrics = [
-    { label: 'Active Bookings',  value: data?.summary.activeCount,    Icon: Zap,         iconBg: 'bg-amber-50',   iconColor: 'text-amber-500'   },
-    { label: 'Pending',          value: data?.summary.pendingCount,   Icon: Clock3,       iconBg: 'bg-sky-50',     iconColor: 'text-sky-500'     },
-    { label: 'Approved',         value: data?.summary.approvedCount,  Icon: CalendarDays, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500' },
-    { label: 'Completed',        value: data?.summary.completedCount, Icon: CheckCircle2, iconBg: 'bg-indigo-50',  iconColor: 'text-indigo-500'  },
+    { label: 'Active Bookings',  value: data?.summary.activeCount,    Icon: CalendarDays, iconBg: 'bg-orange-50',   iconColor: 'text-orange-500'   },
+    { label: 'Pending',          value: data?.summary.pendingCount,   Icon: Clock3,       iconBg: 'bg-blue-50',     iconColor: 'text-blue-500'     },
+    { label: 'Approved',         value: data?.summary.approvedCount,  Icon: CalendarCheck2, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500' },
+    { label: 'Completed',        value: data?.summary.completedCount, Icon: CheckCircle2, iconBg: 'bg-teal-50',  iconColor: 'text-teal-500'  },
   ];
 
   return (
@@ -195,13 +196,16 @@ export default function OperatorReservations() {
       <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
 
         {/* Tabs */}
-        <div className="flex overflow-x-auto border-b border-gray-100 bg-gray-50/50">
-          {TABS.map(({ key, label }) => (
+        <div className="flex overflow-x-auto gap-2 p-4 border-b border-gray-100 bg-gray-50/50">
+          {TABS.map(({ key, label, Icon }) => (
             <button key={key} onClick={() => switchTab(key as TabKey)}
-              className={`relative flex shrink-0 items-center gap-2 px-5 py-3.5 text-sm font-medium transition-colors focus:outline-none ${activeTab === key ? 'text-indigo-700' : 'text-gray-500 hover:text-gray-800'}`}>
-              {key === 'search' && <SlidersHorizontal className="h-3.5 w-3.5" />}
+              className={`relative flex shrink-0 items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-lg focus:outline-none border ${
+                activeTab === key 
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' 
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
+              }`}>
+              <Icon className="h-4 w-4" />
               {label}
-              {activeTab === key && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-indigo-500" />}
             </button>
           ))}
         </div>
@@ -284,14 +288,14 @@ export default function OperatorReservations() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/60 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">
-                  <th className="px-5 py-3">Prosumer NIC</th>
-                  <th className="px-5 py-3">Slot</th>
-                  <th className="px-5 py-3">Booking Date</th>
-                  <th className="px-5 py-5">Time Window</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3">Action</th>
-                  <th className="px-5 py-3" />
+                <tr className="border-b-2 border-emerald-100 bg-emerald-50 text-left text-xs font-bold uppercase tracking-wider text-gray-700">
+                  <th className="px-5 py-4">Prosumer NIC</th>
+                  <th className="px-5 py-4">Slot</th>
+                  <th className="px-5 py-4">Booking Date</th>
+                  <th className="px-5 py-4">Time Window</th>
+                  <th className="px-5 py-4">Status</th>
+                  <th className="px-5 py-4">Action</th>
+                  <th className="px-5 py-4" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
