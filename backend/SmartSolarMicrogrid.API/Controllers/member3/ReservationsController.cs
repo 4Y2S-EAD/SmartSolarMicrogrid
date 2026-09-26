@@ -85,11 +85,19 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
         return BadRequest(new { Message = "Reservations can only be scheduled within 7 days from today." });
       }
 
+      var startOfDayUtc = DateTime.SpecifyKind(dto.BookingDate.Date, DateTimeKind.Utc);
+      var endOfDayUtc = startOfDayUtc.AddDays(1);
+
+      string cleanStartTime = dto.StartTime.Trim();
+      string altStartTime = cleanStartTime.StartsWith("0")
+          ? cleanStartTime.Substring(1)
+          : (cleanStartTime.Length == 7 ? "0" + cleanStartTime : cleanStartTime);
+
       // Check calendar conflict (same slot, date, and start time)
       var isSlotAlreadyReserved = await _mongoDbService.EnergyReservations
           .Find(r => r.SlotId == dto.SlotId
-                  && r.BookingDate == dto.BookingDate.Date
-                  && r.StartTime == dto.StartTime
+                  && r.BookingDate >= startOfDayUtc && r.BookingDate < endOfDayUtc
+                  && (r.StartTime == cleanStartTime || r.StartTime == altStartTime)
                   && (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Approved))
           .AnyAsync();
 
@@ -133,6 +141,99 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
 
       // Return the created reservation
       return CreatedAtAction(nameof(GetReservationById), new { id = reservation.ReservationId }, summary);
+    }
+
+
+    // Predefined 6 daily 2-hour slots (8:00 AM - 8:00 PM)
+    private static readonly List<(string StartTime, string EndTime, string Label)> StandardDailySlots = new()
+    {
+      ("08:00 AM", "10:00 AM", "08:00 AM - 10:00 AM"),
+      ("10:00 AM", "12:00 PM", "10:00 AM - 12:00 PM"),
+      ("12:00 PM", "02:00 PM", "12:00 PM - 02:00 PM"),
+      ("02:00 PM", "04:00 PM", "02:00 PM - 04:00 PM"),
+      ("04:00 PM", "06:00 PM", "04:00 PM - 06:00 PM"),
+      ("06:00 PM", "08:00 PM", "06:00 PM - 08:00 PM")
+    };
+
+    // Get available time slots on a date (GET: api/reservations/available-time-slots)
+    [HttpGet("available-time-slots")]
+    public async Task<IActionResult> GetAvailableTimeSlots(
+        [FromQuery] string slotId,
+        [FromQuery] DateTime date,
+        [FromQuery] string? excludeReservationId = null)
+    {
+      if (string.IsNullOrWhiteSpace(slotId))
+      {
+        return BadRequest(new { Message = "Slot ID is required." });
+      }
+
+      DateTime now = DateTime.UtcNow;
+      DateTime targetDateUtc = DateTime.SpecifyKind(date.Date, DateTimeKind.Utc);
+      DateTime startOfDayUtc = targetDateUtc;
+      DateTime endOfDayUtc = targetDateUtc.AddDays(1);
+
+      // Both Pending and Approved status block the time slot
+      var filterBuilder = Builders<EnergyReservation>.Filter;
+      var filter = filterBuilder.Eq(r => r.SlotId, slotId)
+                 & filterBuilder.Gte(r => r.BookingDate, startOfDayUtc)
+                 & filterBuilder.Lt(r => r.BookingDate, endOfDayUtc)
+                 & (filterBuilder.Eq(r => r.Status, ReservationStatus.Pending) | filterBuilder.Eq(r => r.Status, ReservationStatus.Approved));
+
+      if (!string.IsNullOrWhiteSpace(excludeReservationId))
+      {
+        filter &= filterBuilder.Ne(r => r.ReservationId, excludeReservationId);
+      }
+
+      var existingReservations = await _mongoDbService.EnergyReservations.Find(filter).ToListAsync();
+
+      var availableSlots = new List<AvailableTimeSlotDto>();
+
+      foreach (var slot in StandardDailySlots)
+      {
+        // Check if already booked by another reservation (Pending or Approved)
+        bool isBooked = existingReservations.Any(r =>
+          string.Equals(r.StartTime.Trim(), slot.StartTime, StringComparison.OrdinalIgnoreCase) ||
+          string.Equals(r.StartTime.Trim().TrimStart('0'), slot.StartTime.TrimStart('0'), StringComparison.OrdinalIgnoreCase)
+        );
+
+        if (isBooked)
+        {
+          continue;
+        }
+
+        // Check 12-hour minimum notice & past time
+        DateTime slotScheduledDateTime = ParseSlotDateTime(targetDateUtc, slot.StartTime);
+        if (slotScheduledDateTime < now || slotScheduledDateTime - now < TimeSpan.FromHours(12))
+        {
+          // Check if this slot belongs to the excluded reservation
+          bool isCurrentHold = false;
+          if (!string.IsNullOrWhiteSpace(excludeReservationId))
+          {
+            var excludedRes = await _mongoDbService.EnergyReservations.Find(r => r.ReservationId == excludeReservationId).FirstOrDefaultAsync();
+            if (excludedRes != null && excludedRes.SlotId == slotId &&
+                excludedRes.BookingDate >= startOfDayUtc && excludedRes.BookingDate < endOfDayUtc &&
+                (string.Equals(excludedRes.StartTime.Trim(), slot.StartTime, StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(excludedRes.StartTime.Trim().TrimStart('0'), slot.StartTime.TrimStart('0'), StringComparison.OrdinalIgnoreCase)))
+            {
+              isCurrentHold = true;
+            }
+          }
+
+          if (!isCurrentHold)
+          {
+            continue;
+          }
+        }
+
+        availableSlots.Add(new AvailableTimeSlotDto
+        {
+          Label = slot.Label,
+          StartTime = slot.StartTime,
+          EndTime = slot.EndTime
+        });
+      }
+
+      return Ok(availableSlots);
     }
 
 
@@ -233,11 +334,19 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
         return NotFound(new { Message = "Selected slot was not found on the specified station." });
       }
 
+      var updateStartOfDayUtc = DateTime.SpecifyKind(dto.BookingDate.Date, DateTimeKind.Utc);
+      var updateEndOfDayUtc = updateStartOfDayUtc.AddDays(1);
+
+      string cleanUpdateStartTime = dto.StartTime.Trim();
+      string altUpdateStartTime = cleanUpdateStartTime.StartsWith("0")
+          ? cleanUpdateStartTime.Substring(1)
+          : (cleanUpdateStartTime.Length == 7 ? "0" + cleanUpdateStartTime : cleanUpdateStartTime);
+
       var hasConflict = await _mongoDbService.EnergyReservations
           .Find(r => r.ReservationId != id
                   && r.SlotId == dto.SlotId
-                  && r.BookingDate == dto.BookingDate.Date
-                  && r.StartTime == dto.StartTime
+                  && r.BookingDate >= updateStartOfDayUtc && r.BookingDate < updateEndOfDayUtc
+                  && (r.StartTime == cleanUpdateStartTime || r.StartTime == altUpdateStartTime)
                   && (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Approved))
           .AnyAsync();
 

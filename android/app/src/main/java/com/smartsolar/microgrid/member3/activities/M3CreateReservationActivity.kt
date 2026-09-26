@@ -1,7 +1,6 @@
 package com.smartsolar.microgrid.member3.activities
 
 import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -22,6 +21,7 @@ import com.google.android.material.card.MaterialCardView
 import com.smartsolar.microgrid.R
 import com.smartsolar.microgrid.network.ApiClient
 import com.smartsolar.microgrid.network.TokenManager
+import com.smartsolar.microgrid.network.models.AvailableTimeSlot
 import com.smartsolar.microgrid.network.models.BookingSlot
 import com.smartsolar.microgrid.network.models.CreateReservationRequest
 import com.smartsolar.microgrid.network.models.Station
@@ -32,7 +32,6 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 class M3CreateReservationActivity : AppCompatActivity() {
@@ -48,10 +47,9 @@ class M3CreateReservationActivity : AppCompatActivity() {
     private lateinit var btnPickDate: MaterialCardView
     private lateinit var tvSelectedDate: TextView
     private lateinit var tvDateRuleHint: TextView
-    private lateinit var btnPickStartTime: MaterialCardView
-    private lateinit var tvStartTime: TextView
-    private lateinit var btnPickEndTime: MaterialCardView
-    private lateinit var tvEndTime: TextView
+    private lateinit var pbTimeSlotsLoading: ProgressBar
+    private lateinit var tvNoTimeSlotsNotice: TextView
+    private lateinit var spTimeSlot: Spinner
     private lateinit var layoutProcessingStatus: LinearLayout
     private lateinit var tvStatusText: TextView
     private lateinit var btnCancel: MaterialButton
@@ -60,10 +58,11 @@ class M3CreateReservationActivity : AppCompatActivity() {
     // State
     private val stationsList = mutableListOf<Station>()
     private val slotsList = mutableListOf<BookingSlot>()
+    private val availableTimeSlotsList = mutableListOf<AvailableTimeSlot>()
     private var selectedStationId: String = ""
     private var selectedSlotId: String = ""
-    private var startTime: String = "01:00 AM"
-    private var endTime: String = "01:00 AM"
+    private var startTime: String = ""
+    private var endTime: String = ""
     private val bookingCalendar = Calendar.getInstance().apply {
         // Default to tomorrow to satisfy advance scheduling
         add(Calendar.DAY_OF_YEAR, 1)
@@ -92,21 +91,16 @@ class M3CreateReservationActivity : AppCompatActivity() {
         btnPickDate = findViewById(R.id.btnPickCreateDate)
         tvSelectedDate = findViewById(R.id.tvCreateSelectedDate)
         tvDateRuleHint = findViewById(R.id.tvDateRuleHint)
-        btnPickStartTime = findViewById(R.id.btnPickCreateStartTime)
-        tvStartTime = findViewById(R.id.tvCreateStartTime)
-        btnPickEndTime = findViewById(R.id.btnPickCreateEndTime)
-        tvEndTime = findViewById(R.id.tvCreateEndTime)
+        pbTimeSlotsLoading = findViewById(R.id.pbCreateTimeSlotsLoading)
+        tvNoTimeSlotsNotice = findViewById(R.id.tvCreateNoTimeSlotsNotice)
+        spTimeSlot = findViewById(R.id.spCreateTimeSlot)
         layoutProcessingStatus = findViewById(R.id.layoutProcessingStatus)
         tvStatusText = findViewById(R.id.tvCreateStatusText)
         btnCancel = findViewById(R.id.btnCancelCreate)
         btnSubmit = findViewById(R.id.btnSubmitCreateReservation)
 
-        // Set initial date/time labels
         tvSelectedDate.text = dateDisplayFormat.format(bookingCalendar.time)
-        tvStartTime.text = startTime
-        tvEndTime.text = endTime
 
-        // Calculate max date for 7-day restriction hint
         val maxCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 7) }
         val maxDateStr = dateDisplayFormat.format(maxCal.time)
         tvDateRuleHint.text = "Reservations are restricted to the 7-day period ending on $maxDateStr."
@@ -121,7 +115,7 @@ class M3CreateReservationActivity : AppCompatActivity() {
             finish()
         }
 
-        // Date Picker (restricted to today up to 7 days ahead)
+        // Date selection restricted within 7 days
         btnPickDate.setOnClickListener {
             val datePicker = DatePickerDialog(
                 this,
@@ -131,6 +125,8 @@ class M3CreateReservationActivity : AppCompatActivity() {
                     bookingCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                     tvSelectedDate.text = dateDisplayFormat.format(bookingCalendar.time)
                     tvError.visibility = View.GONE
+                    // Refresh available time slots for the new date
+                    loadAvailableTimeSlots()
                 },
                 bookingCalendar.get(Calendar.YEAR),
                 bookingCalendar.get(Calendar.MONTH),
@@ -142,50 +138,6 @@ class M3CreateReservationActivity : AppCompatActivity() {
             val maxCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 7) }
             datePicker.datePicker.maxDate = maxCal.timeInMillis
             datePicker.show()
-        }
-
-        // Start Time Picker
-        btnPickStartTime.setOnClickListener {
-            val (hour, min) = parse12HourParts(startTime)
-            TimePickerDialog(
-                this,
-                { _, selectedHour, selectedMinute ->
-                    val amPm = if (selectedHour < 12) "AM" else "PM"
-                    val hour12 = when {
-                        selectedHour == 0 -> 12
-                        selectedHour > 12 -> selectedHour - 12
-                        else -> selectedHour
-                    }
-                    startTime = String.format(Locale.US, "%02d:%02d %s", hour12, selectedMinute, amPm)
-                    tvStartTime.text = startTime
-                    tvError.visibility = View.GONE
-                },
-                hour,
-                min,
-                false
-            ).show()
-        }
-
-        // End Time Picker
-        btnPickEndTime.setOnClickListener {
-            val (hour, min) = parse12HourParts(endTime)
-            TimePickerDialog(
-                this,
-                { _, selectedHour, selectedMinute ->
-                    val amPm = if (selectedHour < 12) "AM" else "PM"
-                    val hour12 = when {
-                        selectedHour == 0 -> 12
-                        selectedHour > 12 -> selectedHour - 12
-                        else -> selectedHour
-                    }
-                    endTime = String.format(Locale.US, "%02d:%02d %s", hour12, selectedMinute, amPm)
-                    tvEndTime.text = endTime
-                    tvError.visibility = View.GONE
-                },
-                hour,
-                min,
-                false
-            ).show()
         }
 
         btnSubmit.setOnClickListener {
@@ -234,7 +186,6 @@ class M3CreateReservationActivity : AppCompatActivity() {
                             override fun onNothingSelected(parent: AdapterView<*>?) {}
                         }
 
-                        // Trigger first station selection
                         selectedStationId = stationsList[0].stationId
                         loadSlotsForStation(selectedStationId)
                     } else {
@@ -273,15 +224,15 @@ class M3CreateReservationActivity : AppCompatActivity() {
 
                         if (slotsList.isNotEmpty()) {
                             selectedSlotId = slotsList[0].slotId
-                            startTime = sanitizeTime(slotsList[0].startTime, "01:00 AM")
-                            endTime = sanitizeTime(slotsList[0].endTime, "01:00 AM")
-                            tvStartTime.text = startTime
-                            tvEndTime.text = endTime
+                            renderSlotCards()
+                            loadAvailableTimeSlots()
                         } else {
                             selectedSlotId = ""
+                            renderSlotCards()
+                            spTimeSlot.adapter = null
+                            tvNoTimeSlotsNotice.visibility = View.VISIBLE
+                            btnSubmit.isEnabled = false
                         }
-
-                        renderSlotCards()
                     } else {
                         tvNoSlotsNotice.visibility = View.VISIBLE
                         tvNoSlotsNotice.text = "Could not fetch slots for this station."
@@ -306,7 +257,6 @@ class M3CreateReservationActivity : AppCompatActivity() {
         }
 
         tvNoSlotsNotice.visibility = View.GONE
-        btnSubmit.isEnabled = !isSubmitting
 
         for (slot in slotsList) {
             val itemView = LayoutInflater.from(this).inflate(R.layout.m3_item_slot_selectable, layoutSlotList, false)
@@ -334,16 +284,90 @@ class M3CreateReservationActivity : AppCompatActivity() {
             }
 
             card.setOnClickListener {
-                selectedSlotId = slot.slotId
-                startTime = sanitizeTime(slot.startTime, "01:00 AM")
-                endTime = sanitizeTime(slot.endTime, "01:00 AM")
-                tvStartTime.text = startTime
-                tvEndTime.text = endTime
-                tvError.visibility = View.GONE
-                renderSlotCards()
+                if (selectedSlotId != slot.slotId) {
+                    selectedSlotId = slot.slotId
+                    tvError.visibility = View.GONE
+                    renderSlotCards()
+                    loadAvailableTimeSlots()
+                }
             }
 
             layoutSlotList.addView(itemView)
+        }
+    }
+
+    // Fetches available 2-hour time slots for selected slot and date
+    private fun loadAvailableTimeSlots() {
+        if (selectedSlotId.isBlank()) return
+
+        val dateStr = String.format(
+            Locale.US,
+            "%04d-%02d-%02d",
+            bookingCalendar.get(Calendar.YEAR),
+            bookingCalendar.get(Calendar.MONTH) + 1,
+            bookingCalendar.get(Calendar.DAY_OF_MONTH)
+        )
+
+        pbTimeSlotsLoading.visibility = View.VISIBLE
+        tvNoTimeSlotsNotice.visibility = View.GONE
+        spTimeSlot.adapter = null
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val resp = ApiClient.apiService.getAvailableTimeSlots(selectedSlotId, dateStr)
+                withContext(Dispatchers.Main) {
+                    pbTimeSlotsLoading.visibility = View.GONE
+                    if (resp.isSuccessful && resp.body() != null) {
+                        availableTimeSlotsList.clear()
+                        availableTimeSlotsList.addAll(resp.body()!!)
+
+                        if (availableTimeSlotsList.isNotEmpty()) {
+                            tvNoTimeSlotsNotice.visibility = View.GONE
+                            btnSubmit.isEnabled = !isSubmitting
+
+                            val slotLabels = availableTimeSlotsList.map { it.label }
+                            val adapter = ArrayAdapter(
+                                this@M3CreateReservationActivity,
+                                android.R.layout.simple_spinner_dropdown_item,
+                                slotLabels
+                            )
+                            spTimeSlot.adapter = adapter
+
+                            startTime = availableTimeSlotsList[0].startTime
+                            endTime = availableTimeSlotsList[0].endTime
+
+                            spTimeSlot.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                                    val chosen = availableTimeSlotsList[position]
+                                    startTime = chosen.startTime
+                                    endTime = chosen.endTime
+                                    tvError.visibility = View.GONE
+                                }
+
+                                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                            }
+                        } else {
+                            tvNoTimeSlotsNotice.visibility = View.VISIBLE
+                            btnSubmit.isEnabled = false
+                            startTime = ""
+                            endTime = ""
+                        }
+                    } else {
+                        tvNoTimeSlotsNotice.visibility = View.VISIBLE
+                        btnSubmit.isEnabled = false
+                        startTime = ""
+                        endTime = ""
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    pbTimeSlotsLoading.visibility = View.GONE
+                    tvNoTimeSlotsNotice.visibility = View.VISIBLE
+                    btnSubmit.isEnabled = false
+                    startTime = ""
+                    endTime = ""
+                }
+            }
         }
     }
 
@@ -367,27 +391,17 @@ class M3CreateReservationActivity : AppCompatActivity() {
             return
         }
 
-        // 7-day restriction rule
+        if (startTime.isBlank() || endTime.isBlank()) {
+            tvError.visibility = View.VISIBLE
+            tvError.text = "Please select an available 2-hour time slot."
+            return
+        }
+
+        // Validate 7-day rule
         val maxAllowedCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 7) }
         if (bookingCalendar.after(maxAllowedCal)) {
             tvError.visibility = View.VISIBLE
             tvError.text = "Reservations can only be scheduled within 7 days from today."
-            return
-        }
-
-        // Check if scheduled time is in the future
-        val scheduledMillis = getScheduledDateTimeMillis(bookingCalendar, startTime)
-        if (scheduledMillis <= System.currentTimeMillis()) {
-            tvError.visibility = View.VISIBLE
-            tvError.text = "Scheduled time must be in the future."
-            return
-        }
-
-        // Check minimum 12 hours advance booking if scheduled for today/tomorrow
-        val remainingNoticeMillis = scheduledMillis - System.currentTimeMillis()
-        if (remainingNoticeMillis < (12L * 60 * 60 * 1000)) {
-            tvError.visibility = View.VISIBLE
-            tvError.text = "Reservations must be booked at least 12 hours in advance."
             return
         }
 
@@ -399,7 +413,6 @@ class M3CreateReservationActivity : AppCompatActivity() {
             bookingCalendar.get(Calendar.DAY_OF_MONTH)
         )
 
-        // Update UI state to processing
         isSubmitting = true
         tvError.visibility = View.GONE
         layoutProcessingStatus.visibility = View.VISIBLE
@@ -424,7 +437,6 @@ class M3CreateReservationActivity : AppCompatActivity() {
                     val createdItem = createResp.body()!!
                     val newReservationId = createdItem.reservationId
 
-                    // Step 2: Attempt QR Code Generation
                     withContext(Dispatchers.Main) {
                         tvStatusText.text = "Generating and signing QR token..."
                     }
@@ -432,7 +444,7 @@ class M3CreateReservationActivity : AppCompatActivity() {
                     try {
                         ApiClient.apiService.generateQrCode(newReservationId)
                     } catch (_: Exception) {
-                        // QR generation may also be handled on-demand by detail view
+                        // QR code generation handled on demand if needed
                     }
 
                     withContext(Dispatchers.Main) {
@@ -443,7 +455,6 @@ class M3CreateReservationActivity : AppCompatActivity() {
                             Toast.LENGTH_LONG
                         ).show()
 
-                        // Direct to Reservation Details screen
                         val intent = Intent(this@M3CreateReservationActivity, M3ReservationDetailsActivity::class.java).apply {
                             putExtra(M3ReservationDetailsActivity.EXTRA_RESERVATION_ID, newReservationId)
                         }
@@ -472,65 +483,6 @@ class M3CreateReservationActivity : AppCompatActivity() {
                     tvError.text = "Network error: ${e.localizedMessage ?: "Unknown error"}"
                 }
             }
-        }
-    }
-
-    private fun getScheduledDateTimeMillis(calendar: Calendar, timeStr: String): Long {
-        return try {
-            val datePart = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(calendar.time)
-            val sdf = SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.US)
-            val d = sdf.parse("$datePart $timeStr")
-            d?.time ?: calendar.timeInMillis
-        } catch (_: Exception) {
-            calendar.timeInMillis
-        }
-    }
-
-    private fun parse12HourParts(timeStr: String): Pair<Int, Int> {
-        return try {
-            val sdf = SimpleDateFormat("hh:mm a", Locale.US)
-            val d = sdf.parse(timeStr.trim()) ?: return Pair(1, 0)
-            val cal = Calendar.getInstance().apply { time = d }
-            Pair(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
-        } catch (_: Exception) {
-            Pair(1, 0)
-        }
-    }
-
-    private fun sanitizeTime(rawTime: String?, fallback: String = "01:00 AM"): String {
-        if (rawTime.isNullOrBlank()) return fallback
-        val trimmed = rawTime.trim()
-        if (trimmed.matches(Regex("^(0?[1-9]|1[0-2]):[0-5][0-9]\\s?(AM|PM)$", RegexOption.IGNORE_CASE))) {
-            return try {
-                val sdf = SimpleDateFormat("hh:mm a", Locale.US)
-                val d = sdf.parse(trimmed)
-                if (d != null) SimpleDateFormat("hh:mm a", Locale.US).format(d) else fallback
-            } catch (_: Exception) {
-                fallback
-            }
-        }
-        return try {
-            val timePart = when {
-                trimmed.contains("T") -> trimmed.substringAfter("T").substringBefore(".").substringBefore("Z").trim()
-                trimmed.contains(" ") && trimmed.contains(":") -> trimmed.substringAfter(" ").substringBefore(".").trim()
-                else -> trimmed
-            }
-            val parts = timePart.split(":")
-            if (parts.size >= 2) {
-                val h = parts[0].toIntOrNull() ?: 1
-                val m = parts[1].toIntOrNull() ?: 0
-                val amPm = if (h < 12) "AM" else "PM"
-                val h12 = when {
-                    h == 0 -> 12
-                    h > 12 -> h - 12
-                    else -> h
-                }
-                String.format(Locale.US, "%02d:%02d %s", h12, m, amPm)
-            } else {
-                fallback
-            }
-        } catch (_: Exception) {
-            fallback
         }
     }
 
