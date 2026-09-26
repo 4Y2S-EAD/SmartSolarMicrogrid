@@ -52,3 +52,9 @@ data class GenerateQrResponse(
     val qrToken: String? = null,
     val generatedAt: String? = null
 )
+
+data class AvailableTimeSlot(
+    val label: String,
+    val startTime: String,
+    val endTime: String
+)
