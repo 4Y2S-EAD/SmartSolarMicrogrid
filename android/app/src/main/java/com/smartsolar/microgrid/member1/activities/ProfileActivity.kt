@@ -60,26 +60,42 @@ class ProfileActivity : AppCompatActivity() {
             return
         }
 
+        val dbHelper = com.smartsolar.microgrid.member1.db.ProfileDatabaseHelper(this)
+
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val response = com.smartsolar.microgrid.network.ApiClient.apiService.getProfile(nic)
                 if (response.isSuccessful) {
                     val profile = response.body()
                     if (profile != null) {
-                        findViewById<TextView>(R.id.tvFullName).text = profile.fullName
-                        findViewById<TextView>(R.id.tvNIC).text = profile.nic
-                        findViewById<TextView>(R.id.tvEmail).text = profile.email
-                        findViewById<TextView>(R.id.tvPhone).text = profile.phoneNumber ?: "—"
-                        findViewById<TextView>(R.id.tvAddress).text = profile.address ?: "—"
-                        findViewById<TextView>(R.id.tvRole).text = profile.role
-                        
-                        val initials = profile.fullName.split(" ").map { it.first() }.take(2).joinToString("")
-                        findViewById<TextView>(R.id.tvProfileInitial).text = initials
+                        dbHelper.saveProfile(profile)
+                        updateUI(profile)
+                    }
+                } else {
+                    val profile = dbHelper.getProfile(nic)
+                    if (profile != null) {
+                        updateUI(profile)
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                val profile = dbHelper.getProfile(nic)
+                if (profile != null) {
+                    updateUI(profile)
+                }
             }
         }
+    }
+
+    private fun updateUI(profile: com.smartsolar.microgrid.network.models.UserProfileResponse) {
+        findViewById<TextView>(R.id.tvFullName).text = profile.fullName
+        findViewById<TextView>(R.id.tvNIC).text = profile.nic
+        findViewById<TextView>(R.id.tvEmail).text = profile.email
+        findViewById<TextView>(R.id.tvPhone).text = profile.phoneNumber ?: "—"
+        findViewById<TextView>(R.id.tvAddress).text = profile.address ?: "—"
+        findViewById<TextView>(R.id.tvRole).text = profile.role
+        
+        val initials = profile.fullName.split(" ").map { it.first() }.take(2).joinToString("")
+        findViewById<TextView>(R.id.tvProfileInitial).text = initials
     }
 }
