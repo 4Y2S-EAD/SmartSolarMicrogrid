@@ -16,10 +16,16 @@ public sealed class OperatorQrVerificationService(MongoDbService db)
     public async Task<VerifyQrResponse> VerifyAsync(string? qrData, ClaimsPrincipal principal, CancellationToken ct)
     {
         // Authenticate the operator and QR before returning any reservation or customer information.
-        var operatorId = await RequireOperatorAsync(principal, ct);
+        var operatorUser = await RequireOperatorAsync(principal, ct);
+        var operatorId = operatorUser.NIC;
         var data = ReservationQrCredential.Read(qrData, Environment.GetEnvironmentVariable("QR_JWT_SECRET"));
         var id = data.GetProperty("reservationId").GetString()!;
         var reservation = await GetReservationAsync(id, ct);
+        
+        if (operatorUser.AssignedHubId != reservation.StationId)
+        {
+            throw new QrVerificationException(403, "HUB_MISMATCH", "This QR code belongs to a different hub. You can only verify QR codes for your assigned hub.");
+        }
         var details = await ValidateAsync(reservation, data, qrData!, ct);
         var now = DateTime.UtcNow;
         var result = await db.EnergyReservations.UpdateOneAsync(SnapshotFilter(reservation),
@@ -37,8 +43,14 @@ public sealed class OperatorQrVerificationService(MongoDbService db)
     public async Task<CompleteTransferResponse> CompleteAsync(string id, ClaimsPrincipal principal, CancellationToken ct)
     {
         // Recheck current state and the same operator's server verification, then transition Approved exactly once.
-        var operatorId = await RequireOperatorAsync(principal, ct);
+        var operatorUser = await RequireOperatorAsync(principal, ct);
+        var operatorId = operatorUser.NIC;
         var reservation = await GetReservationAsync(id, ct);
+
+        if (operatorUser.AssignedHubId != reservation.StationId)
+        {
+            throw new QrVerificationException(403, "HUB_MISMATCH", "This QR code belongs to a different hub. You can only complete reservations for your assigned hub.");
+        }
         RequireApproved(reservation);
         if (reservation.VerifiedAt == null || reservation.OperatorId != operatorId ||
             reservation.VerifiedAt != reservation.UpdatedAt || reservation.VerifiedAt < reservation.QrGeneratedAt)
@@ -56,7 +68,7 @@ public sealed class OperatorQrVerificationService(MongoDbService db)
             ReservationStatus.Completed.ToString(), operatorId, reservation.VerifiedAt.Value, now);
     }
 
-    private async Task<string> RequireOperatorAsync(ClaimsPrincipal principal, CancellationToken ct)
+    private async Task<User> RequireOperatorAsync(ClaimsPrincipal principal, CancellationToken ct)
     {
         // Both existing login endpoints use the NIC as JWT subject; role and active account are checked in MongoDB too.
         var id = principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? principal.FindFirstValue("sub");
@@ -66,7 +78,7 @@ public sealed class OperatorQrVerificationService(MongoDbService db)
         var user = await db.Users.Find(u => u.NIC == id).FirstOrDefaultAsync(ct);
         if (user?.Role != UserRole.GridOperator || user.AccountStatus != AccountStatus.Active)
             throw new QrVerificationException(403, "OPERATOR_INACTIVE", "An active Grid Operator account is required.");
-        return id;
+        return user;
     }
 
     private async Task<EnergyReservation> GetReservationAsync(string id, CancellationToken ct)
