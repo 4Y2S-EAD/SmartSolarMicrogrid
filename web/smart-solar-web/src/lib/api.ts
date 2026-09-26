@@ -382,3 +382,81 @@ export const ApiService = {
       method: 'POST',
     }),
 };
+
+// --- Back Office Reservation Types (reusing operator/reservations endpoints) ---
+export type BackOfficeReservationItem = {
+  reservationId: string;
+  prosumerNic: string;
+  stationId: string;
+  stationName: string | null;
+  slotId: string;
+  slotNumber: number | null;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  canApprove: boolean;
+  cancellationReason: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type BackOfficeReservationSummary = {
+  activeCount: number;
+  pendingCount: number;
+  approvedCount: number;
+  completedCount: number;
+};
+
+export type BackOfficeReservationPage = {
+  items: BackOfficeReservationItem[];
+  currentPage: number;
+  pageSize: number;
+  totalRecords: number;
+  totalPages: number;
+  summary: BackOfficeReservationSummary;
+  statusOptions: string[];
+};
+
+export type BackOfficeReservationFilters = {
+  reservationId: string;
+  prosumerNic: string;
+  station: string;
+  bookingDate: string;
+  status: string;
+};
+
+function authHeader(): Record<string, string> {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function fetchBackOfficeReservations(
+  view: string,
+  filters: BackOfficeReservationFilters,
+  page: number,
+  signal?: AbortSignal
+): Promise<BackOfficeReservationPage> {
+  const suffix =
+    view === 'pending' || view === 'history' ? `/${view}` : view === 'all' ? '' : '/search';
+  const params = new URLSearchParams({ page: String(page), pageSize: '20' });
+  if (view === 'search') {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value.trim()) params.set(key, value.trim());
+    });
+  }
+  if (view === 'approved') params.set('status', 'Approved');
+  if (view === 'completed') params.set('status', 'Completed');
+  return fetchApi<BackOfficeReservationPage>(
+    `/operator/reservations${suffix}?${params}`,
+    { signal, headers: authHeader() }
+  );
+}
+
+export async function approveBackOfficeReservation(id: string): Promise<unknown> {
+  return fetchApi(`/reservations/${encodeURIComponent(id)}/approve`, {
+    method: 'PUT',
+    headers: authHeader(),
+  });
+}
