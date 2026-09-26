@@ -1,5 +1,6 @@
 package com.smartsolar.microgrid.member1.activities
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -34,6 +35,7 @@ class HomeActivity : AppCompatActivity() {
         val btnFindStations = findViewById<Button>(R.id.btnFindStations)
         val btnMakeReservation = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnMakeReservation)
         val btnMyReservations = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnMyReservations)
+        val btnMyProfile = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnMyProfile)
         val btnRequestDeactivation = findViewById<Button>(R.id.btnRequestDeactivation)
         val tvWelcomeName = findViewById<TextView>(R.id.tvWelcomeName)
 
@@ -119,6 +121,10 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this, M3ReservationsActivity::class.java))
         }
 
+        btnMyProfile?.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+
         btnRequestDeactivation.setOnClickListener {
             startActivity(Intent(this, DeactivationActivity::class.java))
         }
@@ -150,6 +156,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun fetchUserProfile(nic: String, tvName: TextView) {
         kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
             try {
