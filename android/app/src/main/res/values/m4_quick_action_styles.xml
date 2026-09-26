@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Member 4: consistent operator quick-action cards. -->
+<resources>
+    <style name="Widget.SmartSolar.OperatorQuickAction" parent="Widget.MaterialComponents.Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">116dp</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:layout_margin">6dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="android:paddingVertical">16dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">#193C2D</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:elevation">0dp</item>
+        <item name="backgroundTint">#FFFFFF</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">#DCE8E1</item>
+        <item name="iconGravity">textTop</item>
+        <item name="iconPadding">12dp</item>
+        <item name="iconSize">28dp</item>
+        <item name="iconTint">#047857</item>
+        <item name="rippleColor">#22047857</item>
+    </style>
+</resources>
