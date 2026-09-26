@@ -35,7 +35,8 @@ object ApiClient {
         .addInterceptor { chain ->
             // Scanned credentials and verified personal details must never appear in HTTP logs.
             val path = chain.request().url.encodedPath
-            if (path.endsWith("/verify-qr") || path.contains("/reservations")) chain.proceed(chain.request())
+            if (path.endsWith("/verify-qr") || path.contains("/reservations") ||
+                path.endsWith("/maps/route")) chain.proceed(chain.request())
             else loggingInterceptor.intercept(chain)
         }
         .connectTimeout(30, TimeUnit.SECONDS)
