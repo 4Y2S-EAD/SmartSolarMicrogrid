@@ -460,3 +460,44 @@ export async function approveBackOfficeReservation(id: string): Promise<unknown>
     headers: authHeader(),
   });
 }
+
+// --- Hub-Scoped Grid Operator Reservation API (api/hub/reservations) ---
+// The backend reads assignedHubId from the JWT and filters to the operator's station only.
+// Types are identical to BackOfficeReservationPage since the response shape is the same.
+export type HubReservationFilters = BackOfficeReservationFilters;
+export type HubReservationPage = BackOfficeReservationPage;
+
+export async function fetchHubReservations(
+  view: string,
+  filters: HubReservationFilters,
+  page: number,
+  signal?: AbortSignal
+): Promise<HubReservationPage> {
+  const HUB_VIEW_SUFFIX: Record<string, string> = {
+    all: '',
+    pending: '/pending',
+    approved: '/approved',
+    completed: '/completed',
+    history: '/history',
+    search: '/search',
+  };
+  const suffix = HUB_VIEW_SUFFIX[view] ?? '';
+  const params = new URLSearchParams({ page: String(page), pageSize: '20' });
+  if (view === 'search') {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value.trim()) params.set(key, value.trim());
+    });
+  }
+  return fetchApi<HubReservationPage>(
+    `/hub/reservations${suffix}?${params}`,
+    { signal, headers: authHeader() }
+  );
+}
+
+export async function approveHubReservation(id: string): Promise<unknown> {
+  return fetchApi(`/reservations/${encodeURIComponent(id)}/approve`, {
+    method: 'PUT',
+    headers: authHeader(),
+  });
+}
+

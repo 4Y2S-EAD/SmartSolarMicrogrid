@@ -35,6 +35,20 @@ interface ApiService {
     @PUT("reservations/{id}/approve")
     suspend fun approveOperatorReservation(@Path("id") id: String): Response<MessageResponse>
 
+    // Member 4: hub-scoped endpoints — backend restricts to assignedHubId from JWT.
+    @GET("hub/reservations")
+    suspend fun getHubReservations(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("hub/reservations/pending")
+    suspend fun getHubPending(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("hub/reservations/approved")
+    suspend fun getHubApproved(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("hub/reservations/completed")
+    suspend fun getHubCompleted(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("hub/reservations/history")
+    suspend fun getHubHistory(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("hub/reservations/search")
+    suspend fun searchHubReservations(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+
     @POST("member1/auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<MessageResponse>
 

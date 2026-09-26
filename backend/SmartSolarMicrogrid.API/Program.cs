@@ -28,6 +28,7 @@ builder.Services.AddOpenApi();
 // Register MongoDB Service
 builder.Services.AddSingleton<MongoDbService>();
 builder.Services.AddScoped<SmartSolarMicrogrid.API.Services.member4.OperatorReservationService>();
+builder.Services.AddScoped<SmartSolarMicrogrid.API.Services.member4.HubOperatorReservationService>();
 builder.Services.AddScoped<SmartSolarMicrogrid.API.Services.member4.OperatorQrVerificationService>();
 builder.Services.AddScoped<SmartSolarMicrogrid.API.Services.member4.StationMapService>();
 // Member 4: separate routing credential; existing Maps SDK and station services are unchanged.
