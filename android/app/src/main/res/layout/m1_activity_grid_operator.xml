@@ -282,122 +282,68 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
-                android:paddingHorizontal="12dp"
-                android:useDefaultMargins="true">
+                android:paddingHorizontal="10dp"
+                android:useDefaultMargins="false">
 
 
                 <!-- QR APPROVALS -->
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnQrApproval"
-                    android:layout_width="0dp"
-                    android:layout_height="105dp"
-                    android:layout_columnWeight="1"
-                    android:backgroundTint="#0F766E"
-                    android:text="QR Approvals"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    app:cornerRadius="16dp"
+                    style="@style/Widget.SmartSolar.OperatorQuickAction"
+                    android:text="@string/m4_scan_qr"
                     app:icon="@drawable/ic_qr_code_24"
-                    app:iconGravity="top"
-                    app:iconPadding="10dp"
-                    app:iconTint="#FFFFFF" />
+                     />
 
 
                 <!-- SYSTEM MANAGEMENT -->
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnManagement"
-                    android:layout_width="0dp"
-                    android:layout_height="105dp"
-                    android:layout_columnWeight="1"
-                    android:backgroundTint="#2563EB"
+                    style="@style/Widget.SmartSolar.OperatorQuickAction"
                     android:text="System Management"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    app:cornerRadius="16dp"
-                    app:icon="@drawable/ic_app_badging_24"
-                    app:iconGravity="top"
-                    app:iconPadding="10dp"
-                    app:iconTint="#FFFFFF" />
+                    app:icon="@drawable/m4_ic_settings"
+                     />
 
 
                 <!-- MONITOR STATIONS -->
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnMonitorStations"
-                    android:layout_width="0dp"
-                    android:layout_height="105dp"
-                    android:layout_columnWeight="1"
-                    android:backgroundTint="@color/emerald_600"
+                    style="@style/Widget.SmartSolar.OperatorQuickAction"
                     android:text="@string/m4_station_map"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    app:cornerRadius="16dp"
                     app:icon="@drawable/ic_share_location_24"
-                    app:iconGravity="top"
-                    app:iconPadding="10dp"
-                    app:iconTint="#FFFFFF" />
+                    app:backgroundTint="#ECFDF5" app:strokeColor="#BBE7D3" />
 
 
                 <!-- RESERVATIONS -->
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnReservations"
-                    android:layout_width="0dp"
-                    android:layout_height="105dp"
-                    android:layout_columnWeight="1"
-                    android:backgroundTint="#D97706"
+                    style="@style/Widget.SmartSolar.OperatorQuickAction"
                     android:text="Reservations"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    app:cornerRadius="16dp"
                     app:icon="@drawable/ic_add_notes_24"
-                    app:iconGravity="top"
-                    app:iconPadding="10dp"
-                    app:iconTint="#FFFFFF" />
+                    app:backgroundTint="#047857" app:strokeColor="#047857" app:iconTint="#FFFFFF" android:textColor="#FFFFFF" />
 
 
                 <!-- MANAGE USERS -->
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnUsers"
-                    android:layout_width="0dp"
-                    android:layout_height="105dp"
-                    android:layout_columnWeight="1"
-                    android:backgroundTint="#0891B2"
+                    style="@style/Widget.SmartSolar.OperatorQuickAction"
                     android:text="Manage Users"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    app:cornerRadius="16dp"
                     app:icon="@drawable/ic_account_circle_24"
-                    app:iconGravity="top"
-                    app:iconPadding="10dp"
-                    app:iconTint="#FFFFFF" />
+                     />
 
 
                 <!-- LOGOUT -->
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnLogout"
-                    android:layout_width="0dp"
-                    android:layout_height="105dp"
-                    android:layout_columnWeight="1"
-                    android:backgroundTint="#DC2626"
+                    style="@style/Widget.SmartSolar.OperatorQuickAction"
                     android:text="Logout"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    app:cornerRadius="16dp"
-                    app:icon="@android:drawable/ic_lock_power_off"
-                    app:iconGravity="top"
-                    app:iconPadding="10dp"
-                    app:iconTint="#FFFFFF" />
+                    app:icon="@drawable/m4_ic_logout"
+                    app:backgroundTint="#FFF5F4" app:strokeColor="#F5D5D0" app:iconTint="#B42318" android:textColor="#B42318" app:rippleColor="#22B42318" />
 
             </GridLayout>
 

@@ -51,8 +51,35 @@
             <TextView android:id="@+id/m4MapMessage" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_gravity="top" android:padding="12dp" android:background="#EEFFFFFF"
                 android:text="@string/m4_loading_map" android:textColor="@color/gray_900" android:accessibilityLiveRegion="polite" />
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/m4ThreeDimensional" android:layout_width="wrap_content"
+                android:layout_height="48dp" android:layout_gravity="bottom|start"
+                android:layout_margin="8dp" android:paddingHorizontal="12dp"
+                android:background="#EEFFFFFF" android:text="@string/m4_3d_view" />
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout android:id="@+id/m4RoutePanel" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="horizontal"
+        android:gravity="center_vertical" android:paddingHorizontal="16dp" android:paddingTop="8dp"
+        android:visibility="gone">
+        <TextView android:id="@+id/m4RouteSummary" android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="wrap_content" android:textSize="14sp" android:textColor="@color/gray_900"
+            android:accessibilityLiveRegion="polite" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/m4RouteRetry"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/m4_route_retry" android:visibility="gone" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton android:id="@+id/m4StartDriving"
+        android:layout_width="match_parent" android:layout_height="48dp"
+        android:layout_marginHorizontal="16dp" android:layout_marginTop="8dp"
+        android:text="@string/m4_start_driving" android:textAllCaps="false"
+        android:textStyle="bold" android:textColor="@color/white"
+        android:backgroundTint="@color/emerald_600" android:visibility="gone"
+        app:cornerRadius="16dp" app:icon="@drawable/m4_ic_drive_navigation"
+        app:iconGravity="textStart" app:iconTint="@color/white" />
 
     <TextView android:id="@+id/m4ResultTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
         android:paddingHorizontal="16dp" android:paddingTop="12dp" android:paddingBottom="4dp"

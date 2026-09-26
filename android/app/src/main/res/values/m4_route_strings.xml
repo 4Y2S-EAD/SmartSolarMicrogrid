@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="m4_start_driving">Start Driving</string>
+    <string name="m4_navigation_unavailable">Could not open Google Maps or a browser. Your route preview is still available.</string>
+    <string name="m4_3d_view">3D view</string>
+    <string name="m4_route_loading">Calculating driving route…</string>
+    <string name="m4_route_summary">Nearest: %1$s\nRoad distance: %2$s · Estimated drive: %3$s</string>
+    <string name="m4_route_unavailable">Driving directions unavailable. Your location, stations and straight-line distances are still available.</string>
+    <string name="m4_route_setup">Driving directions are not configured yet. Stations and straight-line distances are still available.</string>
+    <string name="m4_route_none">No driving route found. Stations and straight-line distances are still available.</string>
+    <string name="m4_route_sign_in">Sign in to calculate driving directions.</string>
+    <string name="m4_route_retry">Retry route</string>
+    <string name="m4_route_minutes">%1$d min</string>
+    <string name="m4_route_hours">%1$d hr %2$d min</string>
+    <string name="m4_route_km">%1$.1f km</string>
+    <string name="m4_route_meters">%1$d m</string>
+</resources>

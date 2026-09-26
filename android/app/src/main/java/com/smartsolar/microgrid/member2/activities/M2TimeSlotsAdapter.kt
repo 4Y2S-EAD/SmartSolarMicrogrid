@@ -43,7 +43,7 @@ class M2TimeSlotsAdapter(
         val isSelected = position == selectedPosition
         
         if (slot.status.equals("Available", ignoreCase = true)) {
-            holder.tvSlotStatus.text = "Available"
+            holder.tvSlotStatus.text = slot.status
             
             if (isSelected) {
                 // Selected state
@@ -60,15 +60,16 @@ class M2TimeSlotsAdapter(
             }
 
             holder.itemView.setOnClickListener {
+                if (holder.adapterPosition == RecyclerView.NO_POSITION) return@setOnClickListener
                 val previousSelected = selectedPosition
                 selectedPosition = holder.adapterPosition
-                notifyItemChanged(previousSelected)
+                if (previousSelected >= 0) notifyItemChanged(previousSelected)
                 notifyItemChanged(selectedPosition)
                 onSlotClick(slot)
             }
         } else {
             // Booked/Unavailable state
-            holder.tvSlotStatus.text = "Booked"
+            holder.tvSlotStatus.text = slot.status
             holder.cardTimeSlot.setCardBackgroundColor(Color.parseColor("#FEE2E2")) // Light red
             holder.tvTimeRange.setTextColor(Color.parseColor("#991B1B"))
             holder.tvSlotStatus.setTextColor(Color.parseColor("#991B1B"))
@@ -87,8 +88,11 @@ class M2TimeSlotsAdapter(
     }
 
     private fun formatTime(isoString: String): String {
+        // API clock-only values are already displayable; do not parse them as calendar dates.
+        if (!isoString.contains('T')) return isoString
         return try {
             val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            parser.isLenient = false
             parser.timeZone = TimeZone.getTimeZone("UTC")
             val date = parser.parse(isoString)
             

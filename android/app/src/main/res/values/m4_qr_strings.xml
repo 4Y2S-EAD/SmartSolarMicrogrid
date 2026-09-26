@@ -1,0 +1,25 @@
+<resources>
+    <string name="m4_scan_qr">Scan QR</string>
+    <string name="m4_qr_subtitle">Verify a reservation</string>
+    <string name="m4_qr_guide">Position the Prosumer QR inside the frame</string>
+    <string name="m4_qr_hint">Use the QR on their phone or printed booking. Keep the camera steady.</string>
+    <string name="m4_qr_opening">Opening camera…</string>
+    <string name="m4_qr_scanning">Scanning for a reservation QR…</string>
+    <string name="m4_qr_back">Close scanner</string>
+    <string name="m4_qr_torch_on">Turn flashlight on</string>
+    <string name="m4_qr_torch_off">Turn flashlight off</string>
+    <string name="m4_qr_complete">Complete Energy Transfer</string>
+    <string name="m4_qr_scan_again">Scan another QR</string>
+    <string name="m4_qr_completed_jobs">View completed reservations</string>
+    <string name="m4_qr_confirm_title">Complete this energy transfer?</string>
+    <string name="m4_qr_confirm">Confirm only after the energy transfer for %1$s is finished. This marks the reservation Completed.</string>
+    <string name="m4_qr_cancel">Not yet</string>
+    <string name="m4_qr_confirm_action">Confirm completion</string>
+    <string name="m4_qr_permission_title">Camera access needed</string>
+    <string name="m4_qr_permission_message">Allow camera access to scan the Prosumer reservation QR. Photos are not saved.</string>
+    <string name="m4_qr_permission_settings">Camera access is disabled. Open Settings → Permissions → Camera and allow access, then return here.</string>
+    <string name="m4_qr_allow">Allow camera</string>
+    <string name="m4_qr_settings">Open settings</string>
+    <string name="m4_qr_retry">Retry camera</string>
+    <string name="m4_qr_capacity">%1$s kWh slot capacity</string>
+</resources>

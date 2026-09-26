@@ -26,12 +26,19 @@ object ApiClient {
     }
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+        redactHeader("Authorization")
     }
 
     private val client = OkHttpClient.Builder()
         .addInterceptor(authInterceptor)
-        .addInterceptor(loggingInterceptor)
+        .addInterceptor { chain ->
+            // Scanned credentials and verified personal details must never appear in HTTP logs.
+            val path = chain.request().url.encodedPath
+            if (path.endsWith("/verify-qr") || path.contains("/reservations") ||
+                path.endsWith("/maps/route")) chain.proceed(chain.request())
+            else loggingInterceptor.intercept(chain)
+        }
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
