@@ -59,20 +59,9 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Main Station Image -->
-            <com.google.android.material.card.MaterialCardView
+            <include layout="@layout/station_presentation_image"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
-                <ImageView
-                    android:id="@+id/ivDetailStationImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/station1"
-                    android:background="#E5E7EB"/>
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_height="200dp" />
 
             <!-- Title and Badge -->
             <LinearLayout
@@ -87,7 +76,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Solar Hub 01"
+                    android:text="Loading station..."
                     android:textColor="#000000"
                     android:textSize="24sp"
                     android:textStyle="bold"/>
@@ -96,12 +85,12 @@
                     android:id="@+id/tvDetailStatusBadge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Available"
+                    android:text=""
                     android:textColor="#065F46"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:backgroundTint="#D1FAE5"
-                    android:background="@drawable/ic_launcher_background"
+                    android:background="#D1FAE5"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="6dp"/>
             </LinearLayout>
@@ -121,7 +110,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Colombo, Sri Lanka"
+                    android:id="@+id/tvDetailLocation"
                     android:textColor="#6B7280"
                     android:textSize="14sp"
                     android:layout_marginStart="8dp"/>
@@ -167,7 +156,7 @@
                                 android:id="@+id/tvDetailCapacity"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="50 kW/h"
+                                android:text=""
                                 android:textColor="#000"
                                 android:textSize="16sp"
                                 android:textStyle="bold"/>
@@ -213,14 +202,14 @@
                                 android:id="@+id/tvDetailSlots"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="10"
+                                android:text=""
                                 android:textColor="#000"
                                 android:textSize="16sp"
                                 android:textStyle="bold"/>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Battery Slots"
+                                android:text="Available / total slots"
                                 android:textColor="#6B7280"
                                 android:textSize="12sp"/>
                         </LinearLayout>

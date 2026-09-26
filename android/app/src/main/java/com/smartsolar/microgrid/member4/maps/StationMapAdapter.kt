@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.ImageView
+import com.smartsolar.microgrid.member2.activities.StationImages
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -46,6 +48,8 @@ class StationMapAdapter(private val select: (MapStation) -> Unit) :
         // Format authoritative values without computing availability or distance on the client.
         val station = getItem(position)
         val view = holder.view
+        view.findViewById<ImageView>(R.id.stationPresentationImage)
+            .setImageResource(StationImages.forStation(station.stationId))
         val context = view.context
         val unknown = context.getString(R.string.m4_unknown)
         val nearest = station.stationId == nearestId

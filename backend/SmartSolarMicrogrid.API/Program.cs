@@ -1,10 +1,20 @@
-/* Module: Shared startup | Member 4: Register map, operator reservation and QR verification services. */
+/* Module: Shared startup | Member 4: Register map, road route, operator reservation and QR verification services. */
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SmartSolarMicrogrid.API.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Member 4: load only the optional route credential; preserve existing environment/user-secret overrides.
+var routesEnvPath = Path.Combine(builder.Environment.ContentRootPath, ".env");
+if (string.IsNullOrWhiteSpace(builder.Configuration["GoogleRoutes:ApiKey"]) && File.Exists(routesEnvPath))
+{
+    var routesKey = DotNetEnv.Env.NoEnvVars().Load(routesEnvPath)
+        .LastOrDefault(entry => entry.Key == "GoogleRoutes__ApiKey").Value;
+    if (!string.IsNullOrWhiteSpace(routesKey))
+        builder.Configuration["GoogleRoutes:ApiKey"] = routesKey;
+}
 
 // Add services to the container.
 builder.Services.AddControllers()
@@ -20,6 +30,11 @@ builder.Services.AddSingleton<MongoDbService>();
 builder.Services.AddScoped<SmartSolarMicrogrid.API.Services.member4.OperatorReservationService>();
 builder.Services.AddScoped<SmartSolarMicrogrid.API.Services.member4.OperatorQrVerificationService>();
 builder.Services.AddScoped<SmartSolarMicrogrid.API.Services.member4.StationMapService>();
+// Member 4: separate routing credential; existing Maps SDK and station services are unchanged.
+builder.Services.AddHttpClient<SmartSolarMicrogrid.API.Services.member4.StationRouteService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(20);
+}).RedactLoggedHeaders(new[] { "X-Goog-Api-Key" });
 
 // Configure CORS
 builder.Services.AddCors(options =>

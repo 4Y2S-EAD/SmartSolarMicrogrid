@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.ImageView
+import com.smartsolar.microgrid.member2.activities.StationImages
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
 import com.smartsolar.microgrid.R
@@ -22,6 +24,8 @@ class StationDetailsBottomSheet : BottomSheetDialogFragment() {
         // Display only API data; absent fields remain explicitly unavailable.
         val station = Gson().fromJson(requireArguments().getString("station"), MapStation::class.java)
         val unknown = getString(R.string.m4_unknown)
+        view.findViewById<ImageView>(R.id.stationPresentationImage)
+            .setImageResource(StationImages.forStation(station.stationId))
         view.findViewById<TextView>(R.id.m4DetailName).text = station.stationName
         view.findViewById<TextView>(R.id.m4DetailBody).text = listOfNotNull(
             getString(R.string.m4_status, station.status),
