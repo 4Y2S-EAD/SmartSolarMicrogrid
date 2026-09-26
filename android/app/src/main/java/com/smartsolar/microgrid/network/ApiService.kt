@@ -143,4 +143,12 @@ interface ApiService {
     suspend fun generateQrCode(
         @Path("id") id: String
     ): Response<GenerateQrResponse>
+
+    // Fetches available 2-hour time slots for a battery slot on a date
+    @GET("reservations/available-time-slots")
+    suspend fun getAvailableTimeSlots(
+        @Query("slotId") slotId: String,
+        @Query("date") date: String,
+        @Query("excludeReservationId") excludeReservationId: String? = null
+    ): Response<List<AvailableTimeSlot>>
 }

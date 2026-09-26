@@ -226,131 +226,61 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Time Window Selection (Start & End Time) -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time Window (12-hour format) *"
-                android:textColor="#374151"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginTop="14dp" />
-
+            <!-- Available Time Slot Selection -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="2"
+                android:gravity="center_vertical"
+                android:layout_marginTop="14dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Available Time Slot *"
+                    android:textColor="#374151"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/pbUpdateTimeSlotsLoading"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:indeterminateTint="#059669"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvUpdateNoTimeSlotsNotice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No available 2-hour time slots for this date and battery slot. Please pick another date or slot."
+                android:textColor="#B45309"
+                android:textSize="12sp"
+                android:background="@drawable/bg_rounded_input"
+                android:backgroundTint="#FEF3C7"
+                android:padding="10dp"
+                android:layout_marginTop="6dp"
+                android:visibility="gone" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardUpdateTimeSlot"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#D1D5DB"
+                app:cardBackgroundColor="#FFFFFF"
                 android:layout_marginTop="6dp">
 
-                <!-- Start Time Picker -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/btnPickStartTime"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#D1D5DB"
-                    app:cardBackgroundColor="#FFFFFF"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:layout_marginEnd="5dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="10dp">
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@android:drawable/ic_menu_recent_history"
-                            app:tint="#059669" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:layout_marginStart="8dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Start Time"
-                                android:textColor="#6B7280"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:id="@+id/tvSelectedStartTime"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="09:00 AM"
-                                android:textColor="#111827"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- End Time Picker -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/btnPickEndTime"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#D1D5DB"
-                    app:cardBackgroundColor="#FFFFFF"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:layout_marginStart="5dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="10dp">
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@android:drawable/ic_menu_recent_history"
-                            app:tint="#059669" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:layout_marginStart="8dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="End Time"
-                                android:textColor="#6B7280"
-                                android:textSize="10sp" />
-
-                            <TextView
-                                android:id="@+id/tvSelectedEndTime"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="10:00 AM"
-                                android:textColor="#111827"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
+                <Spinner
+                    android:id="@+id/spUpdateTimeSlot"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingHorizontal="8dp" />
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Loading Indicator -->
             <ProgressBar
