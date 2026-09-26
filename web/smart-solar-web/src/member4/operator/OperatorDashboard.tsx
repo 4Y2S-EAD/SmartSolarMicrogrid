@@ -1,7 +1,7 @@
 /* Member 4: operator dashboard – reservation metrics only (no duplication with Reservations tab). */
 import { useEffect, useState } from 'react';
 import { CalendarDays, CheckCircle2, Clock3, RefreshCw, Zap, Activity, TrendingUp, BarChart3 } from 'lucide-react';
-import { getOperatorReservations, ReservationPage } from './api';
+import { fetchHubReservations, type HubReservationPage } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import './operator.css';
 
@@ -9,7 +9,7 @@ const emptyFilters = { reservationId: '', prosumerNic: '', station: '', bookingD
 
 export default function OperatorDashboard() {
   const { profile } = useAuth();
-  const [data, setData] = useState<ReservationPage | null>(null);
+  const [data, setData] = useState<HubReservationPage | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [revision, setRevision] = useState(0);
@@ -17,7 +17,7 @@ export default function OperatorDashboard() {
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true); setError(''); setData(null);
-    getOperatorReservations('all', emptyFilters, 1, controller.signal)
+    fetchHubReservations('all', emptyFilters, 1, controller.signal)
       .then(result => { if (!controller.signal.aborted) setData(result); })
       .catch(err => { if (!controller.signal.aborted) setError(err instanceof Error ? err.message : 'Unable to load metrics.'); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
@@ -31,6 +31,8 @@ export default function OperatorDashboard() {
     { label: 'Completed', value: data?.summary.completedCount, icon: CheckCircle2, color: 'violet', gradient: 'from-violet-500 to-purple-600', bg: 'bg-violet-50', border: 'border-violet-100', text: 'text-violet-700', sub: 'All time' },
   ];
 
+  const stationName = data?.items?.find((i: any) => i.stationName)?.stationName;
+
   return (
     <section className="m4-dashboard">
       {/* Welcome banner */}
@@ -41,7 +43,7 @@ export default function OperatorDashboard() {
           </div>
           <div>
             <h2>Welcome back, {profile?.full_name || 'Operator'}</h2>
-            <p>Here's your reservation overview for today.</p>
+            <p>Here's your reservation overview for {stationName || 'your assigned hub'}.</p>
           </div>
         </div>
         <button

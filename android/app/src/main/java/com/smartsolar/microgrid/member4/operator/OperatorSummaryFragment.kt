@@ -49,6 +49,16 @@ class OperatorSummaryFragment : Fragment(R.layout.m4_operator_summary) {
                         }
                     }
 
+                    // Update the title to include Grid Name / Station Name if available
+                    val stationName = state.data?.items?.firstOrNull { !it.stationName.isNullOrBlank() }?.stationName
+                    val titleTv = view.findViewById<TextView>(R.id.m4SummaryTitle)
+                    val newTitle = if (stationName != null) "$stationName Metrics" else "Reservation Metrics"
+                    if (titleTv.text.toString() != newTitle) {
+                        titleTv.text = newTitle
+                        val fadeAnim = AnimationUtils.loadAnimation(requireContext(), R.anim.m4_scale_fade_in)
+                        titleTv.startAnimation(fadeAnim)
+                    }
+
                     // Status message
                     view.findViewById<TextView>(R.id.m4SummaryMessage).apply {
                         text = state.error
