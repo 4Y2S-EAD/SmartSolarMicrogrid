@@ -245,14 +245,16 @@ class M3CreateReservationActivity : AppCompatActivity() {
                         }
 
                         if (slotsList.isNotEmpty()) {
-                            val requestedSlot = if (!initialSlotApplied && 
-                                stationId == intent.getStringExtra(EXTRA_STATION_ID)) { 
-                              slotsList.firstOrNull { 
-                                it.slotId == intent.getStringExtra(EXTRA_SLOT_ID) 
-                              } 
-                            } else null 
-                          initialSlotApplied = true 
-                          selectedSlotId = (requestedSlot ?: slotsList[0]).slotId renderSlotCards() loadAvailableTimeSlots()
+                            val requestedSlot = if (!initialSlotApplied &&
+                                stationId == intent.getStringExtra(EXTRA_STATION_ID)) {
+                                slotsList.firstOrNull {
+                                    it.slotId == intent.getStringExtra(EXTRA_SLOT_ID)
+                                }
+                            } else null
+                            initialSlotApplied = true
+                            selectedSlotId = (requestedSlot ?: slotsList[0]).slotId
+                            renderSlotCards()
+                            loadAvailableTimeSlots()
                         } else {
                             selectedSlotId = ""
                             renderSlotCards()

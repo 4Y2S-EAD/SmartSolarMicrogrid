@@ -1,6 +1,6 @@
 /* Module: Grid Operator | Feature: QR verification and transfer completion
  * Member: Member 4
- * Purpose: Authoritative checks and atomic reservation transitions. */
+ * Purpose: Authoritative reservation/QR checks and atomic transitions; reservation dates are independent of slot defaults. */
 using System.Globalization;
 using System.Security.Claims;
 using System.Text.Json;
@@ -97,7 +97,7 @@ public sealed class OperatorQrVerificationService(MongoDbService db)
     public static void ValidateRecords(EnergyReservation r, User? prosumer, SolarStationInfo? station,
         EnergyBookingSlots? slot, JsonElement data, string rawQr)
     {
-        // Apply existing relationships and schedule data without inventing an arrival window or energy measurement.
+        // Validate related records and the reservation's own signed schedule, as created by Member 3.
         RequireApproved(r);
         if (prosumer?.Role != UserRole.Prosumer || prosumer.AccountStatus != AccountStatus.Active || prosumer.NIC != r.ProsumerNic)
             throw new QrVerificationException(409, "INVALID_PROSUMER", "The reservation requires an active Prosumer account.");
@@ -108,8 +108,8 @@ public sealed class OperatorQrVerificationService(MongoDbService db)
             !(string.Equals(slot.Status, "Available", StringComparison.OrdinalIgnoreCase) || string.Equals(slot.Status, "Booked", StringComparison.OrdinalIgnoreCase)) ||
             (!string.IsNullOrEmpty(slot.ReservationId) && slot.ReservationId != r.ReservationId))
             throw new QrVerificationException(409, "INVALID_SLOT", "The reserved battery slot is missing, unavailable or allocated to another reservation.");
-        if (slot.BookingDate.Date != r.BookingDate.Date || !SameTime(slot.StartTime, r.StartTime) || !SameTime(slot.EndTime, r.EndTime))
-            throw new QrVerificationException(409, "INVALID_SCHEDULE", "The reservation no longer matches the station slot schedule.");
+        // Slots are reused across bookings; Member 3 stores the chosen date/times on the reservation.
+        // Compare QR schedule fields with that authoritative reservation below, not the slot's defaults.
         if (string.IsNullOrEmpty(r.QrToken) || rawQr != r.QrToken || r.QrGeneratedAt == null ||
             data.GetProperty("reservationId").GetString() != r.ReservationId ||
             data.GetProperty("prosumerNic").GetString() != r.ProsumerNic ||
@@ -119,14 +119,6 @@ public sealed class OperatorQrVerificationService(MongoDbService db)
             data.GetProperty("startTime").GetString() != r.StartTime || data.GetProperty("endTime").GetString() != r.EndTime)
             throw new QrVerificationException(409, "STALE_QR", "This QR no longer matches the reservation. Ask the Prosumer to generate a new QR.");
         // A QR generated while Pending remains usable after approval: approval is always read from MongoDB above.
-    }
-
-    private static bool SameTime(string first, string second)
-    {
-        // Match the time formats already accepted by Member 3's reservation parser.
-        string[] formats = ["hh:mm tt", "h:mm tt", "HH:mm"];
-        return DateTime.TryParseExact(first, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var a) &&
-            DateTime.TryParseExact(second, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var b) && a.TimeOfDay == b.TimeOfDay;
     }
 
     private static void RequireApproved(EnergyReservation r)
