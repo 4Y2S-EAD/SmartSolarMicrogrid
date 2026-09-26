@@ -28,6 +28,10 @@ class M2StationDetailsActivity : AppCompatActivity() {
         findViewById<ImageView>(R.id.btnBackDetails).setOnClickListener { finish() }
         val book = findViewById<Button>(R.id.btnBookStation)
         book.isEnabled = false
+        val role = com.smartsolar.microgrid.network.TokenManager.getRole()
+        if (role == "GridOperator") {
+            book.visibility = View.GONE
+        }
         val stationId = intent.getStringExtra(M3CreateReservationActivity.EXTRA_STATION_ID)
         if (stationId.isNullOrBlank()) {
             findViewById<TextView>(R.id.tvDetailStationName).text = "Station unavailable"
