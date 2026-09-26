@@ -438,16 +438,6 @@ class M3CreateReservationActivity : AppCompatActivity() {
                     val newReservationId = createdItem.reservationId
 
                     withContext(Dispatchers.Main) {
-                        tvStatusText.text = "Generating and signing QR token..."
-                    }
-
-                    try {
-                        ApiClient.apiService.generateQrCode(newReservationId)
-                    } catch (_: Exception) {
-                        // QR code generation handled on demand if needed
-                    }
-
-                    withContext(Dispatchers.Main) {
                         layoutProcessingStatus.visibility = View.GONE
                         Toast.makeText(
                             this@M3CreateReservationActivity,
