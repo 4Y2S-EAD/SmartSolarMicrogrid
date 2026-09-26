@@ -89,7 +89,7 @@ class RegisterActivity : AppCompatActivity() {
             nic = nic,
             fullName = name,
             email = email,
-            phone = phone,
+            phoneNumber = phone,
             address = address,
             password = password
         )

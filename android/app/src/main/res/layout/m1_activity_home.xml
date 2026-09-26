@@ -415,6 +415,7 @@
                         app:cornerRadius="16dp"/>
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnMyProfile"
                         android:layout_width="0dp"
                         android:layout_height="100dp"
                         android:layout_columnWeight="1"
@@ -471,6 +472,10 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 app:elevation="0dp"
+                app:itemIconTint="@color/bottom_nav_color"
+                app:itemTextColor="@color/bottom_nav_color"
+                app:labelVisibilityMode="selected"
+                app:itemRippleColor="#20059669"
                 app:menu="@menu/bottom_nav_menu" />
         </com.google.android.material.bottomappbar.BottomAppBar>
 

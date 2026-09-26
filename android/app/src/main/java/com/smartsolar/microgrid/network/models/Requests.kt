@@ -4,7 +4,7 @@ data class RegisterRequest(
     val nic: String,
     val fullName: String,
     val email: String,
-    val phone: String,
+    val phoneNumber: String,
     val address: String,
     val password: String
 )
