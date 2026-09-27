@@ -105,13 +105,17 @@ namespace SmartSolarMicrogrid.API.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"] ?? string.Empty));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claimsList = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.NIC),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim("role", user.Role.ToString().ToLower()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+            // Include assignedHubId so hub-scoped controllers can filter without an extra DB query.
+            if (!string.IsNullOrWhiteSpace(user.AssignedHubId))
+                claimsList.Add(new Claim("assignedHubId", user.AssignedHubId));
+            var claims = claimsList;
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],

@@ -7,6 +7,7 @@
     app:cardCornerRadius="16dp" app:cardElevation="1dp">
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="vertical" android:padding="16dp">
+        <include layout="@layout/station_presentation_image" />
         <TextView android:id="@+id/m4NearestBadge" android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:text="@string/m4_nearest_station"
             android:textColor="@color/emerald_600" android:textStyle="bold"

@@ -11,6 +11,12 @@ import retrofit2.http.Query
 import com.smartsolar.microgrid.member4.maps.StationMapResponse
 
 interface ApiService {
+    // Member 4: real driving geometry and metrics, separate from station search and reservation APIs.
+    @POST("member4/maps/route")
+    suspend fun getDrivingRoute(
+        @Body request: com.smartsolar.microgrid.member4.maps.DrivingRouteRequest
+    ): Response<com.smartsolar.microgrid.member4.maps.DrivingRoute>
+
     // Member 4: send the scanned credential to the central API, then reuse existing completion.
     @POST("operator/verify-qr")
     suspend fun verifyOperatorQr(@Body request: com.smartsolar.microgrid.member4.qr.VerifyQrRequest): Response<com.smartsolar.microgrid.member4.qr.VerifyQrResponse>
@@ -28,6 +34,20 @@ interface ApiService {
     suspend fun searchOperatorReservations(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
     @PUT("reservations/{id}/approve")
     suspend fun approveOperatorReservation(@Path("id") id: String): Response<MessageResponse>
+
+    // Member 4: hub-scoped endpoints — backend restricts to assignedHubId from JWT.
+    @GET("hub/reservations")
+    suspend fun getHubReservations(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("hub/reservations/pending")
+    suspend fun getHubPending(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("hub/reservations/approved")
+    suspend fun getHubApproved(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("hub/reservations/completed")
+    suspend fun getHubCompleted(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("hub/reservations/history")
+    suspend fun getHubHistory(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
+    @GET("hub/reservations/search")
+    suspend fun searchHubReservations(@retrofit2.http.QueryMap filters: Map<String, String>): Response<com.smartsolar.microgrid.member4.operator.OperatorReservationPage>
 
     @POST("member1/auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<MessageResponse>

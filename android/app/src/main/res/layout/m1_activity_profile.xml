@@ -1,197 +1,456 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_100">
+    android:background="#F5F7FA">
+
+    <!-- ========================= -->
+    <!-- TOP APP BAR               -->
+    <!-- ========================= -->
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        app:elevation="2dp">
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="@color/white"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             app:title="My Profile"
             app:titleCentered="true"
             app:titleTextColor="@color/gray_900" />
+
     </com.google.android.material.appbar.AppBarLayout>
+
+
+    <!-- ========================= -->
+    <!-- PAGE CONTENT              -->
+    <!-- ========================= -->
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:fillViewport="true">
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingStart="20dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="32dp">
+
+
+            <!-- ========================= -->
+            <!-- PROFILE HEADER CARD       -->
+            <!-- ========================= -->
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                android:layout_marginBottom="16dp">
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#E8EDF1"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="24dp">
+                    android:orientation="vertical"
+                    android:paddingStart="24dp"
+                    android:paddingTop="28dp"
+                    android:paddingEnd="24dp"
+                    android:paddingBottom="26dp">
 
-                    <TextView
-                        android:id="@+id/tvProfileInitial"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:gravity="center"
-                        android:text="👤"
-                        android:textSize="40sp"
-                        android:background="@drawable/bg_rounded_input"
-                        android:backgroundTint="@color/gray_100"/>
+
+                    <!-- Profile Avatar -->
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="92dp"
+                        android:layout_height="92dp"
+                        app:cardBackgroundColor="#E8F5EF"
+                        app:cardCornerRadius="46dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="#C8E8DA"
+                        app:strokeWidth="1dp">
+
+                        <TextView
+                            android:id="@+id/tvProfileInitial"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="N"
+                            android:textColor="@color/emerald_600"
+                            android:textSize="34sp"
+                            android:textStyle="bold" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+
+                    <!-- User Name -->
 
                     <TextView
                         android:id="@+id/tvFullName"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
+                        android:gravity="center"
+                        android:maxLines="2"
                         android:text="Loading..."
                         android:textColor="@color/gray_900"
-                        android:textSize="22sp"
-                        android:textStyle="bold"/>
+                        android:textSize="23sp"
+                        android:textStyle="bold" />
+
+
+                    <!-- Role -->
 
                     <TextView
                         android:id="@+id/tvRole"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Prosumer"
+                        android:layout_marginTop="5dp"
+                        android:text="Solar Prosumer"
                         android:textColor="@color/emerald_600"
-                        android:textStyle="bold"
-                        android:textSize="14sp"/>
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+
+                    <!-- Account Status -->
 
                     <TextView
                         android:id="@+id/tvStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
+                        android:layout_marginTop="13dp"
                         android:background="@drawable/bg_rounded_input"
                         android:backgroundTint="#DCFCE7"
-                        android:text="Active"
-                        android:textColor="@color/emerald_600"
-                        android:textStyle="bold"
-                        android:textSize="12sp"/>
+                        android:paddingStart="14dp"
+                        android:paddingTop="6dp"
+                        android:paddingEnd="14dp"
+                        android:paddingBottom="6dp"
+                        android:text="●  Active Account"
+                        android:textColor="#15803D"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
                 </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- ========================= -->
+            <!-- SECTION TITLE             -->
+            <!-- ========================= -->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="26dp"
+                android:layout_marginBottom="10dp"
+                android:text="PERSONAL INFORMATION"
+                android:textColor="@color/gray_500"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
+
+
+            <!-- ========================= -->
+            <!-- INFORMATION CARD          -->
+            <!-- ========================= -->
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                android:layout_marginBottom="24dp">
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="1dp"
+                app:strokeColor="#E8EDF1"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Contact Information"
-                        android:textColor="@color/gray_900"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="16dp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="NIC Number"
-                        android:textColor="@color/gray_500"
-                        android:textSize="12sp"/>
+                    <!-- NIC -->
 
-                    <TextView
-                        android:id="@+id/tvNIC"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="12dp"
-                        android:text="..."
-                        android:textColor="@color/gray_900"
-                        android:textSize="15sp"/>
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="18dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Email Address"
-                        android:textColor="@color/gray_500"
-                        android:textSize="12sp"/>
+                        <TextView
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/bg_rounded_input"
+                            android:backgroundTint="#ECFDF5"
+                            android:gravity="center"
+                            android:text="ID"
+                            android:textColor="@color/emerald_600"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tvEmail"
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="NIC Number"
+                                android:textColor="@color/gray_500"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvNIC"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="..."
+                                android:textColor="@color/gray_900"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+
+                    <!-- Divider -->
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="74dp"
+                        android:background="#EEF1F4" />
+
+
+                    <!-- EMAIL -->
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="12dp"
-                        android:text="..."
-                        android:textColor="@color/gray_900"
-                        android:textSize="15sp"/>
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="18dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Phone Number"
-                        android:textColor="@color/gray_500"
-                        android:textSize="12sp"/>
+                        <TextView
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/bg_rounded_input"
+                            android:backgroundTint="#ECFDF5"
+                            android:gravity="center"
+                            android:text="@"
+                            android:textColor="@color/emerald_600"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tvPhone"
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Email Address"
+                                android:textColor="@color/gray_500"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="..."
+                                android:textColor="@color/gray_900"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+
+                    <!-- Divider -->
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="74dp"
+                        android:background="#EEF1F4" />
+
+
+                    <!-- PHONE -->
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="12dp"
-                        android:text="..."
-                        android:textColor="@color/gray_900"
-                        android:textSize="15sp"/>
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="18dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Address"
-                        android:textColor="@color/gray_500"
-                        android:textSize="12sp"/>
+                        <TextView
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/bg_rounded_input"
+                            android:backgroundTint="#ECFDF5"
+                            android:gravity="center"
+                            android:text="☎"
+                            android:textColor="@color/emerald_600"
+                            android:textSize="18sp" />
 
-                    <TextView
-                        android:id="@+id/tvAddress"
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Phone Number"
+                                android:textColor="@color/gray_500"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvPhone"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="..."
+                                android:textColor="@color/gray_900"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+
+                    <!-- Divider -->
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="74dp"
+                        android:background="#EEF1F4" />
+
+
+                    <!-- ADDRESS -->
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="..."
-                        android:textColor="@color/gray_900"
-                        android:textSize="15sp"/>
+                        android:gravity="top"
+                        android:orientation="horizontal"
+                        android:padding="18dp">
+
+                        <TextView
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/bg_rounded_input"
+                            android:backgroundTint="#ECFDF5"
+                            android:gravity="center"
+                            android:text="⌂"
+                            android:textColor="@color/emerald_600"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Address"
+                                android:textColor="@color/gray_500"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvAddress"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:lineSpacingExtra="3dp"
+                                android:text="..."
+                                android:textColor="@color/gray_900"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
                 </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- ========================= -->
+            <!-- ACCOUNT SECTION           -->
+            <!-- ========================= -->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="26dp"
+                android:layout_marginBottom="10dp"
+                android:text="ACCOUNT MANAGEMENT"
+                android:textColor="@color/gray_500"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
+
+
+            <!-- EDIT PROFILE -->
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEditProfile"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="EDIT PROFILE"
+                android:text="Edit Profile"
+                android:textAllCaps="false"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                app:cornerRadius="12dp" />
+                app:backgroundTint="@color/emerald_600"
+                app:cornerRadius="14dp"
+                app:iconGravity="textStart"
+                app:iconPadding="10dp" />
+
+
+            <!-- DEACTIVATE -->
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDeactivate"
@@ -199,14 +458,39 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginBottom="24dp"
-                android:text="REQUEST ACCOUNT DEACTIVATION"
+                android:text="Request Account Deactivation"
+                android:textAllCaps="false"
                 android:textColor="@color/rose_500"
-                app:strokeColor="@color/rose_500"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:cornerRadius="12dp" />
+                app:cornerRadius="14dp"
+                app:strokeColor="@color/rose_500"
+                app:strokeWidth="1dp" />
+
+
+            <!-- Warning Message -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:lineSpacingExtra="2dp"
+                android:text="Deactivation requests may require administrator approval."
+                android:textColor="@color/gray_500"
+                android:textSize="11sp" />
+
+
+            <!-- Bottom Space -->
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
 
         </LinearLayout>
+
     </ScrollView>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

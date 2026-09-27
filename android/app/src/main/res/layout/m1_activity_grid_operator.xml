@@ -36,8 +36,8 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="280dp"
-                android:layout_marginBottom="-30dp"
+                android:layout_height="220dp"
+                android:layout_marginBottom="-16dp"
                 app:cardCornerRadius="0dp"
                 app:cardElevation="0dp">
 
@@ -59,7 +59,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="#990F2942" />
+                        android:background="#A0111827" />
 
 
                     <!-- ========================================= -->
@@ -69,7 +69,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="60dp"
+                        android:layout_marginTop="50dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingHorizontal="20dp">
@@ -78,15 +78,15 @@
 
                         <ImageView
                             android:id="@+id/ivAppIcon"
-                            android:layout_width="42dp"
-                            android:layout_height="42dp"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
                             android:background="@drawable/bg_remove_app_logo"
                             android:contentDescription="Smart Solar Microgrid" />
 
                         <!-- App Name -->
 
                         <LinearLayout
-                            android:layout_width="315dp"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
@@ -97,25 +97,26 @@
                                 android:layout_height="wrap_content"
                                 android:text="Smart Solar Microgrid"
                                 android:textColor="#FFFFFF"
-                                android:textSize="20sp"
+                                android:textSize="18sp"
                                 android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
+                                android:layout_marginTop="1dp"
                                 android:text="Grid Operations &amp; Management"
-                                android:textColor="#DBEAFE"
-                                android:textSize="12sp" />
+                                android:textColor="#D1D5DB"
+                                android:textSize="11sp" />
 
                         </LinearLayout>
 
                         <ImageView
                             android:id="@+id/btnMenu"
-                            android:layout_width="45dp"
-                            android:layout_height="45dp"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
                             android:src="@android:drawable/ic_menu_sort_by_size"
-                            app:tint="#FFF" />
+                            app:tint="#F3F4F6" />
 
                         <!-- Notification -->
 
@@ -133,21 +134,21 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingHorizontal="20dp"
-                        android:paddingBottom="60dp">
+                        android:paddingBottom="44dp">
 
                         <ImageView
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:background="#FFFFFF"
-                            android:padding="12dp"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/m4_bg_circle"
+                            android:padding="10dp"
                             android:src="@drawable/ic_account_circle_24"
                             android:contentDescription="Grid Operator"
-                            app:tint="#0F766E" />
+                            app:tint="#059669" />
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="14dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
@@ -155,8 +156,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Welcome,"
-                                android:textColor="#E5E7EB"
-                                android:textSize="14sp" />
+                                android:textColor="#D1D5DB"
+                                android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/tvWelcomeName"
@@ -164,14 +165,15 @@
                                 android:layout_height="wrap_content"
                                 android:text="Grid Operator"
                                 android:textColor="#FFFFFF"
-                                android:textSize="22sp"
+                                android:textSize="20sp"
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tvWelcomeRole"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="● Grid Operator"
+                                android:text="Grid Operator"
                                 android:textColor="#6EE7B7"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
@@ -193,17 +195,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="-30dp"
-                app:cardBackgroundColor="#0F766E"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="6dp">
+                android:layout_marginTop="0dp"
+                app:cardBackgroundColor="#059669"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="20dp">
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp">
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -215,39 +218,43 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Microgrid Status"
-                            android:textColor="#CCFBF1"
-                            android:textSize="14sp" />
+                            android:textColor="#D1FAE5"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvGridStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="System Operational"
+                            android:layout_marginTop="2dp"
+                            android:text="Grid Operations"
                             android:textColor="#FFFFFF"
-                            android:textSize="24sp"
+                            android:textSize="18sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="All core services are running normally"
+                            android:layout_marginTop="1dp"
+                            android:text="Monitor and manage microgrid operations"
                             android:textColor="#A7F3D0"
-                            android:textSize="12sp" />
+                            android:textSize="11sp" />
 
                     </LinearLayout>
 
                     <!-- Status Indicator -->
 
                     <TextView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="#337EE8C4"
-                        android:gravity="center"
-                        android:text="✓"
+                        android:id="@+id/tvGridStatusOnline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/m4_bg_circle"
+                        android:backgroundTint="#33FFFFFF"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="ONLINE"
                         android:textColor="#FFFFFF"
-                        android:textSize="28sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -348,70 +355,7 @@
             </GridLayout>
 
 
-            <!-- ================================================= -->
-            <!-- GRID OPERATION STATUS -->
-            <!-- ================================================= -->
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="18dp">
-
-                    <ImageView
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_app_badging_24"
-                        app:tint="#0F766E" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Grid Operations"
-                            android:textColor="#111827"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="Monitor and manage microgrid operations"
-                            android:textColor="#6B7280"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="ONLINE"
-                        android:textColor="#059669"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 

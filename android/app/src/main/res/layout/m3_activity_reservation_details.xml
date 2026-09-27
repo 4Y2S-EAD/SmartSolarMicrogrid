@@ -767,6 +767,22 @@
                                 app:backgroundTint="#ECFDF5"
                                 app:cornerRadius="10dp"
                                 android:layout_marginTop="10dp" />
+
+                            <!-- Start Driving Button -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnStartDriving"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:text="Start Driving"
+                                android:textSize="13sp"
+                                android:textColor="#FFFFFF"
+                                app:icon="@android:drawable/ic_menu_directions"
+                                app:iconTint="#FFFFFF"
+                                app:iconSize="18dp"
+                                app:iconGravity="textStart"
+                                app:backgroundTint="#059669"
+                                app:cornerRadius="10dp"
+                                android:layout_marginTop="8dp" />
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>

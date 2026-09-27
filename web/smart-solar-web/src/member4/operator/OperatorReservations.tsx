@@ -1,69 +1,365 @@
-/* Member 4: backend-driven operator dashboard, search and existing approval integration. */
-import { FormEvent, useEffect, useState } from 'react';
-import { CalendarDays, CheckCircle2, Clock3, RefreshCw, Search, Zap } from 'lucide-react';
-import { approveOperatorReservation, getOperatorReservations, ReservationFilters, ReservationPage } from './api';
+/* Member 4: Hub-scoped Grid Operator reservation dashboard.
+ * The backend enforces that only the operator's assignedHubId data is returned.
+ * All filtering, counts and pagination are server-side; no logic is done here. */
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import {
+  CalendarCheck2, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight,
+  Clock3, RefreshCw, Search, SlidersHorizontal, Zap, XCircle, Check, AlertCircle,
+  List, History
+} from 'lucide-react';
+import {
+  fetchHubReservations, approveHubReservation,
+  type HubReservationFilters, type HubReservationPage,
+  type BackOfficeReservationItem as HubReservationItem,
+} from '@/lib/api';
 import './operator.css';
-const emptyFilters: ReservationFilters = { reservationId: '', prosumerNic: '', station: '', bookingDate: '', status: '' };
-const tabs = [['all', 'All reservations'], ['pending', 'Pending'], ['approved', 'Approved'], ['completed', 'Completed'], ['history', 'Booking history'], ['search', 'Search & filter']];
-export default function OperatorReservations() {
-  const [view, setView] = useState('all');
-  const [filters, setFilters] = useState(emptyFilters);
-  const [draft, setDraft] = useState(emptyFilters);
-  const [page, setPage] = useState(1);
-  const [revision, setRevision] = useState(0);
-  const [data, setData] = useState<ReservationPage | null>(null);
-  const [statusOptions, setStatusOptions] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [feedback, setFeedback] = useState('');
-  const [approving, setApproving] = useState<string | null>(null);
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true); setError(''); setData(null);
-    getOperatorReservations(view, filters, page, controller.signal).then(result => {
-      if (!controller.signal.aborted) { setData(result); setStatusOptions(result.statusOptions); }
-    }).catch(err => {
-      if (!controller.signal.aborted) setError(err instanceof Error ? err.message : 'Unable to load reservations. Please retry.');
-    }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
-    return () => controller.abort();
-  }, [view, filters, page, revision]);
-  function changeView(next: string) { setView(next); setPage(1); setFeedback(''); }
-  function search(event: FormEvent) { event.preventDefault(); setFilters({ ...draft }); setPage(1); }
-  async function approve(id: string) {
-    setApproving(id); setFeedback('');
-    try { await approveOperatorReservation(id); setFeedback('Reservation approved. Latest records requested.'); setRevision(r => r + 1); }
-    catch (err) { setFeedback(err instanceof Error ? err.message : 'Approval failed. Please retry.'); }
-    finally { setApproving(null); }
-  }
-  const metrics = [
-    { label: 'Active bookings', value: data?.summary.activeCount, icon: Zap },
-    { label: 'Pending reservations', value: data?.summary.pendingCount, icon: Clock3 },
-    { label: 'Approved reservations', value: data?.summary.approvedCount, icon: CalendarDays },
-    { label: 'Completed reservations', value: data?.summary.completedCount, icon: CheckCircle2 },
-  ];
-  return <section className="m4-operator">
-    <header className="m4-heading"><div><span className="m4-eyebrow">GRID OPERATOR / RESERVATIONS</span><h2>Keep every booking on track</h2><p>Review requests, approve reservations and browse booking history.</p></div>
-      <button className="m4-button" disabled={loading || !!approving} onClick={() => setRevision(r => r + 1)}><RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh</button></header>
-    <div className="m4-metrics">{metrics.map(({ label, value, icon: Icon }) => <article key={label} className="m4-metric"><Icon size={22} /><p>{label}</p><strong>{loading || value == null ? '--' : value.toLocaleString()}</strong></article>)}</div>
-    <p className="m4-caption">Active bookings include Pending and Approved reservations. Counts cover all reservations.</p>
-    <div className="m4-panel">
-      <nav className="m4-tabs" aria-label="Reservation views">{tabs.map(([key, title]) => <button key={key} aria-pressed={view === key} onClick={() => changeView(key)}>{title}</button>)}</nav>
-      {view === 'search' && <form className="m4-filters" onSubmit={search}>
-        {([['reservationId', 'Booking ID', 'text'], ['prosumerNic', 'Prosumer NIC', 'text'], ['station', 'Station name or ID', 'text'], ['bookingDate', 'Booking date', 'date']] as const).map(([key, label, type]) => <label key={key}>{label}<input type={type} value={draft[key]} maxLength={key === 'reservationId' ? 24 : key === 'prosumerNic' ? 32 : 100} onChange={e => setDraft({ ...draft, [key]: e.target.value })} /></label>)}
-        <label>Status<select value={draft.status} onChange={e => setDraft({ ...draft, status: e.target.value })}><option value="">All statuses</option>{statusOptions.map(s => <option key={s}>{s}</option>)}</select></label>
-        <div className="m4-filter-actions"><button className="m4-button" type="submit" disabled={loading}><Search size={16} />Search</button><button className="m4-button m4-secondary" type="button" onClick={() => { setDraft(emptyFilters); setFilters(emptyFilters); setPage(1); }}>Clear filters</button></div>
-      </form>}
-      {feedback && <p role="status" className="m4-notice">{feedback}</p>}
-      {loading ? <div className="m4-state" role="status"><RefreshCw className="animate-spin" />Loading reservations...</div>
-        : error ? <div className="m4-state m4-error" role="alert"><p>{error}</p><p>Check your connection and operator session, then retry.</p><button className="m4-button" onClick={() => setRevision(r => r + 1)}>Retry</button></div>
-        : !data?.items.length ? <div className="m4-state"><CalendarDays size={32} /><h3>No reservations found</h3><p>Refresh for new bookings or adjust your search filters.</p></div>
-        : <div className="m4-table-wrap"><table><thead><tr>{['Booking ID', 'Prosumer NIC', 'Station / slot', 'Date / time', 'Status', 'Action'].map(h => <th key={h} scope="col">{h}</th>)}</tr></thead><tbody>{data.items.map(row => <tr key={row.reservationId}>
-          <td className="m4-id">{row.reservationId}</td><td>{row.prosumerNic}</td><td><strong>{row.stationName || 'Station unavailable'}</strong><small>{row.stationId}</small><small>{row.slotNumber == null ? 'Slot unavailable' : `Slot ${row.slotNumber}`}</small></td>
-          <td>{row.bookingDate.slice(0, 10)}<small>{row.startTime} - {row.endTime}</small></td>
-          <td><span className={`m4-status m4-status-${row.status.toLowerCase()}`}>{row.status}</span>{row.cancellationReason && <small>{row.cancellationReason}</small>}</td>
-          <td>{row.canApprove ? <button className="m4-button" disabled={!!approving} onClick={() => approve(row.reservationId)}>{approving === row.reservationId ? 'Approving...' : 'Approve'}</button> : <span className="m4-caption">No action required</span>}</td>
-        </tr>)}</tbody></table></div>}
-      {data && <footer className="m4-pagination"><span>{data.totalRecords} result(s) | Page {data.currentPage} of {Math.max(1, data.totalPages)}</span><div><button disabled={loading || page <= 1} onClick={() => setPage(p => p - 1)}>Previous</button><button disabled={loading || page >= data.totalPages} onClick={() => setPage(p => p + 1)}>Next</button></div></footer>}
+
+const TABS = [
+  { key: 'all',       label: 'All Reservations', Icon: List },
+  { key: 'pending',   label: 'Pending',          Icon: Clock3 },
+  { key: 'approved',  label: 'Approved',         Icon: CalendarDays },
+  { key: 'completed', label: 'Completed',        Icon: CheckCircle2 },
+  { key: 'history',   label: 'Booking History',  Icon: History },
+  { key: 'search',    label: 'Search & Filter',  Icon: SlidersHorizontal },
+] as const;
+type TabKey = (typeof TABS)[number]['key'];
+
+const EMPTY: HubReservationFilters = { reservationId: '', prosumerNic: '', station: '', bookingDate: '', status: '' };
+
+const STATUS_CFG: Record<string, { dot: string; bg: string; text: string }> = {
+  Pending:   { dot: 'bg-amber-400',   bg: 'bg-amber-50',   text: 'text-amber-700'   },
+  Approved:  { dot: 'bg-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-700' },
+  Completed: { dot: 'bg-indigo-400',  bg: 'bg-indigo-50',  text: 'text-indigo-700'  },
+  Cancelled: { dot: 'bg-rose-400',    bg: 'bg-rose-50',    text: 'text-rose-700'    },
+};
+
+function StatusPill({ status }: { status: string }) {
+  const c = STATUS_CFG[status] ?? { dot: 'bg-gray-400', bg: 'bg-gray-100', text: 'text-gray-600' };
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${c.bg} ${c.text}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />
+      {status}
+    </span>
+  );
+}
+
+function MetricCard({ label, value, Icon, iconBg, iconColor, loading }: {
+  label: string; value: number | undefined; Icon: React.ElementType;
+  iconBg: string; iconColor: string; loading: boolean;
+}) {
+  return (
+    <div className="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 ${iconBg}`}>
+        <Icon className={`h-6 w-6 ${iconColor}`} />
+      </div>
+      <div className="min-w-0">
+        <p className="truncate text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</p>
+        <p className="mt-1 text-2xl font-bold tabular-nums text-gray-900">
+          {loading || value == null
+            ? <span className="inline-block h-7 w-12 animate-pulse rounded-md bg-gray-200" />
+            : value.toLocaleString()}
+        </p>
+      </div>
     </div>
-  </section>;
+  );
+}
+
+function ExpandedRow({ row, onClose, onApprove, approving }: {
+  row: HubReservationItem; onClose: () => void;
+  onApprove: (id: string) => void; approving: string | null;
+}) {
+  return (
+    <tr className="bg-indigo-50/40">
+      <td colSpan={7} className="px-6 py-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm sm:grid-cols-4">
+            <div>
+              <div className="text-xs text-gray-400">Reservation ID</div>
+              <div className="mt-0.5 font-mono text-xs text-gray-700 break-all">{row.reservationId}</div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-400">Slot ID</div>
+              <div className="mt-0.5 font-mono text-xs text-gray-700 break-all">{row.slotId}</div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-400">Created</div>
+              <div className="mt-0.5 text-gray-700">{new Date(row.createdAt).toLocaleString()}</div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-400">Last updated</div>
+              <div className="mt-0.5 text-gray-700">{new Date(row.updatedAt).toLocaleString()}</div>
+            </div>
+            {row.completedAt && (
+              <div>
+                <div className="text-xs text-gray-400">Completed at</div>
+                <div className="mt-0.5 text-gray-700">{new Date(row.completedAt).toLocaleString()}</div>
+              </div>
+            )}
+            {row.cancellationReason && (
+              <div className="col-span-2">
+                <div className="text-xs text-gray-400">Cancellation reason</div>
+                <div className="mt-0.5 italic text-gray-700">{row.cancellationReason}</div>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {row.canApprove && (
+              <button disabled={!!approving} onClick={() => onApprove(row.reservationId)}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60">
+                {approving === row.reservationId ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                {approving === row.reservationId ? 'Approving…' : 'Approve'}
+              </button>
+            )}
+            <button onClick={onClose}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50">
+              <XCircle className="h-4 w-4" /> Close
+            </button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+export default function OperatorReservations() {
+  const [activeTab, setActiveTab] = useState<TabKey>('all');
+  const [filters, setFilters] = useState<HubReservationFilters>(EMPTY);
+  const [draft, setDraft]       = useState<HubReservationFilters>(EMPTY);
+  const [page, setPage]         = useState(1);
+  const [revision, setRevision] = useState(0);
+  const [data, setData]         = useState<HubReservationPage | null>(null);
+  const [statusOptions, setStatusOptions] = useState<string[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [feedbackOk, setFeedbackOk] = useState(true);
+  const [approving, setApproving] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    abortRef.current?.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+    setLoading(true); setError('');
+    fetchHubReservations(activeTab, filters, page, ctrl.signal)
+      .then(r => { if (!ctrl.signal.aborted) { setData(r); setStatusOptions(r.statusOptions ?? []); setExpandedId(null); } })
+      .catch(e => { if (!ctrl.signal.aborted) setError(e instanceof Error ? e.message : 'Unable to load reservations. Please retry.'); })
+      .finally(() => { if (!ctrl.signal.aborted) setLoading(false); });
+    return () => ctrl.abort();
+  }, [activeTab, filters, page, revision]);
+
+  function switchTab(tab: TabKey) { setActiveTab(tab); setPage(1); setFeedback(''); setExpandedId(null); }
+  function handleSearch(e: FormEvent) { e.preventDefault(); setFilters({ ...draft }); setPage(1); setExpandedId(null); }
+  function clearSearch() { setDraft(EMPTY); setFilters(EMPTY); setPage(1); setExpandedId(null); }
+  async function handleApprove(id: string) {
+    setApproving(id); setFeedback('');
+    try {
+      await approveHubReservation(id);
+      setFeedback('Reservation approved successfully.'); setFeedbackOk(true);
+      setRevision(r => r + 1);
+    } catch (e) {
+      setFeedback(e instanceof Error ? e.message : 'Approval failed. Please retry.'); setFeedbackOk(false);
+    } finally { setApproving(null); }
+  }
+  function toggleExpand(id: string) { setExpandedId(prev => prev === id ? null : id); }
+
+  const metrics = [
+    { label: 'Active Bookings',  value: data?.summary.activeCount,    Icon: CalendarDays, iconBg: 'bg-orange-50',   iconColor: 'text-orange-500'   },
+    { label: 'Pending',          value: data?.summary.pendingCount,   Icon: Clock3,       iconBg: 'bg-blue-50',     iconColor: 'text-blue-500'     },
+    { label: 'Approved',         value: data?.summary.approvedCount,  Icon: CalendarCheck2, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500' },
+    { label: 'Completed',        value: data?.summary.completedCount, Icon: CheckCircle2, iconBg: 'bg-teal-50',  iconColor: 'text-teal-500'  },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-indigo-500">Grid Operator / My Hub</p>
+          <h2 className="mt-0.5 text-2xl font-bold text-gray-900">Hub Reservations</h2>
+          <p className="mt-1 text-sm text-gray-500">Reservations for your assigned hub only. All data is live from the server.</p>
+        </div>
+        <button disabled={loading || !!approving} onClick={() => setRevision(r => r + 1)}
+          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-60">
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+        </button>
+      </div>
+
+      {/* Metric cards */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {metrics.map(m => <MetricCard key={m.label} {...m} loading={loading} />)}
+      </div>
+      <p className="text-xs text-gray-400">Active = Pending + Approved. Counts apply to your assigned hub only.</p>
+
+      {/* Panel */}
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+
+        {/* Tabs */}
+        <div className="flex overflow-x-auto gap-2 p-4 border-b border-gray-100 bg-gray-50/50">
+          {TABS.map(({ key, label, Icon }) => (
+            <button key={key} onClick={() => switchTab(key as TabKey)}
+              className={`relative flex shrink-0 items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-lg focus:outline-none border ${
+                activeTab === key 
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' 
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
+              }`}>
+              <Icon className="h-4 w-4" />
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Search form */}
+        {activeTab === 'search' && (
+          <form onSubmit={handleSearch} className="grid grid-cols-1 gap-4 border-b border-gray-100 bg-white p-5 sm:grid-cols-2 lg:grid-cols-3">
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              Booking ID
+              <input type="text" maxLength={24} value={draft.reservationId} placeholder="24-char booking ID"
+                onChange={e => setDraft({ ...draft, reservationId: e.target.value })}
+                className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-300 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/20" />
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              Prosumer NIC
+              <input type="text" maxLength={32} value={draft.prosumerNic} placeholder="e.g. 200012345678"
+                onChange={e => setDraft({ ...draft, prosumerNic: e.target.value })}
+                className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-300 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/20" />
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              Booking date
+              <input type="date" value={draft.bookingDate}
+                onChange={e => setDraft({ ...draft, bookingDate: e.target.value })}
+                className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/20" />
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+              Status
+              <select value={draft.status} onChange={e => setDraft({ ...draft, status: e.target.value })}
+                className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/20">
+                <option value="">All statuses</option>
+                {statusOptions.map(s => <option key={s}>{s}</option>)}
+              </select>
+            </label>
+            <div className="flex items-end gap-2">
+              <button type="submit" disabled={loading}
+                className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60">
+                <Search className="h-4 w-4" /> Search
+              </button>
+              <button type="button" onClick={clearSearch}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50">
+                Clear
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Feedback banner */}
+        {feedback && (
+          <div className={`flex items-center gap-2 px-5 py-3 text-sm font-medium ${feedbackOk ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+            {feedbackOk ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <AlertCircle className="h-4 w-4 shrink-0" />}
+            {feedback}
+          </div>
+        )}
+
+        {/* Content */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-20 text-gray-400">
+            <RefreshCw className="h-7 w-7 animate-spin text-indigo-400" />
+            <span className="text-sm">Loading reservations…</span>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center gap-3 py-16 px-6 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-400">
+              <AlertCircle className="h-7 w-7" />
+            </div>
+            <p className="text-sm font-medium text-gray-700">{error}</p>
+            <p className="text-xs text-gray-400">Check your session and hub assignment, then retry.</p>
+            <button onClick={() => setRevision(r => r + 1)}
+              className="mt-1 inline-flex items-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700">
+              <RefreshCw className="h-4 w-4" /> Retry
+            </button>
+          </div>
+        ) : !data?.items.length ? (
+          <div className="flex flex-col items-center gap-3 py-16 text-center text-gray-400">
+            <CalendarCheck2 className="h-10 w-10" />
+            <p className="text-sm font-medium text-gray-600">No reservations found for your hub</p>
+            <p className="text-xs">Try a different tab or adjust your filters.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-emerald-100 bg-emerald-50 text-left text-xs font-bold uppercase tracking-wider text-gray-700">
+                  <th className="px-5 py-4">Prosumer NIC</th>
+                  <th className="px-5 py-4">Slot</th>
+                  <th className="px-5 py-4">Booking Date</th>
+                  <th className="px-5 py-4">Time Window</th>
+                  <th className="px-5 py-4">Status</th>
+                  <th className="px-5 py-4">Action</th>
+                  <th className="px-5 py-4" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {data.items.map(row => (
+                  <>
+                    <tr key={row.reservationId}
+                      className={`cursor-pointer transition-colors hover:bg-indigo-50/20 ${expandedId === row.reservationId ? 'bg-indigo-50/30' : ''}`}
+                      onClick={() => toggleExpand(row.reservationId)}>
+                      <td className="px-5 py-4 font-medium text-gray-900">{row.prosumerNic}</td>
+                      <td className="px-5 py-4 text-gray-600">
+                        {row.slotNumber == null ? <span className="italic text-gray-400">Unavailable</span> : `Slot ${row.slotNumber}`}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600">{row.bookingDate.slice(0, 10)}</td>
+                      <td className="px-5 py-4 text-gray-600">
+                        <div>{row.startTime} -  {row.endTime} </div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <StatusPill status={row.status} />
+                        {row.cancellationReason && <div className="mt-1 text-xs italic text-rose-400">{row.cancellationReason}</div>}
+                      </td>
+                      <td className="px-5 py-4">
+                        {row.canApprove ? (
+                          <button disabled={!!approving}
+                            onClick={e => { e.stopPropagation(); handleApprove(row.reservationId); }}
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60">
+                            {approving === row.reservationId ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+                            {approving === row.reservationId ? 'Approving…' : 'Approve'}
+                          </button>
+                        ) : <span className="text-xs text-gray-400">—</span>}
+                      </td>
+                      <td className="px-5 py-4 text-right text-xs text-gray-300">
+                        {expandedId === row.reservationId ? '▲' : '▼'}
+                      </td>
+                    </tr>
+                    {expandedId === row.reservationId && (
+                      <ExpandedRow key={`${row.reservationId}-exp`} row={row}
+                        onClose={() => setExpandedId(null)} onApprove={handleApprove} approving={approving} />
+                    )}
+                  </>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {data && data.totalPages > 0 && (
+          <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3.5">
+            <span className="text-xs text-gray-500">
+              {data.totalRecords.toLocaleString()} result{data.totalRecords !== 1 ? 's' : ''} — Page {data.currentPage} of {Math.max(1, data.totalPages)}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button disabled={loading || page <= 1} onClick={() => setPage(p => p - 1)}
+                className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-40">
+                <ChevronLeft className="h-3.5 w-3.5" /> Previous
+              </button>
+              <button disabled={loading || page >= data.totalPages} onClick={() => setPage(p => p + 1)}
+                className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-40">
+                Next <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

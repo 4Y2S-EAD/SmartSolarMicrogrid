@@ -38,6 +38,25 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
         setupBottomNavigation()
         setupSidebar()
         setupAnimations()
+        setupUserProfile()
+    }
+
+    private fun setupUserProfile() {
+        val fullName = com.smartsolar.microgrid.network.TokenManager.getFullName()
+        val role = com.smartsolar.microgrid.network.TokenManager.getRole()
+        
+        val tvWelcomeName = findViewById<android.widget.TextView>(R.id.tvWelcomeName)
+        val tvWelcomeRole = findViewById<android.widget.TextView>(R.id.tvWelcomeRole)
+        
+        if (!fullName.isNullOrEmpty()) {
+            tvWelcomeName.text = fullName
+        }
+        
+        if (!role.isNullOrEmpty()) {
+            // Format role text nicely if needed, e.g. "Grid Operator" instead of "GridOperator"
+            val formattedRole = if (role == "GridOperator") "Grid Operator" else role
+            tvWelcomeRole.text = formattedRole
+        }
     }
 
     // STAGGERED ENTRANCE ANIMATIONS

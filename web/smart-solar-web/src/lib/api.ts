@@ -103,6 +103,7 @@ export type Operator = {
 
 export type UserProfile = {
   id: string;
+  nic?: string;
   email: string;
   full_name: string;
   role: 'backoffice' | 'grid_operator';
@@ -381,3 +382,122 @@ export const ApiService = {
       method: 'POST',
     }),
 };
+
+// --- Back Office Reservation Types (reusing operator/reservations endpoints) ---
+export type BackOfficeReservationItem = {
+  reservationId: string;
+  prosumerNic: string;
+  stationId: string;
+  stationName: string | null;
+  slotId: string;
+  slotNumber: number | null;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  canApprove: boolean;
+  cancellationReason: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type BackOfficeReservationSummary = {
+  activeCount: number;
+  pendingCount: number;
+  approvedCount: number;
+  completedCount: number;
+};
+
+export type BackOfficeReservationPage = {
+  items: BackOfficeReservationItem[];
+  currentPage: number;
+  pageSize: number;
+  totalRecords: number;
+  totalPages: number;
+  summary: BackOfficeReservationSummary;
+  statusOptions: string[];
+};
+
+export type BackOfficeReservationFilters = {
+  reservationId: string;
+  prosumerNic: string;
+  station: string;
+  bookingDate: string;
+  status: string;
+};
+
+function authHeader(): Record<string, string> {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function fetchBackOfficeReservations(
+  view: string,
+  filters: BackOfficeReservationFilters,
+  page: number,
+  signal?: AbortSignal
+): Promise<BackOfficeReservationPage> {
+  const suffix =
+    view === 'pending' || view === 'history' ? `/${view}` : view === 'all' ? '' : '/search';
+  const params = new URLSearchParams({ page: String(page), pageSize: '20' });
+  if (view === 'search') {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value.trim()) params.set(key, value.trim());
+    });
+  }
+  if (view === 'approved') params.set('status', 'Approved');
+  if (view === 'completed') params.set('status', 'Completed');
+  return fetchApi<BackOfficeReservationPage>(
+    `/operator/reservations${suffix}?${params}`,
+    { signal, headers: authHeader() }
+  );
+}
+
+export async function approveBackOfficeReservation(id: string): Promise<unknown> {
+  return fetchApi(`/reservations/${encodeURIComponent(id)}/approve`, {
+    method: 'PUT',
+    headers: authHeader(),
+  });
+}
+
+// --- Hub-Scoped Grid Operator Reservation API (api/hub/reservations) ---
+// The backend reads assignedHubId from the JWT and filters to the operator's station only.
+// Types are identical to BackOfficeReservationPage since the response shape is the same.
+export type HubReservationFilters = BackOfficeReservationFilters;
+export type HubReservationPage = BackOfficeReservationPage;
+
+export async function fetchHubReservations(
+  view: string,
+  filters: HubReservationFilters,
+  page: number,
+  signal?: AbortSignal
+): Promise<HubReservationPage> {
+  const HUB_VIEW_SUFFIX: Record<string, string> = {
+    all: '',
+    pending: '/pending',
+    approved: '/approved',
+    completed: '/completed',
+    history: '/history',
+    search: '/search',
+  };
+  const suffix = HUB_VIEW_SUFFIX[view] ?? '';
+  const params = new URLSearchParams({ page: String(page), pageSize: '20' });
+  if (view === 'search') {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value.trim()) params.set(key, value.trim());
+    });
+  }
+  return fetchApi<HubReservationPage>(
+    `/hub/reservations${suffix}?${params}`,
+    { signal, headers: authHeader() }
+  );
+}
+
+export async function approveHubReservation(id: string): Promise<unknown> {
+  return fetchApi(`/reservations/${encodeURIComponent(id)}/approve`, {
+    method: 'PUT',
+    headers: authHeader(),
+  });
+}
+

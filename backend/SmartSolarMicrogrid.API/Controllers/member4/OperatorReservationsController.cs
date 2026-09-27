@@ -10,7 +10,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member4;
 
 [ApiController]
 [Route("api/operator/reservations")]
-[Authorize(Roles = "GridOperator,gridoperator")]
+[Authorize(Roles = "GridOperator,gridoperator,Backoffice,backoffice")]
 public sealed class OperatorReservationsController(OperatorReservationService service, ILogger<OperatorReservationsController> logger) : ControllerBase
 {
     [HttpGet]

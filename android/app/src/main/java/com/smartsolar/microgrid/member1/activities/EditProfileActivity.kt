@@ -55,22 +55,34 @@ class EditProfileActivity : AppCompatActivity() {
             return
         }
 
+        val dbHelper = com.smartsolar.microgrid.member1.db.ProfileDatabaseHelper(this)
+
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val response = com.smartsolar.microgrid.network.ApiClient.apiService.getProfile(nic)
                 if (response.isSuccessful) {
                     val profile = response.body()
                     if (profile != null) {
-                        etFullName.setText(profile.fullName)
-                        etEmail.setText(profile.email)
-                        etPhone.setText(profile.phoneNumber ?: "")
-                        etAddress.setText(profile.address ?: "")
+                        dbHelper.saveProfile(profile)
+                        updateUI(profile)
                     }
+                } else {
+                    val profile = dbHelper.getProfile(nic)
+                    if (profile != null) updateUI(profile)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                val profile = dbHelper.getProfile(nic)
+                if (profile != null) updateUI(profile)
             }
         }
+    }
+
+    private fun updateUI(profile: com.smartsolar.microgrid.network.models.UserProfileResponse) {
+        etFullName.setText(profile.fullName)
+        etEmail.setText(profile.email)
+        etPhone.setText(profile.phoneNumber ?: "")
+        etAddress.setText(profile.address ?: "")
     }
 
     private fun saveProfile() {
@@ -106,10 +118,22 @@ class EditProfileActivity : AppCompatActivity() {
         btnSave.isEnabled = false
         btnSave.text = "Saving..."
 
+        val dbHelper = com.smartsolar.microgrid.member1.db.ProfileDatabaseHelper(this)
+
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val response = com.smartsolar.microgrid.network.ApiClient.apiService.updateProfile(nic, request)
                 if (response.isSuccessful) {
+                    val currentProfile = dbHelper.getProfile(nic)
+                    if (currentProfile != null) {
+                        val updatedProfile = currentProfile.copy(
+                            fullName = fullName,
+                            email = email,
+                            phoneNumber = phone,
+                            address = address
+                        )
+                        dbHelper.saveProfile(updatedProfile)
+                    }
                     Toast.makeText(this@EditProfileActivity, "Profile updated successfully", Toast.LENGTH_SHORT).show()
                     finish()
                 } else {
@@ -119,9 +143,22 @@ class EditProfileActivity : AppCompatActivity() {
                     btnSave.text = "SAVE CHANGES"
                 }
             } catch (e: Exception) {
-                Toast.makeText(this@EditProfileActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-                btnSave.isEnabled = true
-                btnSave.text = "SAVE CHANGES"
+                val currentProfile = dbHelper.getProfile(nic)
+                if (currentProfile != null) {
+                    val updatedProfile = currentProfile.copy(
+                        fullName = fullName,
+                        email = email,
+                        phoneNumber = phone,
+                        address = address
+                    )
+                    dbHelper.saveProfile(updatedProfile)
+                    Toast.makeText(this@EditProfileActivity, "Saved locally. Will sync when online.", Toast.LENGTH_LONG).show()
+                    finish()
+                } else {
+                    Toast.makeText(this@EditProfileActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    btnSave.isEnabled = true
+                    btnSave.text = "SAVE CHANGES"
+                }
             }
         }
     }

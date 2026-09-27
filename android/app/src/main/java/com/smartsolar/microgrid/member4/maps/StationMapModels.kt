@@ -24,5 +24,9 @@ data class StationMapState(
     val error: Boolean = false,
     val loaded: Boolean = false,
     val query: String = "",
-    val nearby: Boolean = false
+    val nearby: Boolean = false,
+    val origin: RoutePoint? = null,
+    val route: DrivingRoute? = null,
+    val routeLoading: Boolean = false,
+    val routeError: String? = null
 )

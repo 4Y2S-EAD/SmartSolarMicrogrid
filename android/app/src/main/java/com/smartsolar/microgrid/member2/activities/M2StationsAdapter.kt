@@ -37,14 +37,7 @@ class M2StationsAdapter(
         // Member 4: distances are only displayed when calculated by the map API.
         holder.tvCapacity.text = "${station.capacityKwh} kWh"
 
-        // අර ඔයා දාන පින්තූර 4 මාරුවෙන් මාරුවට සෙට් කරන කෑල්ල
-        val imageResId = when (position % 4) {
-            0 -> R.drawable.station1
-            1 -> R.drawable.station2
-            2 -> R.drawable.station3
-            else -> R.drawable.station4
-        }
-        holder.ivStationImage.setImageResource(imageResId)
+        holder.ivStationImage.setImageResource(StationImages.forStation(station.stationId))
 
         // Status Badge Logic
         if (station.availableSlotCount <= 0) {
