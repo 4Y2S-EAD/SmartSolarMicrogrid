@@ -38,12 +38,12 @@ export default function Dashboard() {
       const [hubs, prosumers, reservations] = await Promise.all([
         ApiService.getHubs(),
         ApiService.getProsumers(),
-        Promise.resolve({data: [], error: null}),
+        ApiService.getRecentReservations(),
       ]);
 
       const h = hubs ?? [];
       const p = prosumers ?? [];
-      const r = (reservations as any).data ?? [];
+      const r = (reservations as any) ?? [];
 
       setStats({
         hubs: h.length,

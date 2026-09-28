@@ -261,6 +261,8 @@ export const ApiService = {
   // Users
   getUsers: () => fetchApi<UserProfile[]>('/member1/users'),
   
+  getRecentReservations: () => fetchApi<any[]>('/member1/dashboard/recent-reservations'),
+  
   createUser: (payload: any) => 
     fetchApi<any>('/member1/users', {
       method: 'POST',
