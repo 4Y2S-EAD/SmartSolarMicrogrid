@@ -171,12 +171,17 @@ export type UpdateReservationPayload = {
 };
 
 
-// --- Helper Functions ---
+function authHeader(): Record<string, string> {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      ...authHeader(),
       ...(options?.headers || {}),
     },
   });
@@ -429,10 +434,6 @@ export type BackOfficeReservationFilters = {
   status: string;
 };
 
-function authHeader(): Record<string, string> {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
 
 export async function fetchBackOfficeReservations(
   view: string,

@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using SmartSolarMicrogrid.API.DTOs.member2;
 using SmartSolarMicrogrid.API.Models;
 using SmartSolarMicrogrid.API.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SmartSolarMicrogrid.API.Controllers.member2
 {
@@ -10,6 +11,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
     [ApiController]
     // route is how we access this api. ex: http://localhost:5000/api/stations
     [Route("api/stations")]
+    [Authorize]
     public class StationsController : ControllerBase
     {
         // we need mongodb service to talk to database

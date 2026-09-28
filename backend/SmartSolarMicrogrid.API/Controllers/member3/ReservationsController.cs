@@ -10,6 +10,7 @@ using MongoDB.Driver;
 using SmartSolarMicrogrid.API.DTOs.member3;
 using SmartSolarMicrogrid.API.Models;
 using SmartSolarMicrogrid.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -26,6 +27,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member3
 {
   [ApiController]
   [Route("api/reservations")]
+  [Authorize]
   public class ReservationsController : ControllerBase
   {
     private readonly MongoDbService _mongoDbService;

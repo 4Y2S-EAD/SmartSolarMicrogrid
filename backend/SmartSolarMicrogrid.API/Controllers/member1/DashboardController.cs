@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.API.Models;
 using SmartSolarMicrogrid.API.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SmartSolarMicrogrid.API.Controllers.member1
 {
     [ApiController]
     [Route("api/member1/dashboard")]
+    [Authorize]
     public class DashboardController : ControllerBase
     {
         private readonly MongoDbService _mongoDbService;

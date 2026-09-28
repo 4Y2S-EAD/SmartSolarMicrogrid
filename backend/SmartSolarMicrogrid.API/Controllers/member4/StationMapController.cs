@@ -5,11 +5,13 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartSolarMicrogrid.API.DTOs.member4;
 using SmartSolarMicrogrid.API.Services.member4;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SmartSolarMicrogrid.API.Controllers.member4;
 
 [ApiController]
 [Route("api/member4/maps/stations")]
+[Authorize]
 public sealed class StationMapController(StationMapService service) : ControllerBase
 {
     [HttpGet]

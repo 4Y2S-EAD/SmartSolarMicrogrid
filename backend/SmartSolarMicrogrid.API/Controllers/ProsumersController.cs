@@ -3,11 +3,13 @@ using MongoDB.Driver;
 using SmartSolarMicrogrid.API.DTOs;
 using SmartSolarMicrogrid.API.Models;
 using SmartSolarMicrogrid.API.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SmartSolarMicrogrid.API.Controllers
 {
     [ApiController]
     [Route("api/prosumers")]
+    [Authorize]
     public class ProsumersController : ControllerBase
     {
         private readonly MongoDbService _mongoDbService;
