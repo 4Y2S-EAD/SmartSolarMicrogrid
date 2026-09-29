@@ -1,3 +1,8 @@
+// ============================================================================
+// File: ProsumerAuthController.cs
+// Description: Handles API requests and operations for prosumer auth.
+// Author: Member 1
+// ============================================================================
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -18,12 +23,14 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
         private readonly MongoDbService _mongoDbService;
         private readonly IConfiguration _configuration;
 
+        // Initializes a new instance of the ProsumerAuthController class.
         public ProsumerAuthController(MongoDbService mongoDbService, IConfiguration configuration)
         {
             _mongoDbService = mongoDbService;
             _configuration = configuration;
         }
 
+        // Registers.
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
@@ -53,6 +60,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
             return Ok(new { Message = "Registration submitted successfully. Pending activation." });
         }
 
+        // Logins.
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
@@ -84,6 +92,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
             });
         }
 
+        // Generates jwt token.
         private string GenerateJwtToken(User user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");

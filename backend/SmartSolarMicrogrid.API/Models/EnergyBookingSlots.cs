@@ -1,3 +1,8 @@
+// ============================================================================
+// File: EnergyBookingSlots.cs
+// Description: Data model representing energy booking slots.
+// Author: Member 1
+// ============================================================================
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;

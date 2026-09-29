@@ -1,3 +1,8 @@
+// ============================================================================
+// File: User.cs
+// Description: Data model representing user.
+// Author: Member 1
+// ============================================================================
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;

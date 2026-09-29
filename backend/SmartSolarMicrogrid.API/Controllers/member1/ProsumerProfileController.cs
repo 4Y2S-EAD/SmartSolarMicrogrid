@@ -1,3 +1,8 @@
+// ============================================================================
+// File: ProsumerProfileController.cs
+// Description: Handles API requests and operations for prosumer profile.
+// Author: Member 1
+// ============================================================================
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.API.DTOs.member1;
@@ -14,11 +19,13 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
     {
         private readonly MongoDbService _mongoDbService;
 
+        // Initializes a new instance of the ProsumerProfileController class.
         public ProsumerProfileController(MongoDbService mongoDbService)
         {
             _mongoDbService = mongoDbService;
         }
 
+        // Gets profile.
         [HttpGet("{nic}")]
         public async Task<IActionResult> GetProfile(string nic)
         {
@@ -48,6 +55,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
             });
         }
 
+        // Updates profile.
         [HttpPut("{nic}")]
         public async Task<IActionResult> UpdateProfile(string nic, [FromBody] UpdateProfileDto dto)
         {
@@ -70,6 +78,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
             return Ok(new { Message = "Profile updated successfully." });
         }
 
+        // Requests deactivation.
         [HttpPost("{nic}/deactivation-request")]
         public async Task<IActionResult> RequestDeactivation(string nic, [FromBody] DeactivationRequestDto dto)
         {

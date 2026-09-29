@@ -1,3 +1,8 @@
+// ============================================================================
+// File: EnergyReservation.cs
+// Description: Data model representing energy reservation.
+// Author: Member 1
+// ============================================================================
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;

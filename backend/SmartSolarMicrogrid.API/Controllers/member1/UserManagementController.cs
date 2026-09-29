@@ -1,3 +1,8 @@
+// ============================================================================
+// File: UserManagementController.cs
+// Description: Handles API requests and operations for user management.
+// Author: Member 1
+// ============================================================================
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.API.DTOs.member1;
@@ -14,11 +19,13 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
     {
         private readonly MongoDbService _mongoDbService;
 
+        // Initializes a new instance of the UserManagementController class.
         public UserManagementController(MongoDbService mongoDbService)
         {
             _mongoDbService = mongoDbService;
         }
 
+        // Gets users.
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
@@ -40,6 +47,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
             return Ok(mappedProfiles);
         }
 
+        // Creates user.
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
         {
@@ -69,6 +77,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
             return Ok(new { Message = "User created successfully." });
         }
 
+        // Updates user.
         [HttpPut("{nic}")]
         public async Task<IActionResult> UpdateUser(string nic, [FromBody] UpdateUserDto dto)
         {
@@ -94,6 +103,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
             return Ok(new { Message = "User updated successfully." });
         }
 
+        // Updates user status.
         [HttpPut("{nic}/status")]
         public async Task<IActionResult> UpdateUserStatus(string nic, [FromBody] UpdateUserStatusDto dto)
         {
@@ -114,6 +124,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
             return Ok(new { Message = $"User status updated to {newStatus}." });
         }
 
+        // Deletes user.
         [HttpDelete("{nic}")]
         public async Task<IActionResult> DeleteUser(string nic)
         {

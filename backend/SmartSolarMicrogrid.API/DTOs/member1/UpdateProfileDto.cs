@@ -1,3 +1,8 @@
+// ============================================================================
+// File: UpdateProfileDto.cs
+// Description: Data transfer object representing update profile.
+// Author: Member 1
+// ============================================================================
 using System.ComponentModel.DataAnnotations;
 
 namespace SmartSolarMicrogrid.API.DTOs.member1

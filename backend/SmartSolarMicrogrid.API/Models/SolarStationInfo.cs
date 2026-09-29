@@ -1,3 +1,8 @@
+// ============================================================================
+// File: SolarStationInfo.cs
+// Description: Data model representing solar station info.
+// Author: Member 1
+// ============================================================================
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;

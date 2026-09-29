@@ -1,3 +1,8 @@
+// ============================================================================
+// File: AuthController.cs
+// Description: Handles API requests and operations for auth.
+// Author: Member 1
+// ============================================================================
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -19,6 +24,7 @@ namespace SmartSolarMicrogrid.API.Controllers
         private readonly MongoDbService _mongoDbService;
         private readonly IConfiguration _configuration;
 
+        // Initializes a new instance of the AuthController class.
         public AuthController(MongoDbService mongoDbService, IConfiguration configuration)
         {
             _mongoDbService = mongoDbService;
@@ -34,6 +40,7 @@ namespace SmartSolarMicrogrid.API.Controllers
             public UserRole Role { get; set; }
         }
 
+        // Registers.
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
@@ -68,6 +75,7 @@ namespace SmartSolarMicrogrid.API.Controllers
             public string Password { get; set; } = null!;
         }
 
+        // Logins.
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -99,6 +107,7 @@ namespace SmartSolarMicrogrid.API.Controllers
             });
         }
 
+        // Generates jwt token.
         private string GenerateJwtToken(User user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");

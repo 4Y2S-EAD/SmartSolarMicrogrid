@@ -1,3 +1,8 @@
+// ============================================================================
+// File: RegisterDto.cs
+// Description: Data transfer object representing register.
+// Author: Member 1
+// ============================================================================
 using System.ComponentModel.DataAnnotations;
 
 namespace SmartSolarMicrogrid.API.DTOs.member1

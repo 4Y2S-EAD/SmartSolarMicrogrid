@@ -1,3 +1,8 @@
+// ============================================================================
+// File: UpdateUserDto.cs
+// Description: Data transfer object representing update user.
+// Author: Member 1
+// ============================================================================
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 

@@ -1,3 +1,8 @@
+// ============================================================================
+// File: ProsumersController.cs
+// Description: Handles API requests and operations for prosumers.
+// Author: Member 1
+// ============================================================================
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.API.DTOs;
@@ -14,11 +19,13 @@ namespace SmartSolarMicrogrid.API.Controllers
     {
         private readonly MongoDbService _mongoDbService;
 
+        // Initializes a new instance of the ProsumersController class.
         public ProsumersController(MongoDbService mongoDbService)
         {
             _mongoDbService = mongoDbService;
         }
 
+        // Gets all prosumers.
         [HttpGet]
         public async Task<IActionResult> GetAllProsumers()
         {
@@ -44,6 +51,7 @@ namespace SmartSolarMicrogrid.API.Controllers
             return Ok(response);
         }
 
+        // Updates prosumer status.
         [HttpPut("{nic}/status")]
         public async Task<IActionResult> UpdateProsumerStatus(string nic, [FromBody] ProsumerStatusDto dto)
         {

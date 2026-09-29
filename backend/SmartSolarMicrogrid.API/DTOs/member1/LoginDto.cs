@@ -1,3 +1,8 @@
+// ============================================================================
+// File: LoginDto.cs
+// Description: Data transfer object representing login.
+// Author: Member 1
+// ============================================================================
 using System.ComponentModel.DataAnnotations;
 
 namespace SmartSolarMicrogrid.API.DTOs.member1

@@ -1,3 +1,8 @@
+// ============================================================================
+// File: DashboardController.cs
+// Description: Handles API requests and operations for dashboard.
+// Author: Member 1
+// ============================================================================
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.API.Models;
@@ -13,11 +18,13 @@ namespace SmartSolarMicrogrid.API.Controllers.member1
     {
         private readonly MongoDbService _mongoDbService;
 
+        // Initializes a new instance of the DashboardController class.
         public DashboardController(MongoDbService mongoDbService)
         {
             _mongoDbService = mongoDbService;
         }
 
+        // Gets recent reservations.
         [HttpGet("recent-reservations")]
         public async Task<IActionResult> GetRecentReservations()
         {

@@ -1,3 +1,8 @@
+// ============================================================================
+// File: CreateUserDto.cs
+// Description: Data transfer object representing create user.
+// Author: Member 1
+// ============================================================================
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
