@@ -1,3 +1,9 @@
+// ============================================================================
+// File: MongoDbService.cs
+// Description: Service for handling MongoDB operations.
+// Author: Member 1
+// ============================================================================
+
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.API.Models;
