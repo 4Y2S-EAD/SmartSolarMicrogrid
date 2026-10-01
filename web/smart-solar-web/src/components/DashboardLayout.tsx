@@ -1,8 +1,9 @@
 import { ReactNode, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import {
-  Sun, LayoutDashboard, Users, Zap, CalendarDays, QrCode, Radio, LogOut, Menu, X, Gauge, UserCog, Shield, ScanLine,
+  LayoutDashboard, Users, Zap, CalendarDays, QrCode, Radio, LogOut, Menu, X, Gauge, UserCog, Shield, ScanLine,
 } from 'lucide-react';
+import logoImg from '@/assets/logo.png';
 import type { UserRole } from '@/context/AuthContext';
 
 export type NavItem = {
@@ -96,11 +97,13 @@ export default function DashboardLayout({ activeView, onNavigate, children }: Da
       {/* Desktop sidebar */}
       <aside className="hidden w-64 flex-col border-r border-gray-200 bg-white lg:flex">
         <div className="flex items-center gap-3 border-b border-gray-200 px-5 py-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-white shadow-md shadow-amber-500/30">
-            <Sun className="h-5 w-5" />
-          </div>
+          <img
+            src={logoImg}
+            alt="MicroGrid Logo"
+            className="h-10 w-10 object-contain drop-shadow-sm"
+          />
           <div>
-            <div className="text-base font-bold text-gray-900">MicroGrid</div>
+            <div className="text-base font-bold text-gray-900 leading-tight">MicroGrid</div>
             <div className={`text-xs ${roleInfo.color}`}>{roleInfo.label}</div>
           </div>
         </div>
@@ -123,9 +126,11 @@ export default function DashboardLayout({ activeView, onNavigate, children }: Da
           <aside className="absolute left-0 top-0 flex h-full w-64 flex-col bg-white">
             <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-white">
-                  <Sun className="h-5 w-5" />
-                </div>
+                <img
+                  src={logoImg}
+                  alt="MicroGrid Logo"
+                  className="h-10 w-10 object-contain drop-shadow-sm"
+                />
                 <div className="text-base font-bold text-gray-900">MicroGrid</div>
               </div>
               <button onClick={() => setMobileOpen(false)} className="text-gray-400">
@@ -143,7 +148,8 @@ export default function DashboardLayout({ activeView, onNavigate, children }: Da
           <button onClick={() => setMobileOpen(true)} className="text-gray-500">
             <Menu className="h-6 w-6" />
           </button>
-          <span className="ml-3 text-base font-bold text-gray-900">MicroGrid</span>
+          <img src={logoImg} alt="MicroGrid" className="ml-3 h-7 w-7 object-contain" />
+          <span className="ml-2 text-base font-bold text-gray-900">MicroGrid</span>
         </div>
         {header}
         <main className="flex-1 overflow-auto p-6">

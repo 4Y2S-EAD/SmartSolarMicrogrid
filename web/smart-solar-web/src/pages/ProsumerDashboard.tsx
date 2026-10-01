@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import logoImg from '@/assets/logo.png';
 import { 
   ApiService, 
   type ReservationSummary, 
@@ -105,15 +106,22 @@ export default function ProsumerDashboard({ onNavigate }: ProsumerDashboardProps
     <div className="space-y-6">
       {/* Top Welcome Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50/70 via-white to-amber-50/40 p-6 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Welcome, {profile?.full_name || 'Prosumer'}
-            </h1>
+        <div className="flex items-center gap-4">
+          <img
+            src={logoImg}
+            alt="MicroGrid Logo"
+            className="h-14 w-14 object-contain drop-shadow-sm hidden sm:block shrink-0"
+          />
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-gray-900">
+                Welcome, {profile?.full_name || 'Prosumer'}
+              </h1>
+            </div>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage your solar battery charging slot reservations and energy transfers.
+            </p>
           </div>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage your solar battery charging slot reservations and energy transfers.
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
           <Button variant="secondary">

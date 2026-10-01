@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { useAuth, type UserRole } from '@/context/AuthContext';
-import { Sun, Loader2, Lock, Mail, User, Shield, Radio } from 'lucide-react';
+import { Loader2, Lock, Mail, User, Shield, Radio } from 'lucide-react';
+import logoImg from '@/assets/logo.png';
 import Button from '@/components/ui/Button';
 
 export default function Login() {
@@ -48,11 +49,16 @@ export default function Login() {
           <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-sky-500 blur-3xl" />
         </div>
         <div className="relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500 text-white shadow-lg shadow-amber-500/30">
-              <Sun className="h-6 w-6" />
+          <div className="flex items-center gap-3.5">
+            <img
+              src={logoImg}
+              alt="Smart Solar Microgrid Logo"
+              className="h-12 w-12 object-contain drop-shadow-[0_4px_12px_rgba(245,158,11,0.35)]"
+            />
+            <div>
+              <span className="text-xl font-bold tracking-tight text-white">MicroGrid</span>
+              <span className="block text-xs font-medium text-amber-400">Smart Solar Microgrid</span>
             </div>
-            <span className="text-xl font-bold tracking-tight">MicroGrid</span>
           </div>
         </div>
         <div className="relative z-10 max-w-md">
