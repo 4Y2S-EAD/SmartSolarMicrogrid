@@ -65,15 +65,15 @@ Check [`backend/SmartSolarMicrogrid.API/appsettings.json`](backend/SmartSolarMic
 }
 ```
 
-### Step 2: Publish the API
-Open PowerShell in the repository root and run:
+### Step 2: Publish the API to IIS Directory
+Open PowerShell as Administrator in the repository root and run:
 ```powershell
 cd backend\SmartSolarMicrogrid.API
-dotnet publish -c Release -o ./publish
+dotnet publish -c Release -o "C:\inetpub\wwwroot\SmartSolar-API"
 ```
 
 ### Step 3: Verify the Published `web.config`
-Check that `./publish/web.config` exists with the `AspNetCoreModuleV2` handler:
+Check that `C:\inetpub\wwwroot\SmartSolar-API\web.config` exists with the `AspNetCoreModuleV2` handler:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -126,8 +126,8 @@ Open **Internet Information Services (IIS) Manager** (`inetmgr` in Start/Run).
 1. Right-click **Sites** in the left panel > **Add Website...**.
 2. Fill in the details:
    - **Site name**: `SmartSolar-API`
-   - **Physical path**: Navigate to your published backend directory:
-     `C:\...\SmartSolarMicrogrid\backend\SmartSolarMicrogrid.API\publish`
+   - **Physical path**: Navigate to the production directory:
+     `C:\inetpub\wwwroot\SmartSolar-API`
    - **Type**: `http`
    - **IP address**: `All Unassigned`
    - **Port**: `5174` (or any free port of your choice)
@@ -143,8 +143,8 @@ Open **Internet Information Services (IIS) Manager** (`inetmgr` in Start/Run).
 1. Right-click **Sites** > **Add Website...**.
 2. Fill in the details:
    - **Site name**: `SmartSolar-Web`
-   - **Physical path**: Navigate to the Vite build directory:
-     `C:\...\SmartSolarMicrogrid\web\smart-solar-web\dist`
+   - **Physical path**: Navigate to the production frontend directory:
+     `C:\inetpub\wwwroot\SmartSolar-Web`
    - **Type**: `http`
    - **IP address**: `All Unassigned`
    - **Port**: `5173` (or `80` if default web port is free)
@@ -156,11 +156,11 @@ Open **Internet Information Services (IIS) Manager** (`inetmgr` in Start/Run).
 
 ### Folder Permissions (Important!)
 IIS application pools run under virtual service accounts. Make sure they have read permissions on the deployment folders:
-1. Right-click the folder (`publish` or `dist`) > **Properties** > **Security** tab > **Edit...**.
+1. Right-click the folder (`C:\inetpub\wwwroot\SmartSolar-API` or `C:\inetpub\wwwroot\SmartSolar-Web`) > **Properties** > **Security** tab > **Edit...**.
 2. Click **Add...**.
 3. Enter `IIS_IUSRS` and click **Check Names**, then **OK**.
 4. Grant **Read & execute**, **List folder contents**, and **Read**.
-5. *(Optional for logs)*: If you enable stdout logging on the backend, ensure `IIS_IUSRS` has **Write** permissions on the `publish\logs` folder.
+5. *(Optional for logs)*: If you enable stdout logging on the backend, ensure `IIS_IUSRS` has **Write** permissions on the `C:\inetpub\wwwroot\SmartSolar-API\logs` folder.
 6. Click **Apply** > **OK**.
 
 ---
@@ -210,7 +210,7 @@ Update the mobile app environment file so it targets the IIS server:
 | Error | Root Cause | Solution |
 | :--- | :--- | :--- |
 | **HTTP Error 500.19** *(Internal Server Error)* | Missing IIS URL Rewrite Module or missing ASP.NET Core Hosting Bundle. | Download and install **IIS URL Rewrite Module 2.1** and **.NET Hosting Bundle**, then run `iisreset`. |
-| **HTTP Error 500.30** *(ASP.NET Core app failed to start)* | Missing runtime, bad configuration in `appsettings.json`, or unhandled exception during startup. | In `publish/web.config`, set `stdoutLogEnabled="true"`, recreate the issue, and read the generated log files in `publish\logs\`. |
+| **HTTP Error 500.30** *(ASP.NET Core app failed to start)* | Missing runtime, bad configuration in `appsettings.json`, or unhandled exception during startup. | In `C:\inetpub\wwwroot\SmartSolar-API\web.config`, set `stdoutLogEnabled="true"`, recreate the issue, and read the generated log files in `logs\`. |
 | **HTTP Error 500.31 / 500.32** | .NET runtime version mismatch. | Ensure the .NET Hosting Bundle version installed matches the TargetFramework (`net10.0`) of the backend. |
 | **HTTP Error 503** *(Service Unavailable)* | Application Pool stopped due to crash or identity error. | Check Windows Event Viewer (`eventvwr.msc` > Windows Logs > Application) for exact crash stack traces. |
 | **404 Not Found on Page Refresh** | URL Rewrite module not active for the React frontend. | Verify `dist/web.config` exists and IIS URL Rewrite 2.1 is installed on the server. |
