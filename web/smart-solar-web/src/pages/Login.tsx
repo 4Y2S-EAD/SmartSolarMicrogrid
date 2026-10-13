@@ -70,6 +70,9 @@ export default function Login() {
           <p className="mt-4 text-lg text-slate-300">
             Manage hubs, prosumers, and energy reservations from a single backoffice platform.
           </p>
+          <p className="mt-4 text-lg text-slate-300">
+            Manage hubs, prosumers, and energy reservations from a single backoffice platform.
+          </p>
           <div className="mt-8 grid grid-cols-3 gap-4">
             {[
               { label: 'Hubs Online', value: '4' },
@@ -169,11 +172,10 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setRole('backoffice')}
-                    className={`flex items-center gap-3 rounded-lg border-0 p-3.5 text-left ring-1 ring-inset transition-all ${
-                      role === 'backoffice'
+                    className={`flex items-center gap-3 rounded-lg border-0 p-3.5 text-left ring-1 ring-inset transition-all ${role === 'backoffice'
                         ? 'bg-amber-50 ring-amber-500'
                         : 'bg-white ring-gray-300 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <Shield className={`h-5 w-5 ${role === 'backoffice' ? 'text-amber-600' : 'text-gray-400'}`} />
                     <div>
@@ -184,11 +186,10 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setRole('grid_operator')}
-                    className={`flex items-center gap-3 rounded-lg border-0 p-3.5 text-left ring-1 ring-inset transition-all ${
-                      role === 'grid_operator'
+                    className={`flex items-center gap-3 rounded-lg border-0 p-3.5 text-left ring-1 ring-inset transition-all ${role === 'grid_operator'
                         ? 'bg-indigo-50 ring-indigo-500'
                         : 'bg-white ring-gray-300 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <Radio className={`h-5 w-5 ${role === 'grid_operator' ? 'text-indigo-600' : 'text-gray-400'}`} />
                     <div>
