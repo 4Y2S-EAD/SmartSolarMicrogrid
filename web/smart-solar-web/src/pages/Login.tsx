@@ -70,9 +70,6 @@ export default function Login() {
           <p className="mt-4 text-lg text-slate-300">
             Manage hubs, prosumers, and energy reservations from a single backoffice platform.
           </p>
-          <p className="mt-4 text-lg text-slate-300">
-            Manage hubs, prosumers, and energy reservations from a single backoffice platform.
-          </p>
           <div className="mt-8 grid grid-cols-3 gap-4">
             {[
               { label: 'Hubs Online', value: '4' },
