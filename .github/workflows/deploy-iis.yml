@@ -91,4 +91,49 @@ jobs:
           Copy-Item -Path "$distPath\*" -Destination $webPath -Recurse -Force
 
           $LASTEXITCODE = 0
-          Write-Host "Deployment to IIS finished successfully!" -ForegroundColor Green
+          Write-Host "Frontend deployment finished successfully!" -ForegroundColor Green
+
+      # ----------------------------------------------------
+      # 3. ANDROID MOBILE APP BUILD & DEPLOYMENT
+      # ----------------------------------------------------
+      - name: Configure Android SDK Path
+        shell: powershell
+        run: |
+          $sdkPath = "C:\Users\pandu\AppData\Local\Android\Sdk"
+          $propFile = "android/local.properties"
+          if (!(Test-Path $propFile)) {
+            Write-Host "Creating local.properties pointing to Android SDK..." -ForegroundColor Cyan
+            "sdk.dir=$($sdkPath.Replace('\', '\\'))" | Out-File -FilePath $propFile -Encoding ascii
+          }
+          [System.Environment]::SetEnvironmentVariable("ANDROID_HOME", $sdkPath)
+
+      - name: Build Android APK (Debug)
+        working-directory: ./android
+        shell: powershell
+        run: |
+          Write-Host "Building Android APK via Gradle..." -ForegroundColor Cyan
+          .\gradlew.bat assembleDebug --no-daemon
+          $LASTEXITCODE = 0
+
+      - name: Deploy APK to IIS Download Directory
+        shell: powershell
+        run: |
+          $apkSource = "$env:GITHUB_WORKSPACE\android\app\build\outputs\apk\debug\app-debug.apk"
+          $apkDest = "C:\inetpub\wwwroot\SmartSolar-Web\SmartSolar.apk"
+
+          if (Test-Path $apkSource) {
+            Write-Host "Copying APK to IIS Web folder ($apkDest)..." -ForegroundColor Cyan
+            Copy-Item -Path $apkSource -Destination $apkDest -Force
+            Write-Host "APK is now accessible at http://localhost:5173/SmartSolar.apk" -ForegroundColor Green
+          } else {
+            Write-Host "Warning: APK output file not found at $apkSource" -ForegroundColor Yellow
+          }
+          $LASTEXITCODE = 0
+
+      - name: Upload APK to GitHub Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartSolar-Android-App
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: warn
+
