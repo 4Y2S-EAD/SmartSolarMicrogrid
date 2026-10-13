@@ -1,8 +1,10 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useMemo } from 'react';
 import { useAuth, type UserRole } from '@/context/AuthContext';
-import { Loader2, Lock, Mail, User, Shield, Radio } from 'lucide-react';
+import { Loader2, Lock, Mail, User, Shield, Radio, Smartphone, Download, QrCode } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
+import appShowcaseImg from '@/assets/app-showcase.png';
 import Button from '@/components/ui/Button';
+import QrCodeDisplay from '@/components/ui/QrCodeDisplay';
 
 export default function Login() {
   const { signIn, signUp } = useAuth();
@@ -14,6 +16,16 @@ export default function Login() {
   const [role, setRole] = useState<UserRole>('backoffice');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Compute dynamic APK download URL based on current network IP / Host:
+  // When testing on laptop via localhost/127.0.0.1, use the LAN IP (192.168.1.6) so mobile phone camera scans can connect!
+  const apkDownloadUrl = useMemo(() => {
+    if (typeof window === 'undefined') return 'http://192.168.1.6:5175/SmartSolar.apk';
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const host = isLocal ? '192.168.1.6' : window.location.hostname;
+    const port = window.location.port ? `:${window.location.port}` : ':5175';
+    return `${window.location.protocol}//${host}${port}/SmartSolar.apk`;
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -43,8 +55,8 @@ export default function Login() {
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Left brand panel */}
-      <div className="relative flex flex-1 flex-col justify-between overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-10 text-white">
-        <div className="absolute inset-0 opacity-20">
+      <div className="relative flex flex-1 flex-col justify-between overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 lg:p-10 text-white">
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
           <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-amber-400 blur-3xl" />
           <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-sky-500 blur-3xl" />
         </div>
@@ -61,29 +73,76 @@ export default function Login() {
             </div>
           </div>
         </div>
-        <div className="relative z-10 max-w-md">
-          <h1 className="text-4xl font-bold leading-tight tracking-tight">
+
+        <div className="relative z-10 my-4 max-w-xl">
+          <h1 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight">
             Smart Solar Microgrid
             <br />
             <span className="text-amber-400">Trading System</span>
           </h1>
-          <p className="mt-4 text-lg text-slate-300">
+          <p className="mt-3 text-base text-slate-300">
             Manage hubs, prosumers, and energy reservations from a single backoffice platform.
           </p>
-          <div className="mt-8 grid grid-cols-3 gap-4">
+          <div className="mt-5 grid grid-cols-3 gap-3">
             {[
               { label: 'Hubs Online', value: '4' },
               { label: 'Active Prosumers', value: '120+' },
               { label: 'Energy Traded', value: '2.4 MWh' },
             ].map((stat) => (
-              <div key={stat.label} className="rounded-xl bg-white/5 p-4 backdrop-blur-sm ring-1 ring-white/10">
-                <div className="text-2xl font-bold text-amber-400">{stat.value}</div>
+              <div key={stat.label} className="rounded-xl bg-white/5 p-3.5 backdrop-blur-sm ring-1 ring-white/10">
+                <div className="text-xl font-bold text-amber-400">{stat.value}</div>
                 <div className="mt-0.5 text-xs text-slate-400">{stat.label}</div>
               </div>
             ))}
           </div>
+
+          {/* Mobile App Showcase & QR Code Card */}
+          <div className="mt-6 ">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              {/* Phone Mockup Image */}
+              <div className="relative shrink-0 flex items-center justify-center">
+                <img
+                  src={appShowcaseImg}
+                  alt="SmartSolar Mobile App Preview"
+                  className="h-32 sm:h-36 w-auto object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)] transition-transform hover:scale-105 duration-300"
+                />
+              </div>
+
+              {/* QR and Download Action */}
+              <div className="flex-1 flex flex-col justify-between text-center sm:text-left w-full">
+                <div className="mt-3 flex items-center justify-center sm:justify-start gap-3.5">
+                  {/* QR Code */}
+                  <div className="p-1.5 bg-white rounded-xl shadow-md shrink-0 ring-2 ring-amber-400/30">
+                    <QrCodeDisplay value={apkDownloadUrl} size={76} className="border-0 shadow-none rounded-lg" />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 items-center sm:items-start">
+                    <div>
+                      <h3 className="mt-1.5 text-sm sm:text-base font-semibold text-white">
+                        Scan to Install Android App
+                      </h3>
+                      <p className="text-xs text-slate-300">
+                        Scan with your mobile camera to download the APK directly.
+                      </p>
+                    </div>
+                    <a
+                      href={apkDownloadUrl}
+                      download="SmartSolar.apk"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-white/[0.08] to-white/[0.03] p-1 sm:p-1.5 backdrop-blur-md ring-1 ring-white/15 shadow-xl"
+                    >
+                      <Download className="h-3.5 w-3.5" /> Direct Download
+                    </a>{/*
+                    <span className="text-[10px] text-slate-400 break-all select-all font-mono">
+                      {apkDownloadUrl}
+                    </span>*/}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="relative z-10 text-sm text-slate-400">
+
+        <div className="relative z-10 text-xs text-slate-400">
           &copy; 2026 MicroGrid Systems
         </div>
       </div>
@@ -141,7 +200,7 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@microgrid.io"
+                  placeholder="Enter your email address"
                   className="w-full rounded-lg border-0 py-2.5 pl-11 pr-3.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-500"
                 />
               </div>
@@ -170,8 +229,8 @@ export default function Login() {
                     type="button"
                     onClick={() => setRole('backoffice')}
                     className={`flex items-center gap-3 rounded-lg border-0 p-3.5 text-left ring-1 ring-inset transition-all ${role === 'backoffice'
-                        ? 'bg-amber-50 ring-amber-500'
-                        : 'bg-white ring-gray-300 hover:bg-gray-50'
+                      ? 'bg-amber-50 ring-amber-500'
+                      : 'bg-white ring-gray-300 hover:bg-gray-50'
                       }`}
                   >
                     <Shield className={`h-5 w-5 ${role === 'backoffice' ? 'text-amber-600' : 'text-gray-400'}`} />
@@ -184,8 +243,8 @@ export default function Login() {
                     type="button"
                     onClick={() => setRole('grid_operator')}
                     className={`flex items-center gap-3 rounded-lg border-0 p-3.5 text-left ring-1 ring-inset transition-all ${role === 'grid_operator'
-                        ? 'bg-indigo-50 ring-indigo-500'
-                        : 'bg-white ring-gray-300 hover:bg-gray-50'
+                      ? 'bg-indigo-50 ring-indigo-500'
+                      : 'bg-white ring-gray-300 hover:bg-gray-50'
                       }`}
                   >
                     <Radio className={`h-5 w-5 ${role === 'grid_operator' ? 'text-indigo-600' : 'text-gray-400'}`} />
