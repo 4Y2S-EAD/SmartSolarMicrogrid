@@ -1,0 +1,81 @@
+name: Deploy to Local IIS
+
+on:
+  push:
+    branches:
+      - main
+      - dev-panduka
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  deploy:
+    name: Build & Deploy to Local IIS
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # ----------------------------------------------------
+      # 1. BACKEND API DEPLOYMENT
+      # ----------------------------------------------------
+      - name: Build and Publish Backend API
+        shell: powershell
+        run: |
+          Write-Host "Publishing ASP.NET Core API..." -ForegroundColor Cyan
+          dotnet publish backend/SmartSolarMicrogrid.API/SmartSolarMicrogrid.API.csproj -c Release -o "$env:GITHUB_WORKSPACE\publish-api"
+
+      - name: Deploy Backend to IIS
+        shell: powershell
+        run: |
+          $sitePath = "C:\inetpub\wwwroot\SmartSolar-API"
+          $appPoolName = "SmartSolarAPI"
+          $appCmd = "$env:SystemRoot\system32\inetsrv\appcmd.exe"
+
+          Write-Host "Stopping IIS App Pool: $appPoolName..." -ForegroundColor Yellow
+          & $appCmd stop apppool /apppool.name:"$appPoolName" *>$null
+          Start-Sleep -Seconds 2
+
+          # Ensure destination exists
+          if (!(Test-Path $sitePath)) {
+            New-Item -ItemType Directory -Path $sitePath -Force | Out-Null
+          }
+
+          Write-Host "Copying API published files to $sitePath..." -ForegroundColor Cyan
+          Copy-Item -Path "$env:GITHUB_WORKSPACE\publish-api\*" -Destination $sitePath -Recurse -Force
+
+          Write-Host "Starting IIS App Pool: $appPoolName..." -ForegroundColor Green
+          & $appCmd start apppool /apppool.name:"$appPoolName" *>$null
+
+      # ----------------------------------------------------
+      # 2. FRONTEND WEB DEPLOYMENT
+      # ----------------------------------------------------
+      - name: Install Frontend Dependencies
+        working-directory: ./web/smart-solar-web
+        shell: powershell
+        run: |
+          Write-Host "Installing NPM dependencies..." -ForegroundColor Cyan
+          npm ci
+
+      - name: Build Frontend (Vite React)
+        working-directory: ./web/smart-solar-web
+        shell: powershell
+        run: |
+          Write-Host "Building React Production bundle..." -ForegroundColor Cyan
+          npm run build
+
+      - name: Deploy Frontend to IIS
+        shell: powershell
+        run: |
+          $webPath = "C:\inetpub\wwwroot\SmartSolar-Web"
+          $distPath = "$env:GITHUB_WORKSPACE\web\smart-solar-web\dist"
+
+          # Ensure destination exists
+          if (!(Test-Path $webPath)) {
+            New-Item -ItemType Directory -Path $webPath -Force | Out-Null
+          }
+
+          Write-Host "Deploying Vite build to $webPath..." -ForegroundColor Cyan
+          Copy-Item -Path "$distPath\*" -Destination $webPath -Recurse -Force
+
+          Write-Host "Deployment to IIS finished successfully!" -ForegroundColor Green
