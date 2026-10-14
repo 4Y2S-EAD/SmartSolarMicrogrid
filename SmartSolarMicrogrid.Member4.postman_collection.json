@@ -1,0 +1,1102 @@
+{
+  "info": {
+    "_postman_id": "b4e87d19-912f-4c8d-a4e9-member4-collection",
+    "name": "Smart Solar Microgrid - Member 4 API Collection",
+    "description": "Comprehensive Postman test collection for SE4040 Member 4: Operator Management, QR Verification, Booking Views, and Operational Dashboard.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication and Authorization",
+      "item": [
+        {
+          "name": "AUTH-01: Login as Grid Operator (Success)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token and operator user info\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.expect(jsonData).to.have.property('user');",
+                  "    pm.expect(jsonData.user.role.toLowerCase()).to.eql('gridoperator');",
+                  "    // Save token to environment",
+                  "    pm.environment.set(\"authToken\", jsonData.token);",
+                  "    pm.environment.set(\"operatorToken\", jsonData.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{operatorEmail}}\",\n  \"password\": \"{{operatorPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "AUTH-02: Login as Prosumer (For Role Testing)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Extract prosumer token for unauthorized role testing\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user.role.toLowerCase()).to.eql('prosumer');",
+                  "    pm.environment.set(\"prosumerToken\", jsonData.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{prosumerEmail}}\",\n  \"password\": \"{{prosumerPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "AUTH-03: Login with Invalid Credentials (Negative)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Error message is returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nonexistent@domain.com\",\n  \"password\": \"WrongPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "AUTH-04: Operator Endpoint Without Token (Negative - 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations"]
+            }
+          }
+        },
+        {
+          "name": "AUTH-05: Operator Endpoint with Prosumer Token (Negative - 403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403 Forbidden\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{prosumerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/hub/reservations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hub", "reservations"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Operator Dashboard",
+      "item": [
+        {
+          "name": "DASH-01: Get Operator Global Dashboard & Metrics (Success)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response schema contains Items and Summary\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('items');",
+                  "    pm.expect(json).to.have.property('currentPage');",
+                  "    pm.expect(json).to.have.property('pageSize');",
+                  "    pm.expect(json).to.have.property('totalRecords');",
+                  "    pm.expect(json).to.have.property('totalPages');",
+                  "    pm.expect(json).to.have.property('summary');",
+                  "    pm.expect(json).to.have.property('statusOptions');",
+                  "});",
+                  "",
+                  "pm.test(\"Dashboard Summary Counts Math Accuracy\", function () {",
+                  "    var summary = pm.response.json().summary;",
+                  "    pm.expect(summary).to.have.property('activeCount');",
+                  "    pm.expect(summary).to.have.property('pendingCount');",
+                  "    pm.expect(summary).to.have.property('approvedCount');",
+                  "    pm.expect(summary).to.have.property('completedCount');",
+                  "    // In backend service: activeCount = pendingCount + approvedCount",
+                  "    pm.expect(summary.activeCount).to.eql(summary.pendingCount + summary.approvedCount);",
+                  "});",
+                  "",
+                  "pm.test(\"Status Options contains standard reservation statuses\", function () {",
+                  "    var opts = pm.response.json().statusOptions;",
+                  "    pm.expect(opts).to.include.members(['Pending', 'Approved', 'Completed', 'Cancelled']);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations?page=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "DASH-02: Get Hub-Scoped Dashboard for Assigned Station (Success)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"All items belong strictly to assigned hub station\", function () {",
+                  "    var json = pm.response.json();",
+                  "    if (json.items && json.items.length > 0) {",
+                  "        var firstStation = json.items[0].stationId;",
+                  "        json.items.forEach(function(item) {",
+                  "            pm.expect(item.stationId).to.eql(firstStation);",
+                  "        });",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/hub/reservations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hub", "reservations"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Current Bookings",
+      "item": [
+        {
+          "name": "BOOK-01: Get All Current Bookings with Pagination (Success)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Captures a sample bookingId if available\", function () {",
+                  "    var json = pm.response.json();",
+                  "    if (json.items && json.items.length > 0) {",
+                  "        pm.environment.set(\"bookingId\", json.items[0].reservationId);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "BOOK-02: Get Approved Bookings (Hub Scoped)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Every returned item has Status == 'Approved'\", function () {",
+                  "    var json = pm.response.json();",
+                  "    json.items.forEach(function(item) {",
+                  "        pm.expect(item.status).to.eql('Approved');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/hub/reservations/approved",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hub", "reservations", "approved"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Pending Bookings",
+      "item": [
+        {
+          "name": "PEND-01: Get Pending Bookings (Global View)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Items have Status == 'Pending' and canApprove == true\", function () {",
+                  "    var json = pm.response.json();",
+                  "    json.items.forEach(function(item) {",
+                  "        pm.expect(item.status).to.eql('Pending');",
+                  "        pm.expect(item.canApprove).to.be.true;",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations/pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations", "pending"]
+            }
+          }
+        },
+        {
+          "name": "PEND-02: Get Pending Bookings (Hub Scoped)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/hub/reservations/pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hub", "reservations", "pending"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Booking History",
+      "item": [
+        {
+          "name": "HIST-01: Get Booking History (Completed and Cancelled Only)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Items only contain Completed or Cancelled statuses\", function () {",
+                  "    var json = pm.response.json();",
+                  "    json.items.forEach(function(item) {",
+                  "        pm.expect(['Completed', 'Cancelled']).to.include(item.status);",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations", "history"]
+            }
+          }
+        },
+        {
+          "name": "HIST-02: Get Completed Bookings (Hub Scoped)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Items have status Completed\", function () {",
+                  "    var json = pm.response.json();",
+                  "    json.items.forEach(function(item) {",
+                  "        pm.expect(item.status).to.eql('Completed');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/hub/reservations/completed",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "hub", "reservations", "completed"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Booking Search and Filters",
+      "item": [
+        {
+          "name": "SRCH-01: Search by Prosumer NIC (Success)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Matching items contain searched NIC substring\", function () {",
+                  "    var json = pm.response.json();",
+                  "    json.items.forEach(function(item) {",
+                  "        pm.expect(item.prosumerNic.toLowerCase()).to.include('2012');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations/search?prosumerNic=2012",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations", "search"],
+              "query": [
+                { "key": "prosumerNic", "value": "2012" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRCH-02: Search by Booking Date (Success)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations/search?bookingDate=2026-10-09",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations", "search"],
+              "query": [
+                { "key": "bookingDate", "value": "2026-10-09" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRCH-03: Search With No Matches (Empty Items Result)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"TotalRecords is 0 and items is empty array\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.items).to.be.an('array').that.is.empty;",
+                  "    pm.expect(json.totalRecords).to.eql(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations/search?prosumerNic=NONEXISTENT999V",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations", "search"],
+              "query": [
+                { "key": "prosumerNic", "value": "NONEXISTENT999V" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "SRCH-04: Out of Range Pagination (Empty List Edge Case)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Items array is empty for out-of-range page\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.items).to.be.an('array').that.is.empty;",
+                  "    pm.expect(json.currentPage).to.eql(5000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations?page=5000&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations"],
+              "query": [
+                { "key": "page", "value": "5000" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. QR Code Verification",
+      "item": [
+        {
+          "name": "QR-01: Verify Authentic QR Code (Success - 200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"QR Verification status is VALID and code is QR_VERIFIED\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.result).to.eql('VALID');",
+                  "    pm.expect(json.code).to.eql('QR_VERIFIED');",
+                  "    pm.expect(json).to.have.property('reservation');",
+                  "    pm.expect(json.reservation).to.have.property('reservationId');",
+                  "    pm.expect(json.reservation.status).to.eql('Approved');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qrData\": \"{{validQrData}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/verify-qr",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "verify-qr"]
+            }
+          }
+        },
+        {
+          "name": "QR-02: Verify Corrupt/Invalid QR Signature (Negative - 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Result is REJECTED with INVALID_QR code\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.result).to.eql('REJECTED');",
+                  "    pm.expect(json.code).to.eql('INVALID_QR');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qrData\": \"{\\\"data\\\": {\\\"tampered\\\": true}, \\\"signature\\\": \\\"d3Jvbmc=\\\"}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/verify-qr",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "verify-qr"]
+            }
+          }
+        },
+        {
+          "name": "QR-03: Verify Missing QR Data (Negative - 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Rejection code is INVALID_QR\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.result).to.eql('REJECTED');",
+                  "    pm.expect(json.code).to.eql('INVALID_QR');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qrData\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/verify-qr",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "verify-qr"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Energy Transfer Completion",
+      "item": [
+        {
+          "name": "COMP-01: Complete Energy Transfer Without Scan (Negative - 409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409 Conflict\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test(\"Code is SCAN_REQUIRED or INVALID_STATUS\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(['SCAN_REQUIRED', 'INVALID_STATUS', 'NOT_FOUND']).to.include(json.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/{{bookingId}}/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations", "{{bookingId}}", "complete"]
+            }
+          }
+        },
+        {
+          "name": "COMP-02: Complete Non-Existent Reservation ID (Negative - 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404 Not Found\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Error code is NOT_FOUND\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.code).to.eql('NOT_FOUND');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/507f1f77bcf86cd799439011/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations", "507f1f77bcf86cd799439011", "complete"]
+            }
+          }
+        },
+        {
+          "name": "COMP-03: Complete Invalid ObjectId Format (Negative - 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Error code is INVALID_REFERENCE\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.code).to.eql('INVALID_REFERENCE');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/invalid-hex-id-123/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations", "invalid-hex-id-123", "complete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Error Handling and Validation",
+      "item": [
+        {
+          "name": "ERR-01: Invalid Reservation ID Query Format (Validation - 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request for malformed reservationId\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Validation error specifies 24 hexadecimal characters rule\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(JSON.stringify(json)).to.include('24 hexadecimal characters');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations?reservationId=not-a-valid-hex-id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations"],
+              "query": [
+                { "key": "reservationId", "value": "not-a-valid-hex-id" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERR-02: Invalid Date Format Query (Validation - 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Validation error specifies yyyy-MM-dd format\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(JSON.stringify(json)).to.include('yyyy-MM-dd');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations?bookingDate=09-10-2026",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations"],
+              "query": [
+                { "key": "bookingDate", "value": "09-10-2026" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERR-03: Invalid Status Name in Query (Validation - 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Validation error specifies valid enum statuses\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(JSON.stringify(json)).to.include('Pending, Approved, Completed or Cancelled');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/operator/reservations?status=InvalidStatus123",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "operator", "reservations"],
+              "query": [
+                { "key": "status", "value": "InvalidStatus123" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERR-04: Maps Station Route Missing Location (Validation - 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Error code is INVALID_ORIGIN\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.code).to.eql('INVALID_ORIGIN');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stationId\": \"507f1f77bcf86cd799439011\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/member4/maps/route",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "member4", "maps", "route"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
