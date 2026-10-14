@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - main
+      - development
       - dev-panduka
+      - dev-neranda
+      - dev-dinuka
+      - dev-yoshini
   workflow_dispatch: # Allows manual trigger from GitHub Actions tab
 
 jobs:
