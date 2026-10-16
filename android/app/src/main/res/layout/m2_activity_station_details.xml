@@ -59,114 +59,132 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <include layout="@layout/station_presentation_image"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="200dp" />
+                android:layout_height="200dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+                <include layout="@layout/station_presentation_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Title and Badge -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:gravity="center_vertical">
                 
-                <TextView
-                    android:id="@+id/tvDetailStationName"
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#F3F4F6"
+                    app:strokeColor="#E5E7EB"
+                    app:strokeWidth="1dp"
+                    android:layout_marginEnd="16dp">
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/station_det_log" />
+                </com.google.android.material.card.MaterialCardView>
+                
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Loading station..."
-                    android:textColor="#000000"
-                    android:textSize="24sp"
-                    android:textStyle="bold"/>
+                    android:orientation="vertical">
                     
-                <TextView
-                    android:id="@+id/tvDetailStatusBadge"
+                    <TextView
+                        android:id="@+id/tvDetailStationName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Loading..."
+                        android:textColor="#111827"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+                        
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center_vertical">
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@android:drawable/ic_menu_mylocation"
+                            app:tint="#6B7280"/>
+                        <TextView
+                            android:id="@+id/tvDetailLocation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#6B7280"
+                            android:textSize="13sp"
+                            android:layout_marginStart="4dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="#065F46"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:backgroundTint="#D1FAE5"
-                    android:background="#D1FAE5"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"/>
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#E6F4EA"
+                    app:cardElevation="0dp">
+                    
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:gravity="center_vertical">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            app:cardCornerRadius="4dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#059669"
+                            android:layout_marginEnd="6dp"/>
+                        <TextView
+                            android:id="@+id/tvDetailStatusBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="#059669"
+                            android:textSize="12sp"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- Location -->
+            <!-- Stats Cards (Capacity, Slots, Distance) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical">
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@android:drawable/ic_menu_mylocation"
-                    app:tint="#6B7280"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tvDetailLocation"
-                    android:textColor="#6B7280"
-                    android:textSize="14sp"
-                    android:layout_marginStart="8dp"/>
-            </LinearLayout>
-
-            <!-- Stats Cards (Capacity & Slots) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="20dp"
-                android:weightSum="2">
+                android:layout_marginTop="24dp"
+                android:weightSum="3">
                 
                 <!-- Capacity Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="4dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#F9FAFB"
+                    app:cardBackgroundColor="#F4FBF7"
                     app:strokeColor="#E5E7EB"
                     app:strokeWidth="1dp">
-                    
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="12dp"
-                        android:gravity="center_vertical">
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_rotate"
-                            app:tint="#059669"/>
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_marginStart="12dp">
-                            <TextView
-                                android:id="@+id/tvDetailCapacity"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=""
-                                android:textColor="#000"
-                                android:textSize="16sp"
-                                android:textStyle="bold"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Capacity"
-                                android:textColor="#6B7280"
-                                android:textSize="12sp"/>
-                        </LinearLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="12dp" android:gravity="center">
+                        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/capacity"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Capacity" android:textColor="#6B7280" android:textSize="10sp" android:layout_marginTop="4dp"/>
+                        <TextView android:id="@+id/tvDetailCapacity" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="#111827" android:textSize="14sp" android:textStyle="bold"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -175,57 +193,112 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginHorizontal="4dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#F9FAFB"
+                    app:cardBackgroundColor="#F8FAFC"
                     app:strokeColor="#E5E7EB"
                     app:strokeWidth="1dp">
-                    
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="12dp"
-                        android:gravity="center_vertical">
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_info_details"
-                            app:tint="#3B82F6"/>
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_marginStart="12dp">
-                            <TextView
-                                android:id="@+id/tvDetailSlots"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=""
-                                android:textColor="#000"
-                                android:textSize="16sp"
-                                android:textStyle="bold"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Available / total slots"
-                                android:textColor="#6B7280"
-                                android:textSize="12sp"/>
-                        </LinearLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="12dp" android:gravity="center">
+                        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/avilable_slots"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Available Slots" android:textColor="#6B7280" android:textSize="10sp" android:layout_marginTop="4dp"/>
+                        <TextView android:id="@+id/tvDetailSlots" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="#111827" android:textSize="14sp" android:textStyle="bold"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Distance Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#FFF7F0"
+                    app:strokeColor="#E5E7EB"
+                    app:strokeWidth="1dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="12dp" android:gravity="center">
+                        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/distance"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Distance" android:textColor="#6B7280" android:textSize="10sp" android:layout_marginTop="4dp"/>
+                        <TextView android:id="@+id/tvDetailDistance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="#111827" android:textSize="14sp" android:textStyle="bold"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Available Time Slots"
-                android:textColor="#000"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"/>
+                android:orientation="horizontal"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    app:tint="#059669"
+                    android:layout_marginEnd="12dp"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Available Time Slots"
+                    android:textColor="#111827"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/btnViewAllSlots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="View all"
+                    android:textColor="#059669"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginEnd="8dp"/>
+
+                <!-- Date Picker Button -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#E5E7EB"
+                    app:strokeWidth="1dp"
+                    app:cardBackgroundColor="#FFFFFF">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp"
+                        android:gravity="center_vertical">
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@android:drawable/ic_menu_my_calendar"
+                            app:tint="#4B5563"
+                            android:layout_marginEnd="8dp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Today, 05 Oct 2026"
+                            android:textColor="#4B5563"
+                            android:textSize="12sp"
+                            android:textStyle="bold"/>
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@android:drawable/arrow_down_float"
+                            app:tint="#4B5563"
+                            android:layout_marginStart="4dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
                 
             <ProgressBar
                 android:id="@+id/pbSlotsLoading"
@@ -238,7 +311,10 @@
                 android:id="@+id/rvTimeSlots"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"/>
+                android:minHeight="100dp"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:nestedScrollingEnabled="true"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -248,21 +324,54 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:cardElevation="8dp"
+        app:cardElevation="16dp"
         app:cardCornerRadius="0dp"
         android:backgroundTint="#FFFFFF">
         
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnBookStation"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="56dp"
             android:layout_margin="16dp"
-            android:text="Book This Station"
-            android:textColor="#FFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:cornerRadius="30dp"
-            android:backgroundTint="#059669"/>
+            app:cardBackgroundColor="#059669"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="0dp">
+            
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="20dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:id="@+id/btnBookStation">
+                
+                <ImageView
+                    android:id="@+id/iconBook"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:src="@android:drawable/ic_menu_today"
+                    app:tint="#FFFFFF"/>
+                    
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="Book This Station"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+                    
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:src="@android:drawable/ic_media_next"
+                    app:tint="#FFFFFF"/>
+            </RelativeLayout>
+        </com.google.android.material.card.MaterialCardView>
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

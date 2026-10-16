@@ -86,6 +86,11 @@
 
         <activity android:name=".member4.operator.OperatorReservationsActivity" android:exported="false" />
 
+        <!-- Member 2: All Stations Screen -->
+        <activity
+            android:name=".member2.activities.M2ViewAllStationsActivity"
+            android:exported="false" />
+
         <!-- Member 2: Stations Screen -->
         <activity
             android:name=".member2.activities.M2StationsActivity"
@@ -93,6 +98,9 @@
 
         <activity
             android:name=".member2.activities.M2StationDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".member2.activities.M2ViewAllSlotsActivity"
             android:exported="false" />
 
         <!-- Member 3: Energy Reservations Screen -->

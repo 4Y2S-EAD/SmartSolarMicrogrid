@@ -26,7 +26,7 @@ class M2StationDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.m2_activity_station_details)
         findViewById<ImageView>(R.id.btnBackDetails).setOnClickListener { finish() }
-        val book = findViewById<Button>(R.id.btnBookStation)
+        val book = findViewById<View>(R.id.btnBookStation)
         book.isEnabled = false
         val role = com.smartsolar.microgrid.network.TokenManager.getRole()
         if (role == "GridOperator") {
@@ -40,8 +40,13 @@ class M2StationDetailsActivity : AppCompatActivity() {
 
         val slots = findViewById<RecyclerView>(R.id.rvTimeSlots)
         val adapter = M2TimeSlotsAdapter(emptyList()) { selectedSlot = it }
-        slots.layoutManager = GridLayoutManager(this, 2)
         slots.adapter = adapter
+        
+        findViewById<View>(R.id.btnViewAllSlots)?.setOnClickListener {
+            startActivity(Intent(this, M2ViewAllSlotsActivity::class.java).apply {
+                putExtra(M3CreateReservationActivity.EXTRA_STATION_ID, stationId)
+            })
+        }
         val loading = findViewById<ProgressBar>(R.id.pbSlotsLoading)
         loading.visibility = View.VISIBLE
 
@@ -62,10 +67,14 @@ class M2StationDetailsActivity : AppCompatActivity() {
                 findViewById<TextView>(R.id.tvDetailCapacity).text = "${station.capacityKwh} kWh"
                 findViewById<TextView>(R.id.tvDetailSlots).text = "${station.availableSlotCount} / ${station.batterySlotCount}"
                 val location = station.location
-                findViewById<TextView>(R.id.tvDetailLocation).text =
-                    if (location?.latitude != null && location.longitude != null) {
-                        "${location.latitude}, ${location.longitude}"
-                    } else "Location unavailable"
+                if (location?.latitude != null && location.longitude != null) {
+                    findViewById<TextView>(R.id.tvDetailLocation).text = "${location.latitude}, ${location.longitude}"
+                    val distance = calculateDistance(6.9271, 79.8612, location.latitude, location.longitude)
+                    findViewById<TextView>(R.id.tvDetailDistance).text = String.format("%.1f km", distance)
+                } else {
+                    findViewById<TextView>(R.id.tvDetailLocation).text = "Location unavailable"
+                    findViewById<TextView>(R.id.tvDetailDistance).text = "--"
+                }
                 book.isEnabled = true
                 book.setOnClickListener {
                     // Reuse the existing form and submission flow with real API identifiers.
@@ -85,5 +94,16 @@ class M2StationDetailsActivity : AppCompatActivity() {
                 loading.visibility = View.GONE
             }
         }
+    }
+
+    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val r = 6371.0 // Earth's radius in kilometers
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        return r * c
     }
 }

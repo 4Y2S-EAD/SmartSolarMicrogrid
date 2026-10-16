@@ -25,7 +25,6 @@ class M2TimeSlotsAdapter(
         val cardTimeSlot: MaterialCardView = view.findViewById(R.id.cardTimeSlot)
         val tvTimeRange: TextView = view.findViewById(R.id.tvTimeRange)
         val tvSlotStatus: TextView = view.findViewById(R.id.tvSlotStatus)
-        val ivSlotIcon: ImageView = view.findViewById(R.id.ivSlotIcon)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SlotViewHolder {
@@ -37,8 +36,8 @@ class M2TimeSlotsAdapter(
     override fun onBindViewHolder(holder: SlotViewHolder, position: Int) {
         val slot = slots[position]
 
-        // Format ISO times to HH:mm
-        holder.tvTimeRange.text = "${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}"
+        // Format ISO times to HH:mm and put on two lines
+        holder.tvTimeRange.text = "${formatTime(slot.startTime)}\n- ${formatTime(slot.endTime)}"
 
         val isSelected = position == selectedPosition
         
@@ -47,16 +46,16 @@ class M2TimeSlotsAdapter(
             
             if (isSelected) {
                 // Selected state
-                holder.cardTimeSlot.setCardBackgroundColor(Color.parseColor("#059669")) // Dark green
-                holder.tvTimeRange.setTextColor(Color.WHITE)
-                holder.tvSlotStatus.setTextColor(Color.WHITE)
-                holder.ivSlotIcon.setColorFilter(Color.WHITE)
+                holder.cardTimeSlot.setCardBackgroundColor(Color.parseColor("#E6F4EA")) // Light green background
+                holder.cardTimeSlot.strokeColor = Color.parseColor("#059669") // Green border
+                holder.tvTimeRange.setTextColor(Color.parseColor("#111827"))
+                holder.tvSlotStatus.setTextColor(Color.parseColor("#059669"))
             } else {
                 // Default Available state
-                holder.cardTimeSlot.setCardBackgroundColor(Color.parseColor("#D1FAE5")) // Light green
-                holder.tvTimeRange.setTextColor(Color.BLACK)
-                holder.tvSlotStatus.setTextColor(Color.parseColor("#065F46"))
-                holder.ivSlotIcon.setColorFilter(Color.parseColor("#059669"))
+                holder.cardTimeSlot.setCardBackgroundColor(Color.parseColor("#F9FAFB")) // Very light grey background
+                holder.cardTimeSlot.strokeColor = Color.parseColor("#E5E7EB") // Light grey border
+                holder.tvTimeRange.setTextColor(Color.parseColor("#111827"))
+                holder.tvSlotStatus.setTextColor(Color.parseColor("#059669"))
             }
 
             holder.itemView.setOnClickListener {
@@ -69,11 +68,11 @@ class M2TimeSlotsAdapter(
             }
         } else {
             // Booked/Unavailable state
-            holder.tvSlotStatus.text = slot.status
-            holder.cardTimeSlot.setCardBackgroundColor(Color.parseColor("#FEE2E2")) // Light red
-            holder.tvTimeRange.setTextColor(Color.parseColor("#991B1B"))
-            holder.tvSlotStatus.setTextColor(Color.parseColor("#991B1B"))
-            holder.ivSlotIcon.setColorFilter(Color.parseColor("#EF4444"))
+            holder.tvSlotStatus.text = "Booked" // Ensure it says Booked as per screenshot
+            holder.cardTimeSlot.setCardBackgroundColor(Color.parseColor("#F3F4F6")) // Light grey
+            holder.cardTimeSlot.strokeColor = Color.parseColor("#E5E7EB") // Light grey border
+            holder.tvTimeRange.setTextColor(Color.parseColor("#9CA3AF")) // Grey text
+            holder.tvSlotStatus.setTextColor(Color.parseColor("#9CA3AF")) // Grey text
             
             holder.itemView.setOnClickListener(null) // Disable click
         }

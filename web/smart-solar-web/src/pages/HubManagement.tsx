@@ -39,9 +39,11 @@ export default function HubManagement() {
   const [editHub, setEditHub] = useState<Hub | null>(null);
   const [viewHub, setViewHub] = useState<Hub | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Hub | null>(null);
+  const [confirmStatusChange, setConfirmStatusChange] = useState<Hub | null>(null);
   const [form, setForm] = useState<HubForm>(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('All');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -70,9 +72,11 @@ export default function HubManagement() {
   useEffect(() => { load(); }, [load]);
 
   //3 removed filtered and openEdit functions 9/22
-  const filtered = hubs.filter(
-    (h) => h.stationName?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = hubs.filter((h) => {
+    const matchesSearch = h.stationName?.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || (h.status || 'Active').toLowerCase() === statusFilter.toLowerCase();
+    return matchesSearch && matchesStatus;
+  });
 
   const hasActiveReservations = (hubId: string) =>
     reservations.some((r) => r.hub_id === hubId && r.status !== 'cancelled' && r.status !== 'completed');
@@ -133,19 +137,24 @@ export default function HubManagement() {
   };
 
   // 2 Deactivate (toggleStatus and handleDelete) Functions changed 22/9
-  const toggleStatus = async (h: Hub) => {
+  const toggleStatus = (h: Hub) => {
     if (h.status === 'Active' && hasActiveReservations(h.stationId)) {
       setConfirmDelete(h);
       return;
     }
+    setConfirmStatusChange(h);
+  };
 
+  const handleConfirmStatusChange = async () => {
+    if (!confirmStatusChange) return;
     try {
-      if (h.status === 'Active') {
-        await ApiService.deactivateHub(h.stationId);
+      if (confirmStatusChange.status === 'Active') {
+        await ApiService.deactivateHub(confirmStatusChange.stationId);
       } else {
-        await ApiService.updateHub(h.stationId, { status: 'Active' });
+        await ApiService.updateHub(confirmStatusChange.stationId, { status: 'Active' });
       }
     } catch (e) { }
+    setConfirmStatusChange(null);
     load();
   };
 
@@ -162,14 +171,25 @@ export default function HubManagement() {
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <input
-            placeholder="Search hubs..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border-0 py-2.5 pl-10 pr-3.5 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-500"
-          />
+        <div className="flex flex-1 items-center gap-4">
+          <div className="relative w-full max-w-sm">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              placeholder="Search hubs..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-lg border-0 py-2.5 pl-10 pr-3.5 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-500"
+            />
+          </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="rounded-lg border-0 py-2.5 pl-3 pr-8 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-amber-500"
+          >
+            <option value="All">All Statuses</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Deactivated</option>
+          </select>
         </div>
         <Button onClick={openAdd}>
           <Plus className="h-4 w-4" />
@@ -330,6 +350,35 @@ export default function HubManagement() {
           <p className="text-sm text-gray-600">
             Hub <strong>{confirmDelete?.stationName}</strong> has active reservations.
             Deactivation is blocked until all pending or confirmed reservations are cancelled or completed.
+          </p>
+        </div>
+      </Modal>
+
+      {/* Confirm Status Change Modal */}
+      <Modal
+        open={!!confirmStatusChange}
+        onClose={() => setConfirmStatusChange(null)}
+        title={confirmStatusChange?.status === 'Active' ? 'Deactivate Hub' : 'Activate Hub'}
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setConfirmStatusChange(null)}>Cancel</Button>
+            <Button 
+              variant={confirmStatusChange?.status === 'Active' ? 'danger' : 'primary'} 
+              onClick={handleConfirmStatusChange}
+            >
+              Yes, {confirmStatusChange?.status === 'Active' ? 'Deactivate' : 'Activate'}
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center text-center">
+          <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ${confirmStatusChange?.status === 'Active' ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'}`}>
+            <AlertTriangle className="h-7 w-7" />
+          </div>
+          <p className="text-sm text-gray-600">
+            Are you sure you want to {confirmStatusChange?.status === 'Active' ? 'deactivate' : 'activate'} <strong>{confirmStatusChange?.stationName}</strong>? 
+            {confirmStatusChange?.status === 'Active' && ' This will prevent any new reservations.'}
           </p>
         </div>
       </Modal>

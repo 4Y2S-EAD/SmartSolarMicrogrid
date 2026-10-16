@@ -81,9 +81,15 @@
         app:cornerRadius="16dp" app:icon="@drawable/m4_ic_drive_navigation"
         app:iconGravity="textStart" app:iconTint="@color/white" />
 
-    <TextView android:id="@+id/m4ResultTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp" android:paddingTop="12dp" android:paddingBottom="4dp"
-        android:text="@string/m4_stations" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/gray_900" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:paddingHorizontal="16dp" android:paddingTop="12dp" android:paddingBottom="4dp">
+        <TextView android:id="@+id/m4ResultTitle" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+            android:text="@string/m4_stations" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/gray_900" />
+        <TextView android:id="@+id/m4ViewAllStations" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="View all stations" android:textColor="@color/emerald_600" android:textStyle="bold"
+            android:background="?attr/selectableItemBackground" android:clickable="true" android:padding="4dp" />
+    </LinearLayout>
     <ProgressBar android:id="@+id/m4Loading" style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" />
     <TextView android:id="@+id/m4DataMessage" android:layout_width="match_parent" android:layout_height="wrap_content"

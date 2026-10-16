@@ -1,4 +1,8 @@
 function resolveApiBaseUrl(): string {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
   if (typeof window !== 'undefined' && window.location) {
     const hostname = window.location.hostname;
     // When accessing via localhost or loopback, route directly to localhost API port 5174
@@ -11,7 +15,7 @@ function resolveApiBaseUrl(): string {
     }
   }
 
-  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:5174/api';
+  return 'http://localhost:5174/api';
 }
 
 export const API_BASE_URL = resolveApiBaseUrl();
