@@ -1,3 +1,8 @@
+//==================================================================
+//File: StationsController.cs
+//Description: handles all the station related operations
+//Author: Member 02
+//==================================================================
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using SmartSolarMicrogrid.API.DTOs.member2;
@@ -21,7 +26,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
             _mongoDbService = mongoDbService;
         }
 
-        // 1. CREATE A NEW MICROGRID NODE
+        //CREATE A NEW MICROGRID NODE
         [HttpPost]
         public async Task<IActionResult> CreateStation([FromBody] CreateStationDto dto)
         {
@@ -47,7 +52,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
             return Ok(new { Message = "Microgrid node created successfully", StationId = station.StationId });
         }
 
-        // 2. GET ALL MICROGRID NODES
+        // GET ALL MICROGRID NODES
         [HttpGet]
         public async Task<IActionResult> GetAllStations()
         {
@@ -58,7 +63,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
             return Ok(stations);
         }
 
-                // 3. GET SINGLE STATION BY ID
+        // GET SINGLE STATION BY ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetStationById(string id)
         {
@@ -73,7 +78,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
             return Ok(station);
         }
 
-        // 4. UPDATE A STATION
+        // UPDATE A STATION
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStation(string id, [FromBody] UpdateStationDto dto)
         {
@@ -106,7 +111,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
             return Ok(new { Message = "Station updated successfully" });
         }
 
-        // 5. DEACTIVATE STATION (IMPORTANT RULE HERE)
+        // DEACTIVATE STATION (IMPORTANT RULE HERE)
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeactivateStation(string id)
         {
@@ -140,7 +145,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
 
         //battery slot management part 
 
-                // 6. CREATE A NEW BATTERY SLOT FOR A STATION
+                //  CREATE A NEW BATTERY SLOT FOR A STATION
         [HttpPost("{id}/slots")]
         public async Task<IActionResult> CreateSlot(string id, [FromBody] CreateSlotDto dto)
         {
@@ -169,7 +174,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
         }
 
 
-        // 7. GET ALL SLOTS FOR A SPECIFIC STATION
+        // GET ALL SLOTS FOR A SPECIFIC STATION
         [HttpGet("{id}/slots")]
         public async Task<IActionResult> GetSlotsForStation(string id)
         {
@@ -205,7 +210,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
             return Ok(new { Message = "Slot updated successfully" });
         }
 
-        // 9. DELETE A BATTERY SLOT
+        // DELETE A BATTERY SLOT
         [HttpDelete("slots/{slotId}")]
         public async Task<IActionResult> DeleteSlot(string slotId)
         {
