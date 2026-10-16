@@ -15,29 +15,28 @@ import {
 import './operator.css';
 
 const TABS = [
-  { key: 'all',       label: 'All Reservations', Icon: List },
-  { key: 'pending',   label: 'Pending',          Icon: Clock3 },
-  { key: 'approved',  label: 'Approved',         Icon: CalendarDays },
-  { key: 'completed', label: 'Completed',        Icon: CheckCircle2 },
-  { key: 'history',   label: 'Booking History',  Icon: History },
-  { key: 'search',    label: 'Search & Filter',  Icon: SlidersHorizontal },
+  { key: 'all', label: 'All Reservations', Icon: List },
+  { key: 'pending', label: 'Pending', Icon: Clock3 },
+  { key: 'approved', label: 'Approved', Icon: CalendarDays },
+  { key: 'completed', label: 'Completed', Icon: CheckCircle2 },
+  { key: 'history', label: 'Booking History', Icon: History },
+  { key: 'search', label: 'Search & Filter', Icon: SlidersHorizontal },
 ] as const;
 type TabKey = (typeof TABS)[number]['key'];
 
 const EMPTY: HubReservationFilters = { reservationId: '', prosumerNic: '', station: '', bookingDate: '', status: '' };
 
 const STATUS_CFG: Record<string, { dot: string; bg: string; text: string }> = {
-  Pending:   { dot: 'bg-amber-400',   bg: 'bg-amber-50',   text: 'text-amber-700'   },
-  Approved:  { dot: 'bg-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  Completed: { dot: 'bg-indigo-400',  bg: 'bg-indigo-50',  text: 'text-indigo-700'  },
-  Cancelled: { dot: 'bg-rose-400',    bg: 'bg-rose-50',    text: 'text-rose-700'    },
+  Pending: { dot: 'bg-amber-400', bg: 'bg-amber-50', text: 'text-amber-700' },
+  Approved: { dot: 'bg-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-700' },
+  Completed: { dot: 'bg-indigo-400', bg: 'bg-indigo-50', text: 'text-indigo-700' },
+  Cancelled: { dot: 'bg-rose-400', bg: 'bg-rose-50', text: 'text-rose-700' },
 };
 
 function StatusPill({ status }: { status: string }) {
-  const c = STATUS_CFG[status] ?? { dot: 'bg-gray-400', bg: 'bg-gray-100', text: 'text-gray-600' };
+  const c = STATUS_CFG[status] ?? { bg: 'bg-gray-100', text: 'text-gray-600' };
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${c.bg} ${c.text}`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />
+    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${c.bg} ${c.text}`}>
       {status}
     </span>
   );
@@ -124,13 +123,13 @@ function ExpandedRow({ row, onClose, onApprove, approving }: {
 export default function OperatorReservations() {
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [filters, setFilters] = useState<HubReservationFilters>(EMPTY);
-  const [draft, setDraft]       = useState<HubReservationFilters>(EMPTY);
-  const [page, setPage]         = useState(1);
+  const [draft, setDraft] = useState<HubReservationFilters>(EMPTY);
+  const [page, setPage] = useState(1);
   const [revision, setRevision] = useState(0);
-  const [data, setData]         = useState<HubReservationPage | null>(null);
+  const [data, setData] = useState<HubReservationPage | null>(null);
   const [statusOptions, setStatusOptions] = useState<string[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [feedback, setFeedback] = useState('');
   const [feedbackOk, setFeedbackOk] = useState(true);
   const [approving, setApproving] = useState<string | null>(null);
@@ -165,10 +164,10 @@ export default function OperatorReservations() {
   function toggleExpand(id: string) { setExpandedId(prev => prev === id ? null : id); }
 
   const metrics = [
-    { label: 'Active Bookings',  value: data?.summary.activeCount,    Icon: CalendarDays, iconBg: 'bg-orange-50',   iconColor: 'text-orange-500'   },
-    { label: 'Pending',          value: data?.summary.pendingCount,   Icon: Clock3,       iconBg: 'bg-blue-50',     iconColor: 'text-blue-500'     },
-    { label: 'Approved',         value: data?.summary.approvedCount,  Icon: CalendarCheck2, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500' },
-    { label: 'Completed',        value: data?.summary.completedCount, Icon: CheckCircle2, iconBg: 'bg-teal-50',  iconColor: 'text-teal-500'  },
+    { label: 'Active Bookings', value: data?.summary.activeCount, Icon: CalendarDays, iconBg: 'bg-orange-50', iconColor: 'text-orange-500' },
+    { label: 'Pending', value: data?.summary.pendingCount, Icon: Clock3, iconBg: 'bg-blue-50', iconColor: 'text-blue-500' },
+    { label: 'Approved', value: data?.summary.approvedCount, Icon: CalendarCheck2, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500' },
+    { label: 'Completed', value: data?.summary.completedCount, Icon: CheckCircle2, iconBg: 'bg-teal-50', iconColor: 'text-teal-500' },
   ];
 
   return (
@@ -199,11 +198,10 @@ export default function OperatorReservations() {
         <div className="flex overflow-x-auto gap-2 p-4 border-b border-gray-100 bg-gray-50/50">
           {TABS.map(({ key, label, Icon }) => (
             <button key={key} onClick={() => switchTab(key as TabKey)}
-              className={`relative flex shrink-0 items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-lg focus:outline-none border ${
-                activeTab === key 
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' 
+              className={`relative flex shrink-0 items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-lg focus:outline-none border ${activeTab === key
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
                   : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
-              }`}>
+                }`}>
               <Icon className="h-4 w-4" />
               {label}
             </button>
