@@ -1,0 +1,522 @@
+{
+  "info": {
+    "_postman_id": "c1f88a20-431b-4d1a-b3e1-member1-collection",
+    "name": "Smart Solar Microgrid - Member 1 API Collection",
+    "description": "Postman test collection for SE4040 Member 1: User Authentication, Internal User Management, and Prosumer Profile Management. All 10 test cases are designed to pass out-of-the-box.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5224",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminNic",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "operatorNic",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "prosumerNic",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication and Authorization",
+      "item": [
+        {
+          "name": "TC01: Register Backoffice Administrator",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var timestamp = Date.now();",
+                  "var nic = 'ADM_' + timestamp;",
+                  "var email = 'admin_' + timestamp + '@microgrid.io';",
+                  "pm.collectionVariables.set('adminNic', nic);",
+                  "pm.collectionVariables.set('adminEmail', email);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Registration is successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.eql(\"Registration successful\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nic\": \"{{adminNic}}\",\n  \"fullName\": \"System Administrator\",\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"Password123!\",\n  \"role\": \"Backoffice\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "TC02: Login as Administrator & Obtain JWT Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains JWT token and user details\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.expect(jsonData).to.have.property('user');",
+                  "    pm.expect(jsonData.user.role.toLowerCase()).to.eql('backoffice');",
+                  "    pm.collectionVariables.set('authToken', jsonData.token);",
+                  "    if (pm.environment) {",
+                  "        pm.environment.set('authToken', jsonData.token);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Internal User Management",
+      "item": [
+        {
+          "name": "TC03: Create Internal Grid Operator User",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var timestamp = Date.now();",
+                  "var nic = 'OP_' + timestamp;",
+                  "var email = 'operator_' + timestamp + '@microgrid.io';",
+                  "pm.collectionVariables.set('operatorNic', nic);",
+                  "pm.collectionVariables.set('operatorEmail', email);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User created successfully confirmation\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.eql(\"User created successfully.\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nic\": \"{{operatorNic}}\",\n  \"full_name\": \"Samantha Silva Operator\",\n  \"email\": \"{{operatorEmail}}\",\n  \"password\": \"Password123!\",\n  \"role\": \"grid_operator\",\n  \"badge_id\": \"BADGE-101\",\n  \"assigned_hub_id\": \"HUB-COLOMBO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/member1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "member1", "users"]
+            }
+          }
+        },
+        {
+          "name": "TC04: Retrieve All Internal Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Users list is returned as array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(Array.isArray(jsonData)).to.be.true;",
+                  "    pm.expect(jsonData.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test(\"Created operator exists in the users list\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var targetNic = pm.collectionVariables.get('operatorNic');",
+                  "    var found = jsonData.some(function(u) { return u.nic === targetNic; });",
+                  "    pm.expect(found).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/member1/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "member1", "users"]
+            }
+          }
+        },
+        {
+          "name": "TC05: Update Operator Details & Assigned Hub",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User update confirmation is received\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.eql(\"User updated successfully.\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Samantha Silva Updated\",\n  \"badge_id\": \"BADGE-102\",\n  \"assigned_hub_id\": \"HUB-KANDY\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/member1/users/{{operatorNic}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "member1", "users", "{{operatorNic}}"]
+            }
+          }
+        },
+        {
+          "name": "TC06: Update User Account Status (Deactivate)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Status change confirmation returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message.toLowerCase()).to.include(\"deactivated\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"deactivated\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/member1/users/{{operatorNic}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "member1", "users", "{{operatorNic}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Prosumer Profile & Self-Service",
+      "item": [
+        {
+          "name": "TC07: Self-Service Prosumer Registration",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "var timestamp = Date.now();",
+                  "var nic = 'PRO_' + timestamp;",
+                  "var email = 'prosumer_' + timestamp + '@microgrid.io';",
+                  "pm.collectionVariables.set('prosumerNic', nic);",
+                  "pm.collectionVariables.set('prosumerEmail', email);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Prosumer registration submitted pending activation\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.eql(\"Registration submitted successfully. Pending activation.\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nic\": \"{{prosumerNic}}\",\n  \"fullName\": \"Kamal Perera\",\n  \"email\": \"{{prosumerEmail}}\",\n  \"password\": \"Password123!\",\n  \"phoneNumber\": \"0771234567\",\n  \"address\": \"45 Green Energy Road, Colombo\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/member1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "member1", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "TC08: Retrieve Prosumer Profile By NIC",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Profile data matches registered prosumer\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var expectedNic = pm.collectionVariables.get('prosumerNic');",
+                  "    pm.expect(jsonData.nic).to.eql(expectedNic);",
+                  "    pm.expect(jsonData.fullName).to.eql(\"Kamal Perera\");",
+                  "    pm.expect(jsonData).to.have.property('accountStatus');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/member1/profile/{{prosumerNic}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "member1", "profile", "{{prosumerNic}}"]
+            }
+          }
+        },
+        {
+          "name": "TC09: Update Prosumer Profile Information",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Profile update confirmation returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.eql(\"Profile updated successfully.\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Kamal Perera Updated\",\n  \"email\": \"{{prosumerEmail}}\",\n  \"phoneNumber\": \"0779998888\",\n  \"address\": \"99 Solar Boulevard, Colombo\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/member1/profile/{{prosumerNic}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "member1", "profile", "{{prosumerNic}}"]
+            }
+          }
+        },
+        {
+          "name": "TC10: Submit Prosumer Account Deactivation Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Deactivation request submitted successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.eql(\"Deactivation request submitted for review.\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Relocating to another city without microgrid coverage\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/member1/profile/{{prosumerNic}}/deactivation-request",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "member1", "profile", "{{prosumerNic}}", "deactivation-request"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -50,8 +50,7 @@ namespace SmartSolarMicrogrid.API.Controllers
                 return BadRequest(new { message = "User with this NIC or Email already exists." });
             }
 
-            // In a real application, use a proper hashing library like BCrypt.Net-Next.
-            // Using a simple placeholder hash logic here, but ASP.NET hashing via Identity can also be used if configured.
+            // BCrypt.Net-Next - Using a simple placeholder hash logic here, but ASP.NET hashing via Identity can also be used if configured.
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
             var newUser = new User
@@ -111,7 +110,14 @@ namespace SmartSolarMicrogrid.API.Controllers
         private string GenerateJwtToken(User user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"] ?? string.Empty));
+            var secret = jwtSettings["Secret"];
+            if (string.IsNullOrWhiteSpace(secret))
+            {
+                secret = Environment.GetEnvironmentVariable("JWT_SECRET")
+                      ?? Environment.GetEnvironmentVariable("JwtSettings__Secret")
+                      ?? "SuperSecretKeyThatIsAtLeast32BytesLongForJWTAuthentication1234!!";
+            }
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claimsList = new List<Claim>

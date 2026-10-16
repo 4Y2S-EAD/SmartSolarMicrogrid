@@ -8,12 +8,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Member 4: load only the optional route credential; preserve existing environment/user-secret overrides.
 var routesEnvPath = Path.Combine(builder.Environment.ContentRootPath, ".env");
-if (string.IsNullOrWhiteSpace(builder.Configuration["GoogleRoutes:ApiKey"]) && File.Exists(routesEnvPath))
+if (File.Exists(routesEnvPath))
 {
-    var routesKey = DotNetEnv.Env.NoEnvVars().Load(routesEnvPath)
-        .LastOrDefault(entry => entry.Key == "GoogleRoutes__ApiKey").Value;
-    if (!string.IsNullOrWhiteSpace(routesKey))
-        builder.Configuration["GoogleRoutes:ApiKey"] = routesKey;
+    var envEntries = DotNetEnv.Env.NoEnvVars().Load(routesEnvPath);
+    if (string.IsNullOrWhiteSpace(builder.Configuration["GoogleRoutes:ApiKey"]))
+    {
+        var routesKey = envEntries.LastOrDefault(entry => entry.Key == "GoogleRoutes__ApiKey").Value;
+        if (!string.IsNullOrWhiteSpace(routesKey))
+            builder.Configuration["GoogleRoutes:ApiKey"] = routesKey;
+    }
+
+    var envJwtSecret = envEntries.LastOrDefault(entry => entry.Key == "JWT_SECRET" || entry.Key == "JwtSettings__Secret").Value;
+    if (!string.IsNullOrWhiteSpace(envJwtSecret))
+    {
+        builder.Configuration["JwtSettings:Secret"] = envJwtSecret;
+    }
 }
 
 // Add services to the container.
@@ -51,6 +60,14 @@ builder.Services.AddCors(options =>
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["Secret"];
+if (string.IsNullOrWhiteSpace(secretKey))
+{
+    // Backwards-compatible fallback: check system env var, then default dev fallback key
+    secretKey = Environment.GetEnvironmentVariable("JWT_SECRET")
+             ?? Environment.GetEnvironmentVariable("JwtSettings__Secret")
+             ?? "SuperSecretKeyThatIsAtLeast32BytesLongForJWTAuthentication1234!!";
+    builder.Configuration["JwtSettings:Secret"] = secretKey;
+}
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
