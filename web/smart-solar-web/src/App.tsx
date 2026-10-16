@@ -109,7 +109,7 @@ function App() {
   };
 
   const operatorPages: Record<string, React.ReactNode> = {
-    dashboard: <OperatorDashboard />,
+    dashboard: <OperatorDashboard onNavigate={setView} />,
     reservations: <OperatorReservations />,
     'qr-flow': <QrFlow />,
   };
