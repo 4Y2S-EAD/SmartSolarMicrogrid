@@ -45,6 +45,9 @@ jobs:
 
           Write-Host "Copying API published files to $sitePath..." -ForegroundColor Cyan
           Copy-Item -Path "$env:GITHUB_WORKSPACE\publish-api\*" -Destination $sitePath -Recurse -Force
+          if (Test-Path "$env:GITHUB_WORKSPACE\backend\SmartSolarMicrogrid.API\.env") {
+            Copy-Item -Path "$env:GITHUB_WORKSPACE\backend\SmartSolarMicrogrid.API\.env" -Destination "$sitePath\.env" -Force
+          }
 
           # Bring app back online
           if (Test-Path $appOffline) {
