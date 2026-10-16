@@ -22,27 +22,45 @@ public sealed class HubOperatorReservationsController(
 {
     [HttpGet]
     public Task<IActionResult> All([FromQuery] OperatorReservationQuery filters, CancellationToken ct)
-        => Read("all", filters, ct);
+    {
+        // Retrieve all hub-scoped reservations for the authenticated operator.
+        return Read("all", filters, ct);
+    }
 
     [HttpGet("pending")]
     public Task<IActionResult> Pending([FromQuery] OperatorReservationQuery filters, CancellationToken ct)
-        => Read("pending", filters, ct);
+    {
+        // Retrieve pending reservations that require review for this operator's hub.
+        return Read("pending", filters, ct);
+    }
 
     [HttpGet("approved")]
     public Task<IActionResult> Approved([FromQuery] OperatorReservationQuery filters, CancellationToken ct)
-        => Read("approved", filters, ct);
+    {
+        // Retrieve approved reservations ready for prosumer arrival and service.
+        return Read("approved", filters, ct);
+    }
 
     [HttpGet("completed")]
     public Task<IActionResult> Completed([FromQuery] OperatorReservationQuery filters, CancellationToken ct)
-        => Read("completed", filters, ct);
+    {
+        // Retrieve all completed energy transfer sessions for this hub.
+        return Read("completed", filters, ct);
+    }
 
     [HttpGet("history")]
     public Task<IActionResult> History([FromQuery] OperatorReservationQuery filters, CancellationToken ct)
-        => Read("history", filters, ct);
+    {
+        // Retrieve historical reservations including completed and cancelled records.
+        return Read("history", filters, ct);
+    }
 
     [HttpGet("search")]
     public Task<IActionResult> Search([FromQuery] OperatorReservationQuery filters, CancellationToken ct)
-        => Read("search", filters, ct);
+    {
+        // Search and filter hub-scoped reservations using specific criteria.
+        return Read("search", filters, ct);
+    }
 
     private async Task<IActionResult> Read(string view, OperatorReservationQuery filters, CancellationToken ct)
     {
