@@ -199,8 +199,8 @@ export default function OperatorReservations() {
           {TABS.map(({ key, label, Icon }) => (
             <button key={key} onClick={() => switchTab(key as TabKey)}
               className={`relative flex shrink-0 items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-lg focus:outline-none border ${activeTab === key
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
                 }`}>
               <Icon className="h-4 w-4" />
               {label}
