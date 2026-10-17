@@ -1,0 +1,577 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-4a1b-9c2d-member1-collection",
+    "name": "Smart Solar Microgrid - Member 1 API Collection",
+    "description": "10 Automated End-to-End Test Cases for SE4040 Member 1: User, Auth & Prosumer Profile Management (ProsumerAuthController, ProsumerProfileController, and UserManagementController). All test cases are designed to pass 100% reliably in sequential execution.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "m1ProsumerNic",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "m1ProsumerEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "m1AuthToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "m1OperatorNic",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "m1OperatorEmail",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "M1-TC-01: POST Register New Prosumer (200 OK)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "var randomId = Math.floor(1000000 + Math.random() * 9000000);",
+              "var prosumerNic = \"99\" + randomId + \"V\";",
+              "var prosumerEmail = \"prosumer_\" + randomId + \"@smartsolar.io\";",
+              "pm.collectionVariables.set(\"m1ProsumerNic\", prosumerNic);",
+              "pm.collectionVariables.set(\"m1ProsumerEmail\", prosumerEmail);",
+              "if (pm.environment) {",
+              "    pm.environment.set(\"m1ProsumerNic\", prosumerNic);",
+              "    pm.environment.set(\"m1ProsumerEmail\", prosumerEmail);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Registration response message confirms pending activation\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"message\");",
+              "    pm.expect(jsonData.message).to.include(\"Registration submitted successfully\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nic\": \"{{m1ProsumerNic}}\",\n  \"fullName\": \"Chaminda Vaas\",\n  \"email\": \"{{m1ProsumerEmail}}\",\n  \"password\": \"Password123!\",\n  \"phoneNumber\": \"0771234567\",\n  \"address\": \"No. 12, Highlevel Road, Colombo\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/member1/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "member1",
+            "auth",
+            "register"
+          ]
+        },
+        "description": "TC-01: Registers a new prosumer with dynamically generated NIC and email to guarantee unique, collision-free testing."
+      }
+    },
+    {
+      "name": "M1-TC-02: POST Login as Registered Prosumer (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Login response returns JWT token and user details\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"token\");",
+              "    pm.expect(jsonData.token).to.be.a(\"string\");",
+              "    pm.expect(jsonData).to.have.property(\"user\");",
+              "    pm.expect(jsonData.user.nic).to.eql(pm.collectionVariables.get(\"m1ProsumerNic\"));",
+              "    pm.collectionVariables.set(\"m1AuthToken\", jsonData.token);",
+              "    if (pm.environment) {",
+              "        pm.environment.set(\"m1AuthToken\", jsonData.token);",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nic\": \"{{m1ProsumerNic}}\",\n  \"password\": \"Password123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/member1/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "member1",
+            "auth",
+            "login"
+          ]
+        },
+        "description": "TC-02: Authenticates the registered prosumer and captures the signed JWT token."
+      }
+    },
+    {
+      "name": "M1-TC-03: POST Login with Invalid Credentials (401 Unauthorized)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 401 Unauthorized\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test(\"Error response indicates invalid credentials\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"message\");",
+              "    pm.expect(jsonData.message).to.eql(\"Invalid credentials.\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nic\": \"{{m1ProsumerNic}}\",\n  \"password\": \"WrongPassword999!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/member1/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "member1",
+            "auth",
+            "login"
+          ]
+        },
+        "description": "TC-03: Negative authentication test verifying that incorrect passwords result in HTTP 401 Unauthorized."
+      }
+    },
+    {
+      "name": "M1-TC-04: GET Prosumer Profile by Valid NIC (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Profile matches registration data\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.nic).to.eql(pm.collectionVariables.get(\"m1ProsumerNic\"));",
+              "    pm.expect(jsonData.fullName).to.eql(\"Chaminda Vaas\");",
+              "    pm.expect(jsonData.phoneNumber).to.eql(\"0771234567\");",
+              "    pm.expect(jsonData.role).to.eql(\"Prosumer\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/member1/profile/{{m1ProsumerNic}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "member1",
+            "profile",
+            "{{m1ProsumerNic}}"
+          ]
+        },
+        "description": "TC-04: Retrieves the registered prosumer profile and asserts profile fields match."
+      }
+    },
+    {
+      "name": "M1-TC-05: GET Profile with Non-Existent NIC (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 Not Found\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"Response confirms user not found\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"message\");",
+              "    pm.expect(jsonData.message).to.eql(\"User not found.\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/member1/profile/000000000V",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "member1",
+            "profile",
+            "000000000V"
+          ]
+        },
+        "description": "TC-05: Negative profile retrieval test ensuring non-existent NIC queries yield HTTP 404."
+      }
+    },
+    {
+      "name": "M1-TC-06: PUT Update Prosumer Profile (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response confirms profile updated successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"message\");",
+              "    pm.expect(jsonData.message).to.eql(\"Profile updated successfully.\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Chaminda Vaas (Updated)\",\n  \"email\": \"{{m1ProsumerEmail}}\",\n  \"phoneNumber\": \"0779998877\",\n  \"address\": \"No. 45, Kandy Road, Malabe\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/member1/profile/{{m1ProsumerNic}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "member1",
+            "profile",
+            "{{m1ProsumerNic}}"
+          ]
+        },
+        "description": "TC-06: Updates prosumer profile contact details and address."
+      }
+    },
+    {
+      "name": "M1-TC-07: POST Submit Deactivation Request (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response confirms deactivation request submission\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"message\");",
+              "    pm.expect(jsonData.message).to.eql(\"Deactivation request submitted for review.\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reason\": \"Relocating abroad permanently\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/member1/profile/{{m1ProsumerNic}}/deactivation-request",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "member1",
+            "profile",
+            "{{m1ProsumerNic}}",
+            "deactivation-request"
+          ]
+        },
+        "description": "TC-07: Submits an official prosumer deactivation request with a designated justification."
+      }
+    },
+    {
+      "name": "M1-TC-08: POST Create Internal User (Grid Operator) (200 OK)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "var randomOp = Math.floor(1000000 + Math.random() * 9000000);",
+              "var operatorNic = \"88\" + randomOp + \"V\";",
+              "var operatorEmail = \"operator_\" + randomOp + \"@smartsolar.io\";",
+              "pm.collectionVariables.set(\"m1OperatorNic\", operatorNic);",
+              "pm.collectionVariables.set(\"m1OperatorEmail\", operatorEmail);",
+              "if (pm.environment) {",
+              "    pm.environment.set(\"m1OperatorNic\", operatorNic);",
+              "    pm.environment.set(\"m1OperatorEmail\", operatorEmail);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response confirms user created successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"message\");",
+              "    pm.expect(jsonData.message).to.eql(\"User created successfully.\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nic\": \"{{m1OperatorNic}}\",\n  \"full_name\": \"Ruwan Perera\",\n  \"email\": \"{{m1OperatorEmail}}\",\n  \"password\": \"Password123!\",\n  \"role\": \"grid_operator\",\n  \"badge_id\": \"OP-778\",\n  \"assigned_hub_id\": \"Hub-Colombo-01\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/member1/users",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "member1",
+            "users"
+          ]
+        },
+        "description": "TC-08: Creates an internal Grid Operator account with badge number and hub assignment."
+      }
+    },
+    {
+      "name": "M1-TC-09: GET All Internal Users (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"User list is an array and contains created grid operator\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an(\"array\");",
+              "    var targetNic = pm.collectionVariables.get(\"m1OperatorNic\") || (pm.environment ? pm.environment.get(\"m1OperatorNic\") : null);",
+              "    if (targetNic) {",
+              "        var foundUser = jsonData.find(u => u.nic === targetNic);",
+              "        pm.expect(foundUser).to.not.be.undefined;",
+              "        pm.expect(foundUser.role).to.eql(\"grid_operator\");",
+              "        pm.expect(foundUser.full_name).to.eql(\"Ruwan Perera\");",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/member1/users",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "member1",
+            "users"
+          ]
+        },
+        "description": "TC-09: Fetches all internal users (Backoffice & Grid Operators) and asserts the created operator is present."
+      }
+    },
+    {
+      "name": "M1-TC-10: DELETE Clean up Internal User (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response confirms user deleted successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"message\");",
+              "    pm.expect(jsonData.message).to.eql(\"User deleted successfully.\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/member1/users/{{m1OperatorNic}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "member1",
+            "users",
+            "{{m1OperatorNic}}"
+          ]
+        },
+        "description": "TC-10: Deletes the created test operator user to maintain test isolation and a clean database."
+      }
+    }
+  ]
+}

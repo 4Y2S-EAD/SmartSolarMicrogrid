@@ -1,0 +1,510 @@
+{
+  "info": {
+    "_postman_id": "c7a8b920-6d34-4b9e-91c2-member2-collection",
+    "name": "Smart Solar Microgrid - Member 2 API Collection",
+    "description": "10 End-to-End Automated Test Cases for SE4040 Member 2: Microgrid Node & Slot Management API (StationsController.cs). All test cases are designed to pass 100% reliably in sequential execution.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "member2StationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "member2SlotId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "M2-TC-01: GET All Microgrid Stations (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response body is an array of stations\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an(\"array\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/stations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stations"
+          ]
+        },
+        "description": "TC-01: Fetches all microgrid stations from the database. Asserts HTTP 200 OK and array response."
+      }
+    },
+    {
+      "name": "M2-TC-02: POST Create New Solar Station (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response returns creation success message and valid StationId\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"stationId\");",
+              "    pm.expect(jsonData.stationId).to.be.a(\"string\");",
+              "    pm.expect(jsonData.message).to.include(\"created successfully\");",
+              "    // Automatically save stationId for next test cases",
+              "    pm.collectionVariables.set(\"member2StationId\", jsonData.stationId);",
+              "    if (pm.environment) {",
+              "        pm.environment.set(\"member2StationId\", jsonData.stationId);",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"stationName\": \"Colombo Central Solar Hub - M2 Test\",\n  \"latitude\": 6.9271,\n  \"longitude\": 79.8612,\n  \"capacityKwh\": 120.0,\n  \"batterySlotCount\": 6,\n  \"status\": \"Active\",\n  \"schedule\": \"08:00 AM - 08:00 PM\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/stations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stations"
+          ]
+        },
+        "description": "TC-02: Creates a new solar microgrid station and dynamically stores the generated StationId for subsequent test cases."
+      }
+    },
+    {
+      "name": "M2-TC-03: GET Single Station by Valid ID (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Station fields match created station data\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    var expectedId = pm.collectionVariables.get(\"member2StationId\") || (pm.environment ? pm.environment.get(\"member2StationId\") : null);",
+              "    if (expectedId) {",
+              "        pm.expect(jsonData.stationId).to.eql(expectedId);",
+              "    }",
+              "    pm.expect(jsonData.stationName).to.eql(\"Colombo Central Solar Hub - M2 Test\");",
+              "    pm.expect(jsonData.capacityKwh).to.eql(120);",
+              "    pm.expect(jsonData.batterySlotCount).to.eql(6);",
+              "    pm.expect(jsonData.status).to.eql(\"Active\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/stations/{{member2StationId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stations",
+            "{{member2StationId}}"
+          ]
+        },
+        "description": "TC-03: Retrieves the created station by its dynamic ID and asserts all returned fields match the input values."
+      }
+    },
+    {
+      "name": "M2-TC-04: GET Station with Non-Existent ID (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 Not Found\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"Error response indicates station not found\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.message).to.eql(\"Station not found\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/stations/000000000000000000000000",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stations",
+            "000000000000000000000000"
+          ]
+        },
+        "description": "TC-04: Negative test case ensuring that querying a non-existent 24-hex ObjectId correctly returns HTTP 404 Not Found."
+      }
+    },
+    {
+      "name": "M2-TC-05: PUT Update Station Details (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response confirms station updated successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.message).to.eql(\"Station updated successfully\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"stationName\": \"Colombo Central Solar Hub (Upgraded)\",\n  \"capacityKwh\": 180.0,\n  \"schedule\": \"06:00 AM - 10:00 PM\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/stations/{{member2StationId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stations",
+            "{{member2StationId}}"
+          ]
+        },
+        "description": "TC-05: Partially updates station name, capacity, and schedule, verifying successful 200 OK response."
+      }
+    },
+    {
+      "name": "M2-TC-06: POST Create Battery Slot for Station (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response returns creation message and generated SlotId\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"slotId\");",
+              "    pm.expect(jsonData.slotId).to.be.a(\"string\");",
+              "    pm.expect(jsonData.message).to.eql(\"Battery slot created successfully\");",
+              "    // Automatically save slotId for subsequent test cases",
+              "    pm.collectionVariables.set(\"member2SlotId\", jsonData.slotId);",
+              "    if (pm.environment) {",
+              "        pm.environment.set(\"member2SlotId\", jsonData.slotId);",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"slotNumber\": 1,\n  \"bookingDate\": \"2026-11-20T00:00:00Z\",\n  \"startTime\": \"09:00 AM\",\n  \"endTime\": \"11:00 AM\",\n  \"capacityKwh\": 25.0,\n  \"status\": \"Available\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/stations/{{member2StationId}}/slots",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stations",
+            "{{member2StationId}}",
+            "slots"
+          ]
+        },
+        "description": "TC-06: Creates a new battery booking slot linked to the dynamic station and captures the generated SlotId."
+      }
+    },
+    {
+      "name": "M2-TC-07: GET All Slots for Station (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response contains array with newly created slot\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an(\"array\");",
+              "    pm.expect(jsonData.length).to.be.at.least(1);",
+              "    var targetSlotId = pm.collectionVariables.get(\"member2SlotId\") || (pm.environment ? pm.environment.get(\"member2SlotId\") : null);",
+              "    if (targetSlotId) {",
+              "        var foundSlot = jsonData.find(s => s.slotId === targetSlotId);",
+              "        pm.expect(foundSlot).to.not.be.undefined;",
+              "        pm.expect(foundSlot.slotNumber).to.eql(1);",
+              "        pm.expect(foundSlot.status).to.eql(\"Available\");",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/stations/{{member2StationId}}/slots",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stations",
+            "{{member2StationId}}",
+            "slots"
+          ]
+        },
+        "description": "TC-07: Fetches all battery slots for the created station and verifies the slot exists with matching slotNumber and status."
+      }
+    },
+    {
+      "name": "M2-TC-08: PUT Update Battery Slot Details (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response confirms slot updated successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.message).to.eql(\"Slot updated successfully\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"capacityKwh\": 30.0,\n  \"status\": \"Available\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/stations/slots/{{member2SlotId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stations",
+            "slots",
+            "{{member2SlotId}}"
+          ]
+        },
+        "description": "TC-08: Updates slot capacity and availability status, verifying successful update response."
+      }
+    },
+    {
+      "name": "M2-TC-09: DELETE Battery Slot (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response confirms slot deleted successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.message).to.eql(\"Battery slot deleted successfully\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/stations/slots/{{member2SlotId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stations",
+            "slots",
+            "{{member2SlotId}}"
+          ]
+        },
+        "description": "TC-09: Tests slot deletion business rule. Because the slot status is 'Available' (not Booked), deletion is permitted and succeeds."
+      }
+    },
+    {
+      "name": "M2-TC-10: DELETE Deactivate Station (200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response confirms station deactivated successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.message).to.eql(\"Station deactivated successfully\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/stations/{{member2StationId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stations",
+            "{{member2StationId}}"
+          ]
+        },
+        "description": "TC-10: Tests station deactivation business rule. Because this newly created station has zero active reservations, deactivation is permitted and marks the station Inactive."
+      }
+    }
+  ]
+}
