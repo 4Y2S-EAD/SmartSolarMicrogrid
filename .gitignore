@@ -49,3 +49,5 @@ web/**/yarn-debug.log
 # Logs and databases
 *.log
 *.sqlite
+tmp/
+output/

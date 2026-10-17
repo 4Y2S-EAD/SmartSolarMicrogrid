@@ -58,6 +58,18 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
         {
             // get all stations from database without any filter
             var stations = await _mongoDbService.SolarStations.Find(_ => true).ToListAsync();
+
+            // Synchronize real-time slot counts from EnergyBookingSlots collection
+            foreach (var station in stations)
+            {
+                var totalSlots = await _mongoDbService.EnergyBookingSlots.CountDocumentsAsync(s => s.StationId == station.StationId);
+                if (totalSlots > 0)
+                {
+                    station.BatterySlotCount = (int)totalSlots;
+                    var available = await _mongoDbService.EnergyBookingSlots.CountDocumentsAsync(s => s.StationId == station.StationId && (s.Status == "Available" || s.Status == null || s.Status == ""));
+                    station.AvailableSlotCount = (int)available;
+                }
+            }
             
             // return the list of stations
             return Ok(stations);
@@ -73,6 +85,14 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
             if (station == null)
             {
                 return NotFound(new { Message = "Station not found" });
+            }
+
+            var totalSlots = await _mongoDbService.EnergyBookingSlots.CountDocumentsAsync(s => s.StationId == station.StationId);
+            if (totalSlots > 0)
+            {
+                station.BatterySlotCount = (int)totalSlots;
+                var available = await _mongoDbService.EnergyBookingSlots.CountDocumentsAsync(s => s.StationId == station.StationId && (s.Status == "Available" || s.Status == null || s.Status == ""));
+                station.AvailableSlotCount = (int)available;
             }
             
             return Ok(station);
@@ -100,6 +120,7 @@ namespace SmartSolarMicrogrid.API.Controllers.member2
             
             if (dto.CapacityKwh != null) station.CapacityKwh = dto.CapacityKwh.Value;
             if (dto.BatterySlotCount != null) station.BatterySlotCount = dto.BatterySlotCount.Value;
+            if (dto.AvailableSlotCount != null) station.AvailableSlotCount = dto.AvailableSlotCount.Value;
             if (dto.Status != null) station.Status = dto.Status;
             if (dto.Schedule != null) station.Schedule = dto.Schedule;
             

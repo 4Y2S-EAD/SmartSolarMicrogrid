@@ -21,7 +21,7 @@ import {
   User,
   Radio
 } from 'lucide-react';
-import { fetchHubReservations, ApiService, type HubReservationPage, type Hub } from '@/lib/api';
+import { fetchHubReservations, ApiService, type HubReservationPage, type Hub, type BookingSlot } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import StatusBadge from '@/components/ui/StatusBadge';
 import './operator.css';
@@ -36,6 +36,7 @@ export default function OperatorDashboard({ onNavigate }: OperatorDashboardProps
   const { profile } = useAuth();
   const [data, setData] = useState<HubReservationPage | null>(null);
   const [hubs, setHubs] = useState<Hub[]>([]);
+  const [slots, setSlots] = useState<BookingSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [revision, setRevision] = useState(0);
@@ -50,10 +51,29 @@ export default function OperatorDashboard({ onNavigate }: OperatorDashboardProps
       fetchHubReservations('all', emptyFilters, 1, controller.signal),
       ApiService.getHubs().catch(() => [] as Hub[])
     ])
-      .then(([reservationData, hubList]) => {
-        if (!controller.signal.aborted) {
-          setData(reservationData);
-          setHubs(hubList || []);
+      .then(async ([reservationData, hubList]) => {
+        if (controller.signal.aborted) return;
+        setData(reservationData);
+        setHubs(hubList || []);
+
+        // Resolve station id to fetch exact real-time slots
+        const itemStationId = reservationData?.items?.find((i: any) => i.stationId)?.stationId;
+        const matched = (hubList || []).find(
+          (h) =>
+            (itemStationId && h.stationId === itemStationId) ||
+            (profile?.assigned_hub_id && h.stationId === profile.assigned_hub_id) ||
+            h.stationId === '66f000000000000000000001'
+        );
+        const resolvedStationId =
+          matched?.stationId || itemStationId || profile?.assigned_hub_id || '66f000000000000000000001';
+
+        try {
+          const slotList = await ApiService.getBookingSlots(resolvedStationId);
+          if (!controller.signal.aborted) {
+            setSlots(slotList || []);
+          }
+        } catch {
+          // Keep empty if slot endpoint fails
         }
       })
       .catch((err) => {
@@ -92,8 +112,11 @@ export default function OperatorDashboard({ onNavigate }: OperatorDashboardProps
     profile?.assigned_hub_id ||
     '66f000000000000000000001';
   const capacityKwh = matchedHub?.capacityKwh ?? 100;
-  const batterySlots = matchedHub?.batterySlotCount ?? 4;
-  const availableSlots = matchedHub?.availableSlotCount ?? 1;
+  // Calculate live slot counts from real-time EnergyBookingSlots collection
+  const batterySlots = slots.length > 0 ? slots.length : (matchedHub?.batterySlotCount ?? 5);
+  const availableSlots = slots.length > 0
+    ? slots.filter((s) => (s.status?.toLowerCase() === 'available' || !s.status) && !s.reservationId).length
+    : (matchedHub?.availableSlotCount ?? batterySlots);
   const schedule = matchedHub?.schedule || 'Standard 24/7';
   const location = matchedHub?.location || { latitude: 6.9147, longitude: 79.9729 };
 
@@ -435,6 +458,40 @@ export default function OperatorDashboard({ onNavigate }: OperatorDashboardProps
                 <span className="font-bold text-blue-700 font-mono">Online & Armed</span>
               </div>
             </div>
+
+            {/* Live Station Battery Slots Matrix */}
+            {slots.length > 0 && (
+              <div className="pt-3 border-t border-gray-100 space-y-2.5">
+                <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                  <span>Battery Slot Matrix</span>
+                  <span className="text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                    {availableSlots} / {batterySlots} Free
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {slots.map((s) => {
+                    const isAvailable = (s.status?.toLowerCase() === 'available' || !s.status) && !s.reservationId;
+                    return (
+                      <div
+                        key={s.slotId}
+                        className={`p-2 rounded-xl text-center border transition-all ${
+                          isAvailable
+                            ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900'
+                            : 'bg-amber-50/70 border-amber-200 text-amber-900'
+                        }`}
+                        title={`Slot ${s.slotNumber}: ${s.status} (${s.capacityKwh} kWh)`}
+                      >
+                        <div className="text-[10px] uppercase font-bold text-gray-500">Slot {s.slotNumber}</div>
+                        <div className="text-xs font-black font-mono mt-0.5">{s.capacityKwh}k</div>
+                        <div className="text-[9px] font-semibold mt-0.5 capitalize truncate">
+                          {isAvailable ? 'Free' : 'Booked'}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
