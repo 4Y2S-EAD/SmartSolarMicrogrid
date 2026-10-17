@@ -6,7 +6,7 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import EmptyState from '@/components/ui/EmptyState';
-import { Zap, Plus, Search, MapPin, Pencil, Trash2, AlertTriangle, Eye, Power } from 'lucide-react';
+import { Zap, Plus, Search, MapPin, Pencil, Trash2, AlertTriangle, Eye, Power, ExternalLink } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -311,25 +311,54 @@ export default function HubManagement() {
         open={!!viewHub}
         onClose={() => setViewHub(null)}
         title="Hub Details"
+        size="lg"
         footer={<Button variant="secondary" onClick={() => setViewHub(null)}>Close</Button>}
       >
         {viewHub && (
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
-                <Zap className="h-7 w-7" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+                  <Zap className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-gray-900">{viewHub.stationName}</div>
+                  <StatusBadge status={viewHub.status} />
+                </div>
               </div>
-              <div>
-                <div className="text-lg font-semibold text-gray-900">{viewHub.stationName}</div>
-                <StatusBadge status={viewHub.status} />
-              </div>
+
+              {viewHub.location && (
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${viewHub.location.latitude},${viewHub.location.longitude}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 transition"
+                >
+                  <span>Google Maps</span>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
             </div>
-            <div className="grid grid-cols-2 gap-4 rounded-xl bg-gray-50 p-4">
-              <div><div className="text-xs text-gray-400">Capacity</div><div className="mt-0.5 text-sm text-gray-900">{viewHub.capacityKwh} kW</div></div>
-              <div><div className="text-xs text-gray-400">Battery Slots</div><div className="mt-0.5 text-sm text-gray-900">{viewHub.batterySlotCount}</div></div>
-              <div><div className="text-xs text-gray-400">Latitude</div><div className="mt-0.5 text-sm text-gray-900">{viewHub.location?.latitude}</div></div>
-              <div><div className="text-xs text-gray-400">Longitude</div><div className="mt-0.5 text-sm text-gray-900">{viewHub.location?.longitude}</div></div>
-              <div><div className="text-xs text-gray-400">Created</div><div className="mt-0.5 text-sm text-gray-900">{new Date(viewHub.createdAt).toLocaleDateString()}</div></div>
+
+            {/* Embedded Interactive Google Map */}
+            {viewHub.location && (
+              <div className="h-64 w-full rounded-xl overflow-hidden border border-gray-200 shadow-inner">
+                <iframe
+                  title={`Google Map - ${viewHub.stationName}`}
+                  width="100%"
+                  height="100%"
+                  loading="lazy"
+                  className="border-0 w-full h-full"
+                  src={`https://maps.google.com/maps?q=${viewHub.location.latitude},${viewHub.location.longitude}&hl=en&z=15&output=embed`}
+                />
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl bg-gray-50 p-4 text-xs">
+              <div><div className="text-gray-400 font-medium">Capacity</div><div className="mt-0.5 text-sm font-bold text-gray-900">{viewHub.capacityKwh} kW</div></div>
+              <div><div className="text-gray-400 font-medium">Battery Slots</div><div className="mt-0.5 text-sm font-bold text-gray-900">{viewHub.batterySlotCount}</div></div>
+              <div><div className="text-gray-400 font-medium">Coordinates</div><div className="mt-0.5 text-xs font-mono font-semibold text-gray-900">{viewHub.location?.latitude?.toFixed(4)}, {viewHub.location?.longitude?.toFixed(4)}</div></div>
+              <div><div className="text-gray-400 font-medium">Operating Hours</div><div className="mt-0.5 text-xs font-semibold text-gray-900">{viewHub.schedule || 'Standard 24/7'}</div></div>
             </div>
           </div>
         )}

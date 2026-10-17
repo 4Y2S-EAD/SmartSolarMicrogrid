@@ -2,10 +2,15 @@ import { useEffect, useState } from 'react';
 import { ApiService } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import type { Hub, Prosumer, Reservation } from '@/lib/api';
-import { Zap, Users, Gauge, CheckCircle2, TrendingUp, MapPin, Clock, QrCode, ScanLine } from 'lucide-react';
+import { Zap, Users, Gauge, CheckCircle2, TrendingUp, MapPin, Clock, QrCode, ScanLine, ExternalLink } from 'lucide-react';
 import StatusBadge from '@/components/ui/StatusBadge';
+import StationGoogleMap from '@/components/StationGoogleMap';
 
-export default function Dashboard() {
+type DashboardProps = {
+  onNavigate?: (view: string) => void;
+};
+
+export default function Dashboard({ onNavigate }: DashboardProps) {
   const { role, profile } = useAuth();
   const [stats, setStats] = useState({
     hubs: 0,
@@ -17,6 +22,7 @@ export default function Dashboard() {
     confirmedReservations: 0,
     completedReservations: 0,
   });
+  const [hubs, setHubs] = useState<Hub[]>([]);
   const [recentReservations, setRecentReservations] = useState<Reservation[]>([]);
   const [recentQrTx, setRecentQrTx] = useState<{ id: string; status: string; scanned_at: string; token: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,22 +41,23 @@ export default function Dashboard() {
         return;
       }
 
-      const [hubs, prosumers, reservations] = await Promise.all([
+      const [hubsRes, prosumers, reservations] = await Promise.all([
         ApiService.getHubs(),
         ApiService.getProsumers(),
         Promise.resolve({data: [], error: null}),
       ]);
 
-      const h = hubs ?? [];
+      const h = hubsRes ?? [];
       const p = prosumers ?? [];
       const r = (reservations as any).data ?? [];
 
+      setHubs(h);
       setStats({
         hubs: h.length,
-        activeHubs: h.filter((x) => x.status === 'active').length,
+        activeHubs: h.filter((x) => (x.status || '').toLowerCase() === 'active').length,
         prosumers: p.length,
-        activeProsumers: p.filter((x) => x.status === 'active').length,
-        pendingProsumers: p.filter((x) => x.status === 'pending').length,
+        activeProsumers: p.filter((x) => (x.status || '').toLowerCase() === 'active').length,
+        pendingProsumers: p.filter((x) => (x.status || '').toLowerCase() === 'pending').length,
         reservations: r.length,
         confirmedReservations: r.filter((x: any) => x.status === 'confirmed').length,
         completedReservations: r.filter((x: any) => x.status === 'completed').length,
@@ -237,19 +244,31 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <h2 className="text-base font-semibold text-gray-900">Hub Locations</h2>
-            <div className="mt-4 space-y-2">
-              {recentReservations[0]?.hub && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <MapPin className="h-4 w-4 text-gray-400" />
-                  {recentReservations[0].hub.stationName}
-                </div>
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-emerald-600" />
+                <h2 className="text-base font-semibold text-gray-900">Hub Locations</h2>
+              </div>
+              {onNavigate && (
+                <button
+                  onClick={() => onNavigate('station-map')}
+                  className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  Full Map <ExternalLink className="h-3 w-3" />
+                </button>
               )}
-              <p className="text-xs text-gray-400">
-                Map integration available on the Android application with Google Maps.
-              </p>
             </div>
+
+            {hubs.length > 0 ? (
+              <StationGoogleMap
+                stations={hubs}
+                height="290px"
+                showSidebarList={false}
+              />
+            ) : (
+              <p className="text-xs text-gray-400 py-6 text-center">Loading station maps...</p>
+            )}
           </div>
         </div>
       </div>
