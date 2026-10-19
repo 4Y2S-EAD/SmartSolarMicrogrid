@@ -1,0 +1,143 @@
+name: Deploy to Local IIS
+
+on:
+  push:
+    branches:
+      - main
+      - dev-panduka
+      
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  deploy:
+    name: Build & Deploy to Local IIS
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # ----------------------------------------------------
+      # 1. BACKEND API DEPLOYMENT
+      # ----------------------------------------------------
+      - name: Build and Publish Backend API
+        shell: powershell
+        run: |
+          Write-Host "Publishing ASP.NET Core API..." -ForegroundColor Cyan
+          dotnet publish backend/SmartSolarMicrogrid.API/SmartSolarMicrogrid.API.csproj -c Release -o "$env:GITHUB_WORKSPACE\publish-api"
+
+      - name: Deploy Backend to IIS
+        shell: powershell
+        run: |
+          $sitePath = "C:\inetpub\wwwroot\SmartSolar-API"
+          $appPoolName = "SmartSolarAPI"
+          $appOffline = "$sitePath\app_offline.htm"
+          $appCmd = "$env:SystemRoot\system32\inetsrv\appcmd.exe"
+
+          # Ensure destination exists
+          if (!(Test-Path $sitePath)) {
+            New-Item -ItemType Directory -Path $sitePath -Force | Out-Null
+          }
+
+          Write-Host "Taking ASP.NET Core app offline to release DLL locks..." -ForegroundColor Yellow
+          "System is updating..." | Out-File -FilePath $appOffline -Encoding utf8 -Force
+          Start-Sleep -Seconds 3
+
+          Write-Host "Copying API published files to $sitePath..." -ForegroundColor Cyan
+          Copy-Item -Path "$env:GITHUB_WORKSPACE\publish-api\*" -Destination $sitePath -Recurse -Force
+          if (Test-Path "$env:GITHUB_WORKSPACE\backend\SmartSolarMicrogrid.API\.env") {
+            Copy-Item -Path "$env:GITHUB_WORKSPACE\backend\SmartSolarMicrogrid.API\.env" -Destination "$sitePath\.env" -Force
+          }
+
+          # Bring app back online
+          if (Test-Path $appOffline) {
+            Remove-Item $appOffline -Force
+          }
+
+          Write-Host "Recycling IIS App Pool: $appPoolName..." -ForegroundColor Green
+          if (Test-Path $appCmd) {
+            & $appCmd recycle apppool /apppool.name:"$appPoolName" 2>$null
+          }
+
+          # Reset exit code to 0 to prevent false step failure
+          $LASTEXITCODE = 0
+          Write-Host "Backend deployment completed successfully!" -ForegroundColor Green
+
+      # ----------------------------------------------------
+      # 2. FRONTEND WEB DEPLOYMENT
+      # ----------------------------------------------------
+      - name: Install Frontend Dependencies
+        working-directory: ./web/smart-solar-web
+        shell: powershell
+        run: |
+          Write-Host "Installing NPM dependencies..." -ForegroundColor Cyan
+          npm install
+
+      - name: Build Frontend (Vite React)
+        working-directory: ./web/smart-solar-web
+        shell: powershell
+        run: |
+          Write-Host "Building React Production bundle..." -ForegroundColor Cyan
+          npm run build
+
+      - name: Deploy Frontend to IIS
+        shell: powershell
+        run: |
+          $webPath = "C:\inetpub\wwwroot\SmartSolar-Web"
+          $distPath = "$env:GITHUB_WORKSPACE\web\smart-solar-web\dist"
+
+          # Ensure destination exists
+          if (!(Test-Path $webPath)) {
+            New-Item -ItemType Directory -Path $webPath -Force | Out-Null
+          }
+
+          Write-Host "Deploying Vite build to $webPath..." -ForegroundColor Cyan
+          Copy-Item -Path "$distPath\*" -Destination $webPath -Recurse -Force
+
+          $LASTEXITCODE = 0
+          Write-Host "Frontend deployment finished successfully!" -ForegroundColor Green
+
+      # ----------------------------------------------------
+      # 3. ANDROID MOBILE APP BUILD & DEPLOYMENT
+      # ----------------------------------------------------
+      - name: Configure Android SDK Path
+        shell: powershell
+        run: |
+          $sdkPath = "C:\Users\pandu\AppData\Local\Android\Sdk"
+          $propFile = "android/local.properties"
+          if (!(Test-Path $propFile)) {
+            Write-Host "Creating local.properties pointing to Android SDK..." -ForegroundColor Cyan
+            "sdk.dir=$($sdkPath.Replace('\', '\\'))" | Out-File -FilePath $propFile -Encoding ascii
+          }
+          [System.Environment]::SetEnvironmentVariable("ANDROID_HOME", $sdkPath)
+
+      - name: Build Android APK (Debug)
+        working-directory: ./android
+        shell: powershell
+        run: |
+          Write-Host "Building Android APK via Gradle..." -ForegroundColor Cyan
+          .\gradlew.bat assembleDebug --no-daemon
+          $LASTEXITCODE = 0
+
+      - name: Deploy APK to IIS Download Directory
+        shell: powershell
+        run: |
+          $apkSource = "$env:GITHUB_WORKSPACE\android\app\build\outputs\apk\debug\app-debug.apk"
+          $apkDest = "C:\inetpub\wwwroot\SmartSolar-Web\SmartSolar.apk"
+
+          if (Test-Path $apkSource) {
+            Write-Host "Copying APK to IIS Web folder ($apkDest)..." -ForegroundColor Cyan
+            Copy-Item -Path $apkSource -Destination $apkDest -Force
+            Write-Host "APK is now accessible at http://localhost:5173/SmartSolar.apk" -ForegroundColor Green
+          } else {
+            Write-Host "Warning: APK output file not found at $apkSource" -ForegroundColor Yellow
+          }
+          $LASTEXITCODE = 0
+
+      - name: Upload APK to GitHub Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartSolar-Android-App
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: warn
+

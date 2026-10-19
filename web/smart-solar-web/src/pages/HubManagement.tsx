@@ -6,7 +6,7 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import EmptyState from '@/components/ui/EmptyState';
-import { Zap, Plus, Search, MapPin, Pencil, Trash2, AlertTriangle, Eye, Power } from 'lucide-react';
+import { Zap, Plus, Search, MapPin, Pencil, Trash2, AlertTriangle, Eye, Power, ExternalLink } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -39,9 +39,11 @@ export default function HubManagement() {
   const [editHub, setEditHub] = useState<Hub | null>(null);
   const [viewHub, setViewHub] = useState<Hub | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Hub | null>(null);
+  const [confirmStatusChange, setConfirmStatusChange] = useState<Hub | null>(null);
   const [form, setForm] = useState<HubForm>(emptyForm);
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('All');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -70,9 +72,11 @@ export default function HubManagement() {
   useEffect(() => { load(); }, [load]);
 
   //3 removed filtered and openEdit functions 9/22
-  const filtered = hubs.filter(
-    (h) => h.stationName?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = hubs.filter((h) => {
+    const matchesSearch = h.stationName?.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || (h.status || 'Active').toLowerCase() === statusFilter.toLowerCase();
+    return matchesSearch && matchesStatus;
+  });
 
   const hasActiveReservations = (hubId: string) =>
     reservations.some((r) => r.hub_id === hubId && r.status !== 'cancelled' && r.status !== 'completed');
@@ -133,19 +137,24 @@ export default function HubManagement() {
   };
 
   // 2 Deactivate (toggleStatus and handleDelete) Functions changed 22/9
-  const toggleStatus = async (h: Hub) => {
+  const toggleStatus = (h: Hub) => {
     if (h.status === 'Active' && hasActiveReservations(h.stationId)) {
       setConfirmDelete(h);
       return;
     }
+    setConfirmStatusChange(h);
+  };
 
+  const handleConfirmStatusChange = async () => {
+    if (!confirmStatusChange) return;
     try {
-      if (h.status === 'Active') {
-        await ApiService.deactivateHub(h.stationId);
+      if (confirmStatusChange.status === 'Active') {
+        await ApiService.deactivateHub(confirmStatusChange.stationId);
       } else {
-        await ApiService.updateHub(h.stationId, { status: 'Active' });
+        await ApiService.updateHub(confirmStatusChange.stationId, { status: 'Active' });
       }
     } catch (e) { }
+    setConfirmStatusChange(null);
     load();
   };
 
@@ -162,14 +171,25 @@ export default function HubManagement() {
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <input
-            placeholder="Search hubs..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border-0 py-2.5 pl-10 pr-3.5 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-500"
-          />
+        <div className="flex flex-1 items-center gap-4">
+          <div className="relative w-full max-w-sm">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              placeholder="Search hubs..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-lg border-0 py-2.5 pl-10 pr-3.5 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-amber-500"
+            />
+          </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="rounded-lg border-0 py-2.5 pl-3 pr-8 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-amber-500"
+          >
+            <option value="All">All Statuses</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Deactivated</option>
+          </select>
         </div>
         <Button onClick={openAdd}>
           <Plus className="h-4 w-4" />
@@ -291,25 +311,54 @@ export default function HubManagement() {
         open={!!viewHub}
         onClose={() => setViewHub(null)}
         title="Hub Details"
+        size="lg"
         footer={<Button variant="secondary" onClick={() => setViewHub(null)}>Close</Button>}
       >
         {viewHub && (
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
-                <Zap className="h-7 w-7" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+                  <Zap className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-gray-900">{viewHub.stationName}</div>
+                  <StatusBadge status={viewHub.status} />
+                </div>
               </div>
-              <div>
-                <div className="text-lg font-semibold text-gray-900">{viewHub.stationName}</div>
-                <StatusBadge status={viewHub.status} />
-              </div>
+
+              {viewHub.location && (
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${viewHub.location.latitude},${viewHub.location.longitude}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 transition"
+                >
+                  <span>Google Maps</span>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
             </div>
-            <div className="grid grid-cols-2 gap-4 rounded-xl bg-gray-50 p-4">
-              <div><div className="text-xs text-gray-400">Capacity</div><div className="mt-0.5 text-sm text-gray-900">{viewHub.capacityKwh} kW</div></div>
-              <div><div className="text-xs text-gray-400">Battery Slots</div><div className="mt-0.5 text-sm text-gray-900">{viewHub.batterySlotCount}</div></div>
-              <div><div className="text-xs text-gray-400">Latitude</div><div className="mt-0.5 text-sm text-gray-900">{viewHub.location?.latitude}</div></div>
-              <div><div className="text-xs text-gray-400">Longitude</div><div className="mt-0.5 text-sm text-gray-900">{viewHub.location?.longitude}</div></div>
-              <div><div className="text-xs text-gray-400">Created</div><div className="mt-0.5 text-sm text-gray-900">{new Date(viewHub.createdAt).toLocaleDateString()}</div></div>
+
+            {/* Embedded Interactive Google Map */}
+            {viewHub.location && (
+              <div className="h-64 w-full rounded-xl overflow-hidden border border-gray-200 shadow-inner">
+                <iframe
+                  title={`Google Map - ${viewHub.stationName}`}
+                  width="100%"
+                  height="100%"
+                  loading="lazy"
+                  className="border-0 w-full h-full"
+                  src={`https://maps.google.com/maps?q=${viewHub.location.latitude},${viewHub.location.longitude}&hl=en&z=15&output=embed`}
+                />
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl bg-gray-50 p-4 text-xs">
+              <div><div className="text-gray-400 font-medium">Capacity</div><div className="mt-0.5 text-sm font-bold text-gray-900">{viewHub.capacityKwh} kW</div></div>
+              <div><div className="text-gray-400 font-medium">Battery Slots</div><div className="mt-0.5 text-sm font-bold text-gray-900">{viewHub.batterySlotCount}</div></div>
+              <div><div className="text-gray-400 font-medium">Coordinates</div><div className="mt-0.5 text-xs font-mono font-semibold text-gray-900">{viewHub.location?.latitude?.toFixed(4)}, {viewHub.location?.longitude?.toFixed(4)}</div></div>
+              <div><div className="text-gray-400 font-medium">Operating Hours</div><div className="mt-0.5 text-xs font-semibold text-gray-900">{viewHub.schedule || 'Standard 24/7'}</div></div>
             </div>
           </div>
         )}
@@ -330,6 +379,35 @@ export default function HubManagement() {
           <p className="text-sm text-gray-600">
             Hub <strong>{confirmDelete?.stationName}</strong> has active reservations.
             Deactivation is blocked until all pending or confirmed reservations are cancelled or completed.
+          </p>
+        </div>
+      </Modal>
+
+      {/* Confirm Status Change Modal */}
+      <Modal
+        open={!!confirmStatusChange}
+        onClose={() => setConfirmStatusChange(null)}
+        title={confirmStatusChange?.status === 'Active' ? 'Deactivate Hub' : 'Activate Hub'}
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setConfirmStatusChange(null)}>Cancel</Button>
+            <Button 
+              variant={confirmStatusChange?.status === 'Active' ? 'danger' : 'primary'} 
+              onClick={handleConfirmStatusChange}
+            >
+              Yes, {confirmStatusChange?.status === 'Active' ? 'Deactivate' : 'Activate'}
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center text-center">
+          <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ${confirmStatusChange?.status === 'Active' ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'}`}>
+            <AlertTriangle className="h-7 w-7" />
+          </div>
+          <p className="text-sm text-gray-600">
+            Are you sure you want to {confirmStatusChange?.status === 'Active' ? 'deactivate' : 'activate'} <strong>{confirmStatusChange?.stationName}</strong>? 
+            {confirmStatusChange?.status === 'Active' && ' This will prevent any new reservations.'}
           </p>
         </div>
       </Modal>

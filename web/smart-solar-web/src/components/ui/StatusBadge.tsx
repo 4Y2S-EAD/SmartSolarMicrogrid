@@ -26,13 +26,12 @@ const statusConfig: Record<string, { label: string; classes: string; dot: string
 export default function StatusBadge({ status }: StatusBadgeProps) {
   const config = statusConfig[status] ?? {
     label: status,
-    classes: 'bg-gray-100 text-gray-600 ring-gray-500/20',
-    dot: 'bg-gray-400',
+    classes: 'text-gray-600',
   };
 
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${config.classes}`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
+
       {config.label}
     </span>
   );

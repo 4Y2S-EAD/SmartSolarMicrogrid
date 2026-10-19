@@ -3,52 +3,42 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardTimeSlot"
-    android:layout_width="match_parent"
+    android:layout_width="110dp"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginEnd="12dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="#F9FAFB">
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="#E5E7EB"
+    app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:gravity="center">
 
-        <ImageView
-            android:id="@+id/ivSlotIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_recent_history"
-            app:tint="#059669"/>
-
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/tvTimeRange"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="12dp">
-            
-            <TextView
-                android:id="@+id/tvTimeRange"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="#000"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
+            android:text="06:00 AM\n- 08:00 AM"
+            android:textAlignment="center"
+            android:textColor="#111827"
+            android:textSize="12sp"
+            android:textStyle="bold"/>
 
-            <TextView
-                android:id="@+id/tvSlotStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="#065F46"
-                android:textSize="12sp"
-                android:layout_marginTop="2dp"/>
-        </LinearLayout>
-
+        <TextView
+            android:id="@+id/tvSlotStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Available"
+            android:textColor="#059669"
+            android:textSize="12sp"
+            android:layout_marginTop="8dp"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

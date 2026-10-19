@@ -116,6 +116,9 @@ class StationMapFragment : Fragment(R.layout.m4_fragment_station_map) {
             search.setText("")
             submitSearch()
         }
+        view.findViewById<View>(R.id.m4ViewAllStations)?.setOnClickListener {
+            startActivity(android.content.Intent(requireContext(), com.smartsolar.microgrid.member2.activities.M2ViewAllStationsActivity::class.java))
+        }
         search.setOnEditorActionListener { _, action, _ ->
             if (action == EditorInfo.IME_ACTION_SEARCH) { submitSearch(); true } else false
         }

@@ -18,6 +18,9 @@ namespace SmartSolarMicrogrid.API.DTOs.member2
         
         // slot count can change
         public int? BatterySlotCount { get; set; }
+
+        // available slot count
+        public int? AvailableSlotCount { get; set; }
         
         // active or inactive status
         public string? Status { get; set; }

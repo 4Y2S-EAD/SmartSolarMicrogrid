@@ -1,17 +1,18 @@
 function resolveApiBaseUrl(): string {
+  // If running in browser and accessed via LAN IP or external hostname (e.g. mobile phone, another laptop)
   if (typeof window !== 'undefined' && window.location) {
     const hostname = window.location.hostname;
-    // When accessing via localhost or loopback, route directly to localhost API port 5174
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return `${window.location.protocol}//localhost:5174/api`;
-    }
-    // When accessing via a LAN IP (e.g. 192.168.x.x, 10.x.x.x), dynamically use that IP on port 5174
-    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname)) {
+    if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
       return `${window.location.protocol}//${hostname}:5174/api`;
     }
   }
 
-  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:5174/api';
+  // Use explicit environment variable if set
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
+  return 'http://localhost:5174/api';
 }
 
 export const API_BASE_URL = resolveApiBaseUrl();

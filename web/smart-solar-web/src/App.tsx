@@ -5,6 +5,7 @@ import OperatorDashboard from '@/member4/operator/OperatorDashboard';
 import OperatorReservations from '@/member4/operator/OperatorReservations';
 import ProsumerManagement from '@/pages/ProsumerManagement';
 import HubManagement from '@/pages/HubManagement';
+import StationMap from '@/pages/StationMap';
 import ScheduleManagement from '@/pages/ScheduleManagement';
 import ReservationManagement from '@/pages/ReservationManagement';
 import QrFlow from '@/pages/QrFlow';
@@ -98,9 +99,10 @@ function App() {
 
   // Role-based page access
   const backofficePages: Record<string, React.ReactNode> = {
-    dashboard: <Dashboard />,
+    dashboard: <Dashboard onNavigate={setView} />,
     prosumers: <ProsumerManagement />,
     hubs: <HubManagement />,
+    'station-map': <StationMap />,
     schedule: <ScheduleManagement />,
     reservations: <ReservationManagement />,
     'qr-flow': <QrFlow />,
@@ -109,7 +111,7 @@ function App() {
   };
 
   const operatorPages: Record<string, React.ReactNode> = {
-    dashboard: <OperatorDashboard />,
+    dashboard: <OperatorDashboard onNavigate={setView} />,
     reservations: <OperatorReservations />,
     'qr-flow': <QrFlow />,
   };

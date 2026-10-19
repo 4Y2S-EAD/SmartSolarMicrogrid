@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import {
-  LayoutDashboard, Users, Zap, CalendarDays, QrCode, Radio, LogOut, Menu, X, Gauge, UserCog, Shield, ScanLine,
+  LayoutDashboard, Users, Zap, CalendarDays, QrCode, Radio, LogOut, Menu, X, Gauge, UserCog, Shield, ScanLine, MapPin
 } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
 import type { UserRole } from '@/context/AuthContext';
@@ -17,6 +17,7 @@ const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['backoffice', 'grid_operator'] },
   { id: 'prosumers', label: 'Prosumer Management', icon: Users, roles: ['backoffice'] },
   { id: 'hubs', label: 'Hub Management', icon: Zap, roles: ['backoffice'] },
+  { id: 'station-map', label: 'Station Map', icon: MapPin, roles: ['backoffice'] },
   { id: 'schedule', label: 'Schedule & Slots', icon: CalendarDays, roles: ['backoffice'] },
   { id: 'reservations', label: 'Reservations', icon: Gauge, roles: ['backoffice', 'grid_operator'] },
   { id: 'qr-flow', label: 'QR Transaction Flow', icon: QrCode, roles: ['backoffice', 'grid_operator'] },
